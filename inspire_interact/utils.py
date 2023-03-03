@@ -4,6 +4,7 @@ import os
 
 import yaml
 
+#TODO: break up into small functions, readability issues
 def prepare_inspire(config_dict, project_home, fragger_path, fragger_memory):
     """ Function to prepare the inSPIRE run.
     """
@@ -70,10 +71,10 @@ def prepare_inspire(config_dict, project_home, fragger_path, fragger_memory):
     elif not inspire_settings['select']:
         output_config['proteome'] = f'{project_home}/proteome/proteome.fasta'
 
-    if os.path.exists(f'{project_home}/proteome/pathogenProteome.fasta'):
+    if os.path.exists(f'{project_home}/proteomeSelect/pathogenProteome.fasta'):
         output_config['pathogenProteome'] = f'{project_home}/proteome/pathogenProteome.fasta'
         output_config['hostProteome'] = f'{project_home}/proteome/hostProteome.fasta'
-        # TODO control flags.
+        output_config['controlFlags'] = [elem.strip() for elem in  config_dict["controlFlags"].split(",")]
     elif os.path.exists(f'{project_home}/proteomeSelect_file_list.txt'):
         with open(
             f'{project_home}/proteome_file_list.txt', mode='r', encoding='UTF-8'
