@@ -4,7 +4,7 @@ setup(
     name='inspire-interact',
     version=1.0,
     description='Interactive GUI for inSPIRE Platform.',
-    author='John Cormican, Juliane Liepe',
+    author='John Cormican, Juliane Liepe, Manuel S. Pereira',
     author_email='juliane.liepe@mpinat.mpg.de',
     packages=[
         'inspire_interact',

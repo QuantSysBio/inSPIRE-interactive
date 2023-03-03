@@ -1,7 +1,7 @@
 ---
 serverAddress: fileserver
-fraggerPath: /home/john.cormican/Downloads/fragpipe/tools/MSFragger-3.7/MSFragger-3.7.jar
-netMHCpan: tcsh /home/john.cormican/netMHCpan-4.1/netMHCpan
+#fraggerPath: /home/john.cormican/Downloads/fragpipe/tools/MSFragger-3.7/MSFragger-3.7.jar
+#netMHCpan: tcsh /home/john.cormican/netMHCpan-4.1/netMHCpan
 #TODO fix netMHCpan issue "Unrecognized key"
-fraggerMemory: 14
-maxInspireCpus: 8
+#fraggerMemory: 14
+#maxInspireCpus: 8
