@@ -318,7 +318,11 @@ function addConfigs() {
 async function executePipeline(serverAddress) {
     let user = document.getElementById('userSelection').value;
     let project = document.getElementById('projectSelection').value;
-    let searchEngine = document.getElementById('searchEngineSelection').value; // TODO handle msfragger
+    var searchEngine = 'msfragger'
+    let useMsFragger = document.getElementById('searchRequired').value;
+    if (useMsFragger !== 'msFragger'){
+        searchEngine = document.getElementById('searchEngineSelection').value; // TODO handle msfragger
+    }
     var ms1Accuracy = document.getElementById('ms1AccuracyInput').value;
     var mzAccuracy = document.getElementById('ms2AccuracyInput').value;
     var mzUnits = document.getElementById('ms2UnitSelection').value;
@@ -331,6 +335,12 @@ async function executePipeline(serverAddress) {
         'mzAccuracy': mzAccuracy,
         'mzUnits': mzUnits,
     };
+
+    if (useMsFragger === 'msFragger'){
+        configObject['runFragger'] = 1;
+    } else {
+        configObject['runFragger'] = 0;
+    }
 
     var response = await postJson(serverAddress, 'inspire', configObject);
 

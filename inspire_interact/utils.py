@@ -4,7 +4,7 @@ import os
 
 import yaml
 
-def prepare_inspire(config_dict, project_home):
+def prepare_inspire(config_dict, project_home, fragger_path, fragger_memory):
     """ Function to prepare the inSPIRE run.
     """
     inspire_settings = {
@@ -13,23 +13,8 @@ def prepare_inspire(config_dict, project_home):
         'select': False,
     }
 
-    if os.path.exists(f'{project_home}/search_file_list.txt'):
-        search_results = ''
-        with open(
-            f'{project_home}/search_file_list.txt', mode='r', encoding='UTF-8'
-        ) as list_file:
-            file_list = list_file.readlines()
-            search_results = [x.split()[-1].split('\n')[0] for x in file_list]
-    else:
-        search_results = [
-            f'{project_home}/search/{filename}' for filename in os.listdir(
-                f'{project_home}/search/'
-            )
-        ]
-
     output_config = {
         'experimentTitle': config_dict['project'],
-        'searchResults': search_results,
         'searchEngine': config_dict['searchEngine'],
         'scansFormat': 'mgf',
         'outputFolder': f'{project_home}/inspireOutput',
@@ -38,10 +23,26 @@ def prepare_inspire(config_dict, project_home):
         'rescoreMethod': 'percolator',
         'silentExecution': True,
         'reuseInput': True,
+        'fraggerPath': fragger_path,
+        'fraggerMemory': fragger_memory,
     }
 
+    if os.path.exists(f'{project_home}/search_file_list.txt'):
+        with open(
+            f'{project_home}/search_file_list.txt', mode='r', encoding='UTF-8'
+        ) as list_file:
+            file_list = list_file.readlines()
+            output_config['searchResults'] = [x.split()[-1].split('\n')[0] for x in file_list]
+    elif config_dict['runFragger'] == 1:
+        inspire_settings['fragger'] = True
+    else:
+        output_config['searchResults'] = [
+            f'{project_home}/search/{filename}' for filename in os.listdir(
+                f'{project_home}/search/'
+            )
+        ]
+
     if os.path.exists(f'{project_home}/ms_file_list.txt'):
-        search_results = ''
         with open(
             f'{project_home}/ms_file_list.txt', mode='r', encoding='UTF-8'
         ) as list_file:
@@ -61,13 +62,12 @@ def prepare_inspire(config_dict, project_home):
         output_config['rescoreMethod'] = 'percolatorSeparate'
 
     if os.path.exists(f'{project_home}/proteome_file_list.txt'):
-        search_results = ''
         with open(
             f'{project_home}/proteome_file_list.txt', mode='r', encoding='UTF-8'
         ) as list_file:
             file_list = list_file.readlines()
             output_config['proteome'] = [x.split()[-1].split('\n')[0] for x in file_list][0]
-    elif 'proteome' in output_config:
+    elif not inspire_settings['select']:
         output_config['proteome'] = f'{project_home}/proteome/proteome.fasta'
 
     if os.path.exists(f'{project_home}/proteome/pathogenProteome.fasta'):

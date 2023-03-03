@@ -9,7 +9,7 @@ setup(
     packages=[
         'inspire_interact',
     ],
-    long_description=open('README.md').read(),
+    long_description=open('README.md', mode='r', encoding='UTF-8').read(),
     long_description_content_type='text/markdown',
     py_modules=[
         'inspire_interact',

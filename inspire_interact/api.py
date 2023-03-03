@@ -8,15 +8,17 @@ import flask
 from flask import request, Response, render_template, send_from_directory
 from flask.json import jsonify
 from flask_cors import cross_origin
+import yaml
 
-from inspire_interact.config import Config
 from inspire_interact.constants import (
+    ALL_CONFIG_KEYS,
     FILESERVER_NAME_KEY,
+    FRAGGER_MEMORY_KEY,
+    FRAGGER_PATH_KEY,
     INTERACT_HOME_KEY,
     INTERMEDIATE_FILES,
     MODE_KEY,
     SERVER_ADDRESS_KEY,
-    THERMO_PARSER_KEY,
 )
 from inspire_interact.utils import check_pids, prepare_inspire
 
@@ -76,7 +78,7 @@ def upload_file(user, project, file_type):
         os.mkdir(f'projects/{user}/{project}/{file_type}')
 
     uploaded_files = request.files.getlist("files")
-    print(uploaded_files)
+
     if file_type == 'proteome':
         uploaded_files[0].save(
             f'{upload_home}/proteome.fasta'
@@ -174,9 +176,11 @@ def run_inspire_core():
         project_title = config_dict['project']
         server_address = app.config[SERVER_ADDRESS_KEY]
         home_key= app.config[INTERACT_HOME_KEY]
+        fragger_path = app.config[FRAGGER_PATH_KEY]
+        fragger_memory = app.config[FRAGGER_MEMORY_KEY]
         project_home = f'{home_key}/projects/{user}/{project_title}'
 
-        inspire_settings = prepare_inspire(config_dict, project_home)
+        inspire_settings = prepare_inspire(config_dict, project_home, fragger_path, fragger_memory)
 
         with open(
             f'projects/{user}/{project_title}/inspire_script.sh',
@@ -190,6 +194,12 @@ def run_inspire_core():
                 bash_file.write(
                     f'inspire --pipeline convert --config_file {project_home}/config.yml\n'
                 )
+
+            if inspire_settings['fragger']:
+                bash_file.write(
+                    f'inspire --pipeline fragger --config_file {project_home}/config.yml\n'
+                )
+
             bash_file.write(
                 f'inspire --pipeline core --config_file {project_home}/config.yml\n'
             )
@@ -349,15 +359,20 @@ def main():
     """
     args = get_arguments()
 
-    interact_config = Config(args.config_file)
+    with open(args.config_file, 'r', encoding='UTF-8') as stream:
+        config_dict = yaml.safe_load(stream)
+    for config_key in config_dict:
+        if config_key not in ALL_CONFIG_KEYS:
+            raise ValueError(f'Unrecognised key {config_key} found in config file.')
 
     app.config[INTERACT_HOME_KEY] = os.getcwd()
     if not os.path.exists('projects'):
         os.mkdir('projects')
     host_name = socket.gethostname()
     app.config[SERVER_ADDRESS_KEY] = socket.gethostbyname(host_name + ".local")
-    app.config[FILESERVER_NAME_KEY] = interact_config.fileserver_name
-    app.config[THERMO_PARSER_KEY] = interact_config.thermo_parser
+    app.config[FILESERVER_NAME_KEY] = config_dict.get(FILESERVER_NAME_KEY)
+    app.config[FRAGGER_PATH_KEY] = config_dict.get(FRAGGER_PATH_KEY)
+    app.config[FRAGGER_MEMORY_KEY] = config_dict.get(FRAGGER_MEMORY_KEY)
     app.config[MODE_KEY] = args.mode
 
     app.run(host='0.0.0.0', debug = False)
