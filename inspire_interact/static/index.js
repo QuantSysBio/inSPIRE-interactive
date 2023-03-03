@@ -273,10 +273,6 @@ async function checkFilePattern(serverAddress, file_type)
     }
 }
 
-async function update_gui(file_type) {
-
-}
-
 function selectSearchType(value) {
     switch(value){
         case 'searchDone':
