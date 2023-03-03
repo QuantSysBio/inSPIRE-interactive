@@ -91,281 +91,329 @@
 			/* -ms-transform: translateY(-50%);
 			transform: translateY(-50%); */
 		}
+
+		.header {
+			display: flex;
+			flex-direction: row;
+			justify-content: flex-start;
+			align-items: center;
+			width: 100%;
+			height: 10%;
+			margin-left: 5%;
+		}
+		
+		.icon_top {
+			height: 100%;
+			width: 200px;
+			align-self: flex-start;
+			margin: 0;
+			margin-right: 25px;
+		}
+
+		#welcomingDiv {
+			padding: 0;
+			margin: 0;
+			font-size: large;
+			margin-left: auto;
+			margin-right: 10%;
+			align-self: flex-end;
+			justify-self: flex-end;
+		}
+
+		.center_content {
+			display: flex;
+			justify-content: center;
+			align-items: center;
+			flex-direction: row;
+			padding-top: 10%;
+			margin: 0;
+			height: 100%;
+			width: 100%;
+		}
+
 	</style>
 	<script src="{{url_for('static', filename='index.js')}}"></script>
 	<title>inSPIRE-Interactive</title>
 </head>
-<body>
-	<h1>Welcome to inSPIRE-Interactive!</h1>
-	<img src="{{url_for('static', filename='inSPIRE-logo.png')}}"/>
-	<div id="openingDiv">
-		<h3>User Selection</h3>
-		<p>Select a previous user.</p>
-		<form>
-			<select onchange="selectUser('{{ server_address }}', this.value)" id="userSelection">
-				<option value="default">Select User</option>
-				{{user_list |safe}}
-			</select>
-		</form>
-		<form>
-			<label for="newUserText">Or add a new user:</label><br>
-			<input type="text" id="newUserInput" name="newUserInput">
-		</form>
-		<br>
-		<button id="createUserButton" onclick="createNewUser('{{ server_address }}')">Create New User</button>
-
-		<p id="projectText" style="visibility: hidden;">Which project do you want to work on?.</p>
-		<p id="projectDropDownText" style="visibility: hidden;">Select existing projects.</p>
-		<form id="projectForm" style="visibility: hidden;">
-			<select onchange="selectProject('{{ server_address }}', this.value)" id="projectSelection">
-				<option value="default">Select Project</option>
-			</select>
-		</form>
-		<form id="newProjectForm" style="visibility: hidden;">
-			<label for="newProjectText">Or enter your new project title:</label><br>
-			<input type="text" id="newProjectInput" name="newProjectInput">
-		</form>
-		<br>
-		<button id="createProjectButton" onclick="createNewProject('{{ server_address }}')"  style="visibility: hidden;">Create New Project</button>
-		<p id="workflowSelectText" style="visibility: hidden;">What do you want to do?</p>
-		<form id="workflowForm" style="visibility: hidden;">
-			<select onchange="selectWorkflow(this.value)" id="Workflow">
-				<option value="default">Select Workflow</option>
-				<option value="inspire">Run inSPIRE</option>
-				<option value="downloadProjectData">Download Project Data</option>
-				<option value="deleteProjectData">Delete Project Data</option>
-			</select>
-		</form>
-	</div>
-	<div id="welcomingDiv"></div>
-
-	<br>
-
-	<div id="msDataDiv" style="display:none;" class="row">
-		<h3>MS Data (RAW or mgf)</h3>
-		<div class="column" style="margin-left: 0%;">
-			<p>Upload your MS data.</p>
-			<br>
-			<input type="file" id="ms_file_upload" multiple="true" />
-			<br>
-			<br>
-			<input type="submit" onclick="uploadFiles('{{ server_address }}', 'ms')">
-			<p id="msWaiting" style="display:none;">Files uploading...</p>
-		</div>
-		<div class="column" style="margin-left: 0%; border-right: auto;">
-			<p>Or specify a file pattern on the inSPIRE Server.</p>
-			<div id="rawFilePatternEntry" style="width:600; margin-left:0;">
-				<form id="msFileForm">
-					<input type="text" id="msFileInput" name="msFileInput" style="width:60%;">
-				</form>
-			</div>
-			<br>
-			<input type="submit" onclick="checkFilePattern('{{ server_address }}', 'ms')">
-			<div id="msFileListDiv" style="display:none;">
-				Files to be used:
-				<ul id="msFileList"></ul>
-				If file list above is incorrect, adjust your file pattern and click the button again.
-			</div>
-		</div>
+<body>	
+	<div class="header">
+		<img src="{{url_for('static', filename='inSPIRE-logo-nobg.png')}}" class="icon_top"/>		
+		<h1>Welcome to inSPIRE-Interactive!</h1>
+		<div id="welcomingDiv"></div>
 	</div>
 
-	<br>
+	
 
-	<div id="searchDiv" style="display:none;" class="row">
-		<h3>Initial Search</h3>
-		<p>Have you already run a search or do you want to run MSFragger as part of inSPIRE?</p>
-		<form id="searchRunDiv">
-			<select onchange="selectSearchType(this.value)" id="searchRequired">
-				<option value="default">Select Option</option>
-				<option value="searchDone">I have search results.</option>
-				<option value="msFragger">I need to run MSFragger.</option>
-			</select>
-		</form>
-		<br>
-		<form id="searchEngineDiv" style="display:none;">
-			<select onchange="selectSearchType(this.value)" id="searchEngineSelection">
-				<option value="default">Select Search Engine Used</option>
-				<option value="maxquant">Max Quant</option>
-				<option value="mascot">Mascot</option>
-				<option value="msfragger">MSFragger</option>
-				<option value="peaks">PEAKS DB</option>
-			</select>
-		</form>
-		<div id="searchColumn1" class="column"  style="display:none; margin-left: 0%;">
-			<p>Upload your search results.</p>
-			<br>
-			<input type="file" id="search_file_upload" multiple="true" />
-			<br>
-			<br>
-			<input type="submit" onclick="uploadFiles('{{ server_address }}', 'search')">
-			<p id="searchWaiting" style="display:none;">Files uploading...</p>
-		</div>
-		<div id="searchColumn2" class="column"  style="display:none; margin-left: 0%;">
-			<p>Or specify a file pattern on the inSPIRE Server.</p>
-			<form id="searchFileForm">
-				<input type="text" id="searchFileInput" name="msFileInput" style="width:60%;">
+	<hr>
+
+	<div class="centerContent">
+		<div id="openingDiv">
+			<h3>User Selection</h3>
+			<p>Select a previous user.</p>
+			<form>
+				<select onchange="selectUser('{{ server_address }}', this.value)" id="userSelection">
+					<option value="default">Select User</option>
+					{{user_list |safe}}
+				</select>
+			</form>
+			<form>
+				<label for="newUserText">Or add a new user:</label><br>
+				<input type="text" id="newUserInput" name="newUserInput">
 			</form>
 			<br>
-			<input type="submit" onclick="checkFilePattern('{{ server_address }}', 'search')">
-			<div id="searchFileListDiv" style="display:none; margin-left: 0%;">
-				Files to be used:
-				<ul id="searchFileList"></ul>
-				If file list above is incorrect, adjust your file pattern and click the button again.
-			</div>
-		</div>
-		<div id="msFraggerParams" style="display:none; margin-left: 0%;">
-			Enter your MSFragger parameters.
-		</div>
-	</div>
+			<button id="createUserButton" onclick="createNewUser('{{ server_address }}')">Create New User</button>
 
-	<br>
-
-	<div id="proteomeDiv" style="display:none;" class="row">
-		<h3>Proteome Fasta File(s)</h3>
-		<p>Are you running inSPIRE standard or inSPIRE-Select for pathogen identification?</p>
-		<form id="inspireTypeDiv">
-			<select onchange="selectInspireType(this.value)" id="Workflow">
-				<option value="default">Select Option</option>
-				<option value="inspireStandard">inSPIRE-Standard</option>
-				<option value="inspireSelect">inSPIRE-Select</option>
-			</select>
-		</form>
+			<p id="projectText" style="visibility: hidden;">Which project do you want to work on?.</p>
+			<p id="projectDropDownText" style="visibility: hidden;">Select existing projects.</p>
+			<form id="projectForm" style="visibility: hidden;">
+				<select onchange="selectProject('{{ server_address }}', this.value)" id="projectSelection">
+					<option value="default">Select Project</option>
+				</select>
+			</form>
+			<form id="newProjectForm" style="visibility: hidden;">
+				<label for="newProjectText">Or enter your new project title:</label><br>
+				<input type="text" id="newProjectInput" name="newProjectInput">
+			</form>
+			<br>
+			<button id="createProjectButton" onclick="createNewProject('{{ server_address }}')"  style="visibility: hidden;">Create New Project</button>
+			<p id="workflowSelectText" style="visibility: hidden;">What do you want to do?</p>
+			<form id="workflowForm" style="visibility: hidden;">
+				<select onchange="selectWorkflow(this.value)" id="Workflow">
+					<option value="default">Select Workflow</option>
+					<option value="inspire">Run inSPIRE</option>
+					<option value="downloadProjectData">Download Project Data</option>
+					<option value="deleteProjectData">Delete Project Data</option>
+				</select>
+			</form>
+		</div>
 
 		<br>
 
-		<div id="proteomeColumn1" class="column"  style="display:none; margin-left: 0%;">
-			<p>Upload your proteome file.</p>
-			<br>
-			<input type="file" id="proteome_file_upload" multiple="true" />
-			<br>
-			<br>
-			<input type="submit" onclick="uploadFiles('{{ server_address }}', 'proteome')">
-			<p id="proteomeWaiting" style="display:none;">Files uploading...</p>
-		</div>
-
-		<div id="proteomeColumn2" class="column"  style="display:none; margin-left: 0%;">
-			<p>Or specify a file pattern on the inSPIRE Server.</p>
-			<form id="proteomeFileForm">
-				<input type="text" id="proteomeFileInput" name="proteomeFileInput" style="width:60%;">
-			</form>
-			<br>
-			<input type="submit" onclick="checkFilePattern('{{ server_address }}', 'proteome')">
-			<div id="proteomeFileListDiv" style="display:none; margin-left: 0%;">
-				Proteome file to be used:
-				<ul id="proteomeFileList"></ul>
-				If the file above is incorrect, adjust your file pattern and click the button again.
-			</div>
-		</div>
-
-		<div id="proteomeSelectColumn1" class="column"  style="display:none; margin-left: 0%;">
-			<p>Upload the host proteome file.</p>
-			<br>
-			<p>Specify the control flags (Comma-Separated).</p>
-			<form id="controlFlagForm">
-				<input type="text" id="controlFlagInput" name="controlFlagInput" style="width:60%;">
-			</form>
-			<br>
-			<p>Host Proteome:</p>
-			<input type="file" id="hostProteome_file_upload" multiple="true" />
-			<br>
-			<p>Pathogen Proteome:</p>
-			<input type="file" id="pathogenProteome_file_upload" multiple="true" />
-			<br>
-			<input type="submit" onclick="uploadFiles('{{ server_address }}', 'proteomeSelect')">
-			<p id="proteomeSelectWaiting" style="display:none;">Files uploading...</p>
-		</div>
-
-		<div id="proteomeSelectColumn2" class="column"  style="display:none; margin-left: 0%;">
-			<p>Or specify a file pattern on the inSPIRE Server.</p>
-
-			Specify Host Proteome File:
-			<form id="hostProteomeFileForm">
-				<input type="text" id="hostProteomeFileInput" name="hostProteomeFileInput" style="width:60%;">
-			</form>
-			<br>
-			<input type="submit" onclick="checkFilePattern('{{ server_address }}', 'hostProteome')">
-			<div id="hostProteomeFileListDiv" style="display:none;">
-				Host proteome file to be used:
-				<ul id="hostProteomeFileList"></ul>
-				If the file above is incorrect, adjust your file pattern and click the button again.
-			</div>
-
-			<div id="pathogenProteomeDiv" style="display:none; margin-left:0;">
-				Specify Pathogen Proteome File.
-				<form id="pathogenProteomeFileForm">
-					<input type="text" id="pathogenProteomeFileInput" name="pathogenProteomeFileInput" style="width:60%;">
-				</form>
+		<div id="msDataDiv" style="display:none;" class="row">
+			<h3>MS Data (RAW or mgf)</h3>
+			<div class="column" style="margin-left: 0%;">
+				<p>Upload your MS data.</p>
 				<br>
-				<input type="submit" onclick="checkFilePattern('{{ server_address }}', 'pathogenProteome')">
-				<div id="pathogenProteomeFileListDiv" style="display:none; margin-left:0;"">
-					Pathogen proteome file to be used:
-					<ul id="pathogenProteomeFileList"></ul>
-					If the file above is incorrect, adjust your file pattern and click the button again.
+				<input type="file" id="ms_file_upload" multiple="true" />
+				<br>
+				<br>
+				<input type="submit" onclick="uploadFiles('{{ server_address }}', 'ms')">
+				<p id="msWaiting" style="display:none;">Files uploading...</p>
+			</div>
+			<div class="column" style="margin-left: 0%; border-right: auto;">
+				<p>Or specify a file pattern on the inSPIRE Server.</p>
+				<div id="rawFilePatternEntry" style="width:600; margin-left:0;">
+					<form id="msFileForm">
+						<input type="text" id="msFileInput" name="msFileInput" style="width:60%;">
+					</form>
+				</div>
+				<br>
+				<input type="submit" onclick="checkFilePattern('{{ server_address }}', 'ms')">
+				<div id="msFileListDiv" style="display:none;">
+					Files to be used:
+					<ul id="msFileList"></ul>
+					If file list above is incorrect, adjust your file pattern and click the button again.
 				</div>
 			</div>
 		</div>
-	</div>
-	<br>
-	<div id="parametersDiv" style="display:none;" class="row">
-		<h3>Parameters</h3>
-		<p> 
-			Here you provide the accuracy of the mass spectrometer used.
-			You also have the option of setting any other inSPIRE config that you require.
-		</p>
-		<div id="paramsCol1" class="column"  style="margin-left: 0%;">
-			Enter the MS1 Accuracy of the Mass Spectrometer:
-			<div id="ms1SettingsEntry" style="width:600; margin-left:0;">
-				<form id="ms1SettingsForm">
-					<input type="text" id="ms1AccuracyInput" name="mzAccuracyInput">
-					<select id="ms1UnitSelection">
-						<option value="ppm">ppm</option>
-					</select>
-				</form>
+
+		<br>
+
+		<div id="searchDiv" style="display:none;" class="row">
+			<h3>Initial Search</h3>
+			<p>Have you already run a search or do you want to run MSFragger as part of inSPIRE?</p>
+			<form id="searchRunDiv">
+				<select onchange="selectSearchType(this.value)" id="searchRequired">
+					<option value="default">Select Option</option>
+					<option value="searchDone">I have search results.</option>
+					<option value="msFragger">I need to run MSFragger.</option>
+				</select>
+			</form>
+			<br>
+			<form id="searchEngineDiv" style="display:none;">
+				<select onchange="selectSearchType(this.value)" id="searchEngineSelection">
+					<option value="default">Select Search Engine Used</option>
+					<option value="maxquant">Max Quant</option>
+					<option value="mascot">Mascot</option>
+					<option value="msfragger">MSFragger</option>
+					<option value="peaks">PEAKS DB</option>
+				</select>
+			</form>
+			<div id="searchColumn1" class="column"  style="display:none; margin-left: 0%;">
+				<p>Upload your search results.</p>
+				<br>
+				<input type="file" id="search_file_upload" multiple="true" />
+				<br>
+				<br>
+				<input type="submit" onclick="uploadFiles('{{ server_address }}', 'search')">
+				<p id="searchWaiting" style="display:none;">Files uploading...</p>
 			</div>
-			<br><br>
-			Enter the MS2 Accuracy of the Mass Spectrometer:
-			<div id="ms2SettingsEntry" style="width:600; margin-left:0;">
-				<form id="ms2SettingsForm">
-					<input type="text" id="ms2AccuracyInput" name="ms2AccuracyInput">
-					<select id="ms2UnitSelection">
-						<option value="Da">Da</option>
-						<option value="ppm">ppm</option>
-					</select>
+			<div id="searchColumn2" class="column"  style="display:none; margin-left: 0%;">
+				<p>Or specify a file pattern on the inSPIRE Server.</p>
+				<form id="searchFileForm">
+					<input type="text" id="searchFileInput" name="msFileInput" style="width:60%;">
 				</form>
+				<br>
+				<input type="submit" onclick="checkFilePattern('{{ server_address }}', 'search')">
+				<div id="searchFileListDiv" style="display:none; margin-left: 0%;">
+					Files to be used:
+					<ul id="searchFileList"></ul>
+					If file list above is incorrect, adjust your file pattern and click the button again.
+				</div>
+			</div>
+			<div id="msFraggerParams" style="display:none; margin-left: 0%;">
+				Enter your MSFragger parameters.
 			</div>
 		</div>
-		<div id="paramsCol2" class="column"  style="margin-left: 0%;">
-			(Optional) Additional inSPIRE configurations.
-			<table id="configsTable" style="width: 60%; border: 2px solid darkgreen; border-collapse: collapse;">
-				<tr>
-					<td>Config Key</td>
-					<td>Config Setting</td>
-					<td>Remove Entry</td>
-				</tr>
-				<tr>
-					<td><input type="text" class="configKey" /></td>
-					<td><input type="text" class="configValue" /></td>
-					<td><input type="button" class="deleteEntry"  value="Delete Entry" onclick="deleteRow(this)"></td>
-				</tr>
-			</table>
-			<button id="addConfigs" onclick="addConfigs()">Add Additional Configurations</button>
+
+		<br>
+
+		<div id="proteomeDiv" style="display:none;" class="row">
+			<h3>Proteome Fasta File(s)</h3>
+			<p>Are you running inSPIRE standard or inSPIRE-Select for pathogen identification?</p>
+			<form id="inspireTypeDiv">
+				<select onchange="selectInspireType(this.value)" id="Workflow">
+					<option value="default">Select Option</option>
+					<option value="inspireStandard">inSPIRE-Standard</option>
+					<option value="inspireSelect">inSPIRE-Select</option>
+				</select>
+			</form>
+
+			<br>
+
+			<div id="proteomeColumn1" class="column"  style="display:none; margin-left: 0%;">
+				<p>Upload your proteome file.</p>
+				<br>
+				<input type="file" id="proteome_file_upload" multiple="true" />
+				<br>
+				<br>
+				<input type="submit" onclick="uploadFiles('{{ server_address }}', 'proteome')">
+				<p id="proteomeWaiting" style="display:none;">Files uploading...</p>
+			</div>
+
+			<div id="proteomeColumn2" class="column"  style="display:none; margin-left: 0%;">
+				<p>Or specify a file pattern on the inSPIRE Server.</p>
+				<form id="proteomeFileForm">
+					<input type="text" id="proteomeFileInput" name="proteomeFileInput" style="width:60%;">
+				</form>
+				<br>
+				<input type="submit" onclick="checkFilePattern('{{ server_address }}', 'proteome')">
+				<div id="proteomeFileListDiv" style="display:none; margin-left: 0%;">
+					Proteome file to be used:
+					<ul id="proteomeFileList"></ul>
+					If the file above is incorrect, adjust your file pattern and click the button again.
+				</div>
+			</div>
+
+			<div id="proteomeSelectColumn1" class="column"  style="display:none; margin-left: 0%;">
+				<p>Upload the host proteome file.</p>
+				<br>
+				<p>Specify the control flags (Comma-Separated).</p>
+				<form id="controlFlagForm">
+					<input type="text" id="controlFlagInput" name="controlFlagInput" style="width:60%;">
+				</form>
+				<br>
+				<p>Host Proteome:</p>
+				<input type="file" id="hostProteome_file_upload" multiple="true" />
+				<br>
+				<p>Pathogen Proteome:</p>
+				<input type="file" id="pathogenProteome_file_upload" multiple="true" />
+				<br>
+				<input type="submit" onclick="uploadFiles('{{ server_address }}', 'proteomeSelect')">
+				<p id="proteomeSelectWaiting" style="display:none;">Files uploading...</p>
+			</div>
+
+			<div id="proteomeSelectColumn2" class="column"  style="display:none; margin-left: 0%;">
+				<p>Or specify a file pattern on the inSPIRE Server.</p>
+
+				Specify Host Proteome File:
+				<form id="hostProteomeFileForm">
+					<input type="text" id="hostProteomeFileInput" name="hostProteomeFileInput" style="width:60%;">
+				</form>
+				<br>
+				<input type="submit" onclick="checkFilePattern('{{ server_address }}', 'hostProteome')">
+				<div id="hostProteomeFileListDiv" style="display:none;">
+					Host proteome file to be used:
+					<ul id="hostProteomeFileList"></ul>
+					If the file above is incorrect, adjust your file pattern and click the button again.
+				</div>
+
+				<div id="pathogenProteomeDiv" style="display:none; margin-left:0;">
+					Specify Pathogen Proteome File.
+					<form id="pathogenProteomeFileForm">
+						<input type="text" id="pathogenProteomeFileInput" name="pathogenProteomeFileInput" style="width:60%;">
+					</form>
+					<br>
+					<input type="submit" onclick="checkFilePattern('{{ server_address }}', 'pathogenProteome')">
+					<div id="pathogenProteomeFileListDiv" style="display:none; margin-left:0;"">
+						Pathogen proteome file to be used:
+						<ul id="pathogenProteomeFileList"></ul>
+						If the file above is incorrect, adjust your file pattern and click the button again.
+					</div>
+				</div>
+			</div>
+		</div>
+		<br>
+		<div id="parametersDiv" style="display:none;" class="row">
+			<h3>Parameters</h3>
+			<p> 
+				Here you provide the accuracy of the mass spectrometer used.
+				You also have the option of setting any other inSPIRE config that you require.
+			</p>
+			<div id="paramsCol1" class="column"  style="margin-left: 0%;">
+				Enter the MS1 Accuracy of the Mass Spectrometer:
+				<div id="ms1SettingsEntry" style="width:600; margin-left:0;">
+					<form id="ms1SettingsForm">
+						<input type="text" id="ms1AccuracyInput" name="mzAccuracyInput">
+						<select id="ms1UnitSelection">
+							<option value="ppm">ppm</option>
+						</select>
+					</form>
+				</div>
+				<br><br>
+				Enter the MS2 Accuracy of the Mass Spectrometer:
+				<div id="ms2SettingsEntry" style="width:600; margin-left:0;">
+					<form id="ms2SettingsForm">
+						<input type="text" id="ms2AccuracyInput" name="ms2AccuracyInput">
+						<select id="ms2UnitSelection">
+							<option value="Da">Da</option>
+							<option value="ppm">ppm</option>
+						</select>
+					</form>
+				</div>
+			</div>
+			<div id="paramsCol2" class="column"  style="margin-left: 0%;">
+				(Optional) Additional inSPIRE configurations.
+				<table id="configsTable" style="width: 60%; border: 2px solid darkgreen; border-collapse: collapse;">
+					<tr>
+						<td>Config Key</td>
+						<td>Config Setting</td>
+						<td>Remove Entry</td>
+					</tr>
+					<tr>
+						<td><input type="text" class="configKey" /></td>
+						<td><input type="text" class="configValue" /></td>
+						<td><input type="button" class="deleteEntry"  value="Delete Entry" onclick="deleteRow(this)"></td>
+					</tr>
+				</table>
+				<button id="addConfigs" onclick="addConfigs()">Add Additional Configurations</button>
+			</div>
+		</div>
+
+		<br>
+
+		<div id="executionDiv" class="container">
+			<div class="vertical-center">
+				<button id="executeButton" style="display: none;" onclick="executePipeline('{{ server_address }}')">
+					Execute Pipeline
+				</button>	
+			</div>
+		</div>
+
+		<div id="fileDownloadText" style="display: none;">
+			<p>Pipeline running. Results will be accessable via:</p>
+			<a id="fileDownload" href></a>
 		</div>
 	</div>
-
-	<br>
-
-	<div id="executionDiv" class="container">
-		<div class="vertical-center">
-			<button id="executeButton" style="display: none;" onclick="executePipeline('{{ server_address }}')">
-				Execute Pipeline
-			</button>	
-		</div>
-	</div>
-
-	<div id="fileDownloadText" style="display: none;">
-		<p>Pipeline running. Results will be accessable via:</p>
-		<a id="fileDownload" href></a>
-	</div>
-
 </body>
 </html>

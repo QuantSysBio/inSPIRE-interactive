@@ -121,7 +121,7 @@ function selectWorkflow(value)
     workflow.disabled = "disabled";
     let user = document.getElementById('userSelection').value;
     let project = document.getElementById('projectSelection').value;
-    let message = "<b>" + user + "</b> working on <b>" + project + "</b> to run <b>" + value + "</b>.";
+    let message = "User <b>" + user + "</b> is working on <b>" + project + "</b> to run <b>" + value + "</b>.";
     document.getElementById("openingDiv").style.display = "none";
     document.getElementById("welcomingDiv").innerHTML = message;
     switch(value){
@@ -182,14 +182,25 @@ async function uploadFiles(serverAddress, mode) {
     document.getElementById(mode + "Waiting").style.display = "none";
 
     console.log(response);
+    updateGUI(mode);
+};
+
+/**
+ * Function to asynchronously update GUI after each stage submit
+ * @param {*} mode 
+ */
+async function updateGUI(mode) {
     switch(mode){
         case 'ms':
+            document.getElementById("msDataDiv").style.display = "none";
             document.getElementById("searchDiv").style.display = "block";
             break;
         case 'search':
+            document.getElementById("searchDiv").style.display = "none";
             document.getElementById("proteomeDiv").style.display = 'block';
             break;
         case 'proteome':
+            document.getElementById("proteomeDiv").style.display = 'none';
             document.getElementById("parametersDiv").style.display = 'block';
             document.getElementById("executeButton").style.display = 'block';
             break;
@@ -198,7 +209,7 @@ async function uploadFiles(serverAddress, mode) {
             document.getElementById("executeButton").style.display = 'block';
             break;
     };
-};
+}
 
 function updateListElement(listName, arrayToAdd)
 // Function to update a HTML list element with a new array.
