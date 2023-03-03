@@ -134,7 +134,7 @@ function selectWorkflow(value)
             document.getElementById('executeButton').style.display = 'block';
             break;
         case 'inspireSelect':
-            document.getElementById("msDataDiv").style.display = "block";
+            
             break;
         case 'inspire':
             document.getElementById("msDataDiv").style.display = "block";
@@ -280,10 +280,16 @@ function selectInspireType(value) {
         case 'inspireStandard':
             document.getElementById('proteomeColumn1').style.display = 'block';
             document.getElementById('proteomeColumn2').style.display = 'block';
+            // Allows for sequential viewing of both elements.
+            document.getElementById('proteomeSelectColumn1').style.display = 'none';
+            document.getElementById('proteomeSelectColumn2').style.display = 'none';
             break;
         case 'inspireSelect':
             document.getElementById('proteomeSelectColumn1').style.display = 'block';
             document.getElementById('proteomeSelectColumn2').style.display = 'block';
+            // Allows for sequential viewing of both elements. 
+            document.getElementById('proteomeColumn1').style.display = 'none';
+            document.getElementById('proteomeColumn2').style.display = 'none';
             break;
     };
 };
@@ -323,6 +329,7 @@ async function executePipeline(serverAddress) {
     if (useMsFragger !== 'msFragger'){
         searchEngine = document.getElementById('searchEngineSelection').value; // TODO handle msfragger
     }
+    let controlFlags = document.getElementById('controlFlagInput').value;
     var ms1Accuracy = document.getElementById('ms1AccuracyInput').value;
     var mzAccuracy = document.getElementById('ms2AccuracyInput').value;
     var mzUnits = document.getElementById('ms2UnitSelection').value;
@@ -331,6 +338,7 @@ async function executePipeline(serverAddress) {
         'user': user,
         'project': project,
         'searchEngine': searchEngine,
+        'controlFlags': controlFlags,
         'ms1Accuracy': ms1Accuracy,
         'mzAccuracy': mzAccuracy,
         'mzUnits': mzUnits,

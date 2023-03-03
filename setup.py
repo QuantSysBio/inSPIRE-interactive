@@ -21,7 +21,7 @@ setup(
     },
     python_requires='>=3.8',
     install_requires=[
-        'inspirems',
+        #'inspirems',
     ],
     project_urls={
         'Homepage': 'https://github.com/QuantSysBio/inSPIRE',
