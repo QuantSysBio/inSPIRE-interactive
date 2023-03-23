@@ -151,7 +151,7 @@
 			<h3>User Selection</h3>
 			<p>Select a previous user.</p>
 			<form>
-				<select onchange="selectUser('{{ server_address }}', this.value)" id="userSelection">
+				<select autocomplete="off" onchange="selectUser('{{ server_address }}', this.value)" id="userSelection">
 					<option selected disabled hidden>Select User</option>
 					{{user_list |safe}}
 				</select>
@@ -166,7 +166,7 @@
 			<p id="projectText" style="visibility: hidden;">Which project do you want to work on?.</p>
 			<p id="projectDropDownText" style="visibility: hidden;">Select existing projects.</p>
 			<form id="projectForm" style="visibility: hidden;">
-				<select onchange="selectProject('{{ server_address }}', this.value)" id="projectSelection">
+				<select autocomplete="off" onchange="selectProject('{{ server_address }}', this.value)" id="projectSelection">
 					<option selected disabled hidden>Select Project</option>
 				</select>
 			</form>
@@ -178,7 +178,7 @@
 			<button id="createProjectButton" onclick="createNewProject('{{ server_address }}')"  style="visibility: hidden;">Create New Project</button>
 			<p id="workflowSelectText" style="visibility: hidden;">What do you want to do?</p>
 			<form id="workflowForm" style="visibility: hidden;">
-				<select onchange="selectWorkflow(this.value)" id="Workflow">
+				<select autocomplete="off" onchange="selectWorkflow(this.value)" id="Workflow">
 					<option selected disabled hidden>Select Workflow</option>
 					<option value="inspire">Run inSPIRE</option>
 					<option value="downloadProjectData">Download Project Data</option>
@@ -223,7 +223,7 @@
 			<h3>Initial Search</h3>
 			<p>Have you already run a search or do you want to run MSFragger as part of inSPIRE?</p>
 			<form id="searchRunDiv">
-				<select onchange="selectSearchType(this.value)" id="searchRequired">
+				<select autocomplete="off" onchange="selectSearchType(this.value)" id="searchRequired">
 					<option selected disabled hidden>Select Option</option>
 					<option value="searchDone">I have search results.</option>
 					<option value="msFragger">I need to run MSFragger.</option>
@@ -231,7 +231,7 @@
 			</form>
 			<br>
 			<form id="searchEngineDiv" style="display:none;">
-				<select onchange="selectSearchType(this.value)" id="searchEngineSelection">
+				<select autocomplete="off" onchange="selectSearchType(this.value)" id="searchEngineSelection">
 					<option selected disabled hidden>Select Search Engine Used</option>
 					<option value="maxquant">Max Quant</option>
 					<option value="mascot">Mascot</option>
@@ -272,7 +272,7 @@
 			<h3>Proteome Fasta File(s)</h3>
 			<p>Are you running inSPIRE standard or inSPIRE-Select for pathogen identification?</p>
 			<form id="inspireTypeDiv">
-				<select onchange="selectInspireType(this.value)" id="Workflow">
+				<select autocomplete="off" onchange="selectInspireType(this.value)" id="Workflow">
 					<option selected disabled hidden>Select Option</option>
 					<option value="inspireStandard">inSPIRE-Standard</option>
 					<option value="inspireSelect">inSPIRE-Select</option>
