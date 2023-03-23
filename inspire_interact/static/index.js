@@ -10,8 +10,7 @@ async function selectUser(serverAddress, selectedUser)
     ).then( response => {
         return response.json();
     });
-    var userSelection = document.getElementById('userSelection');
-    userSelection.disabled = 'disabled';
+
     showProjectOptions(response["message"]);
 };
 
@@ -37,7 +36,7 @@ async function createNewUser(serverAddress)
     opt.innerHTML = newUser;
     userSelection.appendChild(opt);
     userSelection.selectedIndex = userSelection.options.length-1;
-    userSelection.disabled = 'disabled';
+
 
     showProjectOptions(response["message"]);
 };
@@ -48,18 +47,25 @@ function showProjectOptions(options)
     var projectSelection = document.getElementById('projectSelection');
     var arrayLength = options.length;
 
+    resetSelect(projectSelection);
+
     for (var i = 0; i < arrayLength; i++) {
         var opt = document.createElement('option');
         opt.value = options[i];
         opt.innerHTML = options[i];
         projectSelection.appendChild(opt);
     };
-    document.getElementById("projectText").style.visibility = "visible";
-    document.getElementById("projectDropDownText").style.visibility = "visible";
-    document.getElementById("projectForm").style.visibility = "visible";
-    document.getElementById("newProjectForm").style.visibility = "visible";
-    document.getElementById("createProjectButton").style.visibility = "visible";
+
+    document.getElementById("projectSelectDiv").style.visibility = "visible";
+    document.getElementById("openingVl1").style.visibility = "visible";
 };
+
+function resetSelect(element /*HTMLElement*/) {
+    while(projectSelection.lastChild.className != "default") {
+        element.lastChild.remove()
+    }
+    element.selectedIndex = 0;
+}
 
 async function createNewProject(serverAddress)
 // Function to create a new project.
@@ -84,7 +90,6 @@ async function createNewProject(serverAddress)
 
     projectSelection.appendChild(opt);
     projectSelection.selectedIndex = projectSelection.options.length-1;
-    projectSelection.disabled = 'disabled';
 
     showWorkflowOptions();
 };
@@ -101,29 +106,28 @@ async function selectProject(serverAddress, selectedProject)
     ).then( response => {
         return response.json();
     });
-    var projectSelection = document.getElementById('projectSelection');
-    projectSelection.disabled = 'disabled';
+   
+   
     showWorkflowOptions();
 };
 
 function showWorkflowOptions()
 // Function to show the workflow options to the user.
 {
-    document.getElementById("workflowSelectText").style.visibility = "visible";
-    document.getElementById("workflowForm").style.visibility = "visible";
+    document.getElementById("workflowSelectDiv").style.visibility = "visible";
+    document.getElementById("openingVl2").style.visibility = "visible";
 };
 
 
 function selectWorkflow(value)
 // Function to select the Interact workflow 
 {
-    let workflow = document.getElementById('Workflow');
-    workflow.disabled = "disabled";
     let user = document.getElementById('userSelection').value;
     let project = document.getElementById('projectSelection').value;
     let message = "User <b>" + user + "</b> is working on <b>" + project + "</b> to run <b>" + value + "</b>.";
     document.getElementById("openingDiv").style.display = "none";
     document.getElementById("welcomingDiv").innerHTML = message;
+    cycleBackButtonVisibility();
     switch(value){
         case 'deleteProjectData':
             document.getElementById('executeButton').innerHTML = 'Delete All Project Data';
@@ -186,29 +190,86 @@ async function uploadFiles(serverAddress, mode) {
 };
 
 /**
- * Function to asynchronously update GUI after each stage submit
+ * Function to asynchronously update GUI after each stage submit.
+ * 
  * @param {*} mode 
  */
-async function updateGUI(mode) {
-    switch(mode){
+
+var last = "init";
+
+async function updateGUI(currentFrame) {
+    switch(currentFrame){
         case 'ms':
             document.getElementById("msDataDiv").style.display = "none";
             document.getElementById("searchDiv").style.display = "block";
             break;
+
         case 'search':
             document.getElementById("searchDiv").style.display = "none";
             document.getElementById("proteomeDiv").style.display = 'block';
             break;
+
         case 'proteome':
             document.getElementById("proteomeDiv").style.display = 'none';
             document.getElementById("parametersDiv").style.display = 'block';
             document.getElementById("executeButton").style.display = 'block';
             break;
+
         case 'proteomeSelect':
             document.getElementById("parametersDiv").style.display = 'block';
             document.getElementById("executeButton").style.display = 'block';
             break;
+
     };
+
+    last = currentFrame;
+}
+
+/**
+ * Function to revert the GUI to the last possible frame.
+ * @param {*} frame frame to be reverted to
+ */
+async function revertGUI(frame) {
+    switch(frame) {
+        case "init" :
+            document.getElementById("openingDiv").style.display = "flex";
+            document.getElementById("welcomingDiv").style.display = "none";
+            document.getElementById("msDataDiv").style.display = "none";
+            cycleBackButtonVisibility();
+            break;
+            
+        case 'ms':
+            document.getElementById("msDataDiv").style.display = "block";
+            document.getElementById("searchDiv").style.display = "none";
+            last = "none"
+            break;
+
+        case 'search':
+            document.getElementById("searchDiv").style.display = "block";
+            document.getElementById("proteomeDiv").style.display = 'none';
+            last = "ms"
+            break;
+
+        case 'proteome':
+            document.getElementById("proteomeDiv").style.display = 'block';
+            document.getElementById("parametersDiv").style.display = 'none';
+            document.getElementById("executeButton").style.display = 'none';
+            last = "search"
+            break;
+
+        case 'proteomeSelect':
+            document.getElementById("parametersDiv").style.display = 'none';
+            document.getElementById("executeButton").style.display = 'none';
+            last = "proteome"
+            break;
+
+    };
+}
+
+async function onBack() {
+    if(last != null) {
+        revertGUI(last)
+    }
 }
 
 function updateListElement(listName, arrayToAdd)
@@ -400,3 +461,9 @@ function makeDownloadVisible(message)
         a.innerHTML = message;
     }
 };
+
+function cycleBackButtonVisibility() {
+    let button = document.getElementById("backButton")
+
+    button.style.visibility = button.style.visibility == "visible" ? "hidden" : "visible"
+}
