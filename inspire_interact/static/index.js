@@ -189,13 +189,12 @@ async function uploadFiles(serverAddress, mode) {
             document.getElementById('host-proteome-file-upload').files[0], 
             document.getElementById('pathogen-proteome-file-upload').files[0]
         ] 
-        : selectedFiles = document.getElementById(mode + '-file-upload').files;
+        : Arrays.from(document.getElementById(mode + '-file-upload').files);
         
-
     console.log(selectedFiles);
 
     var multiFormData = new FormData();
-    selectedFiles.forEach(elem => {
+    selectedFiles.forEach ((elem) => {
         multiFormData.append('files', elem )
     });
 
