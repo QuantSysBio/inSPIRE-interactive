@@ -190,7 +190,7 @@ async function uploadFiles(serverAddress, mode) {
             document.getElementById('pathogen-proteome-file-upload').files[0]
         ] 
         : selectedFiles = document.getElementById(mode + '-file-upload').files;
-        var selectedFiles = [];
+        
 
     console.log(selectedFiles);
 
