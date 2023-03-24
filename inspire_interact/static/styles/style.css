@@ -1,0 +1,150 @@
+h1 {
+    text-align: center;
+}
+
+img {
+    display: block;
+    margin-left: auto;
+    margin-right: auto;
+    width: 20%;
+}
+
+body {
+    min-height: 100vh;
+    background-color: floralwhite;
+    overflow-x: hidden;
+}
+
+div {
+    margin-left: 10%;
+    margin-right: 10%;
+}
+
+hr {
+    padding: 0;
+}
+
+/* #msDataDiv {
+    border: 5px solid blue;
+    width: 200px;
+    height: 100px;
+} */
+
+.vl {
+    border-left:#165a19 dotted 2px;
+    height: 200px;
+    left: 50%;
+    margin: 20px;
+}
+
+.row {
+    display: flex;
+    flex-direction: row;
+    justify-content: flex-start;
+    align-items: center;
+}
+
+#execute-button {
+    display: block;
+    padding: 10px 14px;
+    cursor: pointer;
+    text-align: center;
+    text-decoration: none;
+    outline: none;
+    color: #fff;
+    background-color: #165a19;
+    border: none;
+    border-radius: 10px;
+    /* box-shadow: 0 9px #999; */
+    
+};
+
+#execute-button:hover {
+    background-color: #165a19;
+};
+
+#execute-button:active {
+    background-color: #165a19;
+    box-shadow: 0 5px #666;
+    transform: translateY(4px);
+};
+
+.container {
+    position: relative;
+    border: 3px solid #165a19;
+}
+
+.vertical-center {
+    margin: 0;
+    position: relative;
+    top: 50%;
+    /* -ms-transform: translateY(-50%);
+    transform: translateY(-50%); */
+}
+
+.header {
+    display: flex;
+    flex-direction: row;
+    justify-content: flex-start;
+    align-items: center;
+    width: 100%;
+    height: 10%;
+    margin-left: 5%;
+}
+
+.icon-top {
+    height: 100%;
+    width: 200px;
+    align-self: flex-start;
+    margin: 0;
+    margin-right: 25px;
+}
+
+.opening-sub-div {
+    margin: 3%;
+}
+
+#welcoming-div {
+    padding: 0;
+    margin: 0;
+    font-size: large;
+    margin-left: auto;
+    margin-right: 10%;
+    align-self: flex-end;
+    justify-self: flex-end;
+}
+
+.center-content {
+    width: 100%;
+    margin-top: 5%;
+    margin-left: 0%;
+    height: auto;
+}
+
+#opening-div {
+    display: flex;
+    flex-direction: row;
+    justify-content: space-evenly;
+    align-items: center;
+    width: 100%;
+    margin: 0;
+}
+
+.footer {
+    position: fixed;
+    bottom: 0;
+    width: 100%;
+    height: 5%;
+    margin-left: 0%;
+}
+
+.text-button {
+    border: none;
+    background-color: inherit;
+    font-size: inherit;
+    cursor: pointer;
+    margin-left: 5%;
+}
+
+.text-button:hover {background: #eee;}
+

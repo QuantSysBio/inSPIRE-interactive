@@ -1,7 +1,12 @@
+/* ============================================= USER ============================================= */
 
-async function selectUser(serverAddress, selectedUser)
-// Function activated when the user is selected, showing projects available.
-{
+/**
+ * Sets a user selected through HTML, forcing a GUI update to show the user's projects.
+ * 
+ * @param {*} serverAddress address of the server hosting inSPIRE-interact.
+ * @param {*} selectedUser user selected by user.
+ */
+async function selectUser(serverAddress, selectedUser) {
     var response = await fetch(
         'http://' + serverAddress + ':5000/interact/user/' + selectedUser,
         {
@@ -14,12 +19,16 @@ async function selectUser(serverAddress, selectedUser)
     showProjectOptions(response["message"]);
 };
 
-async function createNewUser(serverAddress)
-// Function activated to create a new inSPIRE-interact user.
-{
-    let buttonElement = document.getElementById('createUserButton');
-    buttonElement.disabled = "disabled";
-    let newUser = document.getElementById('newUserInput').value;
+/**
+ * Creates a new inSPIRE-interact user, forcing a GUI update to show the user's projects.
+ * 
+ * @param {*} serverAddress address of the server hosting inSPIRE-interact.
+ */
+async function createNewUser(serverAddress) {
+    //Disable the create user button.
+    document.getElementById('create-user-button').disabled = "disabled";
+    
+    let newUser = document.getElementById('new-user-input').value;
 
     var response = await fetch(
         'http://' + serverAddress + ':5000/interact/user/' + newUser,
@@ -30,10 +39,11 @@ async function createNewUser(serverAddress)
         return response.json();
     });
 
-    var userSelection = document.getElementById('userSelection');
-    var opt = document.createElement('option');
+    let opt = document.createElement('option');
     opt.value = newUser;
     opt.innerHTML = newUser;
+
+    let userSelection = document.getElementById('user-selection');
     userSelection.appendChild(opt);
     userSelection.selectedIndex = userSelection.options.length-1;
 
@@ -41,39 +51,54 @@ async function createNewUser(serverAddress)
     showProjectOptions(response["message"]);
 };
 
-function showProjectOptions(options)
-// Function to show the projects available for a inSPIRE user.
-{
-    var projectSelection = document.getElementById('projectSelection');
-    var arrayLength = options.length;
+
+/* ============================================= PROJECT ============================================= */
+
+/**
+ * Updates GUI to display the selected user's projects.
+ * 
+ * @param {*} options the multiple projects belonging to the selected user.
+ */
+function showProjectOptions(options) {
+    let projectSelection = document.getElementById("project-selection");
 
     resetSelect(projectSelection);
 
-    for (var i = 0; i < arrayLength; i++) {
-        var opt = document.createElement('option');
-        opt.value = options[i];
-        opt.innerHTML = options[i];
-        projectSelection.appendChild(opt);
-    };
+    options.forEach ((option) => {
+        let optionElem = document.createElement('option');
+        optionElem.value = option;
+        optionElem.innerHTML = option;
 
-    document.getElementById("projectSelectDiv").style.visibility = "visible";
-    document.getElementById("openingVl1").style.visibility = "visible";
+        projectSelection.appendChild(optionElem);
+    });
+
+    setElementVisibility(["project-select-div", "opening-Vl-1"])
 };
 
-function resetSelect(element /*HTMLElement*/) {
-    while(projectSelection.lastChild.className != "default") {
+/**
+ * Resets the project selections displayed in the drop-down menu in case the user is re-selected.
+ * 
+ * @param {HTMLElement} element drop-down menu element containing the projects.
+ */
+function resetSelect(element) {
+    while(element.lastChild.className != "default")
         element.lastChild.remove()
-    }
+    
     element.selectedIndex = 0;
 }
 
-async function createNewProject(serverAddress)
-// Function to create a new project.
-{
-    let buttonElement = document.getElementById('createProjectButton');
-    buttonElement.disabled = "disabled";
-    let user = document.getElementById('userSelection').value;
-    let newProject = document.getElementById('newProjectInput').value;
+/**
+ * Creates a new project for the chosen user, calls the backend services and updates the GUI to reflect the addition.
+ * 
+ * @param {*} serverAddress  address of the server hosting inSPIRE-interact.
+ */
+async function createNewProject(serverAddress) {
+    //Disable the create project button.
+    document.getElementById('create-project-button').disabled = "disabled";
+
+
+    let user = document.getElementById('user-selection').value;
+    let newProject = document.getElementById('new-project-input').value;
     var response = await fetch(
         'http://' + serverAddress + ':5000/interact/project/' + user + '/' + newProject,
         {
@@ -83,21 +108,25 @@ async function createNewProject(serverAddress)
         return response.json();
     });
 
-    var projectSelection = document.getElementById('projectSelection');
-    var opt = document.createElement('option');
+    let opt = document.createElement('option');
     opt.value = newProject;
     opt.innerHTML = newProject;
 
+    let projectSelection = document.getElementById('project-selection');
     projectSelection.appendChild(opt);
     projectSelection.selectedIndex = projectSelection.options.length-1;
 
     showWorkflowOptions();
 };
 
-async function selectProject(serverAddress, selectedProject)
-// Function to select the project
-{
-    let user = document.getElementById('userSelection').value;
+/**
+ * Sets a selected project, getting selection from backend.
+ * 
+ * @param {*} serverAddress address of the server hosting inSPIRE-interact. 
+ * @param {*} selectedProject project selected by the user.
+ */
+async function selectProject(serverAddress, selectedProject) {
+    let user = document.getElementById('user-selection').value;
     var response = await fetch(
         'http://' + serverAddress + ':5000/interact/project/' + user + '/' + selectedProject,
         {
@@ -111,189 +140,87 @@ async function selectProject(serverAddress, selectedProject)
     showWorkflowOptions();
 };
 
-function showWorkflowOptions()
-// Function to show the workflow options to the user.
-{
-    document.getElementById("workflowSelectDiv").style.visibility = "visible";
-    document.getElementById("openingVl2").style.visibility = "visible";
+
+/* ============================================= WORKFLOW ============================================= */
+
+/**
+ * Updates GUI to display available workflow options.
+ */
+function showWorkflowOptions() {
+    setElementVisibility(["workflow-select-div", "opening-Vl-2"]);
 };
 
 
-function selectWorkflow(value)
-// Function to select the Interact workflow 
-{
-    let user = document.getElementById('userSelection').value;
-    let project = document.getElementById('projectSelection').value;
+/**
+ * Sets the selected interact workflow, updating the GUI to reflect the choice.
+ * 
+ * @param {*} value user's choice of workflow. 
+ */
+function selectWorkflow(value) {
+    let user = document.getElementById('user-selection').value;
+    let project = document.getElementById('project-selection').value;
     let message = "User <b>" + user + "</b> is working on <b>" + project + "</b> to run <b>" + value + "</b>.";
-    document.getElementById("openingDiv").style.display = "none";
-    document.getElementById("welcomingDiv").innerHTML = message;
+
+    document.getElementById("opening-div").style.display = "none";
+    document.getElementById("welcoming-div").innerHTML = message;
     cycleBackButtonVisibility();
+
     switch(value){
-        case 'deleteProjectData':
-            document.getElementById('executeButton').innerHTML = 'Delete All Project Data';
-            document.getElementById('executeButton').style.display = 'block';
-            break;
-        case 'downloadProjectData':
-            document.getElementById('executeButton').innerHTML = 'Download All Project Files';
-            document.getElementById('executeButton').style.display = 'block';
-            break;
-        case 'inspireSelect':
+        case 'deleteProjectData': case 'downloadProjectData': {
+            let executeButtonElmt = document.getElementById('execute-button');
+
+            executeButtonElmt.innerHTML = (value == 'deleteProjectData') ? 'Delete All Project Data' : 'Download All Project Files';
+            executeButtonElmt.style.display = 'block';
+        } break;
             
+        case 'inspireSelect':
             break;
+
         case 'inspire':
-            document.getElementById("msDataDiv").style.display = "block";
-            // document.getElementById("fileInstructions").style.visibility = "visible";
-            // document.getElementById("fileInput").style.visibility = "visible";
+            document.getElementById("ms-data-div").style.display = "block";
             break;
     };
 };
 
-async function postFiles(serverAddress, formData, mode){
-    let user = document.getElementById('userSelection').value;
-    let project = document.getElementById('projectSelection').value;
-    console.log(formData);
-    var response = await fetch(
-        'http://' + serverAddress + ':5000/interact/upload/' + user + '/' + project + '/' + mode,
-        {
-            method: 'POST',
-            body: formData,
-        }
-    ).then( response => {
-        return response.json();
-    });
-    return response;
-}
+/* ============================================= FUNCTIONAL ============================================= */
 
 async function uploadFiles(serverAddress, mode) {
-    var selectedFiles = [];
-    if (mode === 'proteomeSelect') {
-        let hostFileElement = document.getElementById('hostProteome_file_upload');
-        let pathogenFileElement = document.getElementById('pathogenProteome_file_upload');
-        selectedFiles = [hostFileElement.files[0], pathogenFileElement.files[0]];
-    } else {
-        let fileElement = document.getElementById(mode + '_file_upload');
-        console.log(fileElement);
-        selectedFiles = fileElement.files;
-    }
-    var multiFormData = new FormData();
-    for (var i = 0; i < selectedFiles.length; i++) {
-        multiFormData.append('files', selectedFiles[i]);
-    };
+    var selectedFiles = (mode === 'proteome-select') ? [
+            document.getElementById('host-proteome-file-upload').files[0], 
+            document.getElementById('pathogen-proteome-file-upload').files[0]
+        ] 
+        : selectedFiles = document.getElementById(mode + '-file-upload').files;
+        var selectedFiles = [];
+
     console.log(selectedFiles);
 
-    document.getElementById(mode + "Waiting").style.display = 'block';
-    var response = await postFiles(serverAddress, multiFormData, mode);
-    document.getElementById(mode + "Waiting").style.display = "none";
+    var multiFormData = new FormData();
+    selectedFiles.forEach(elem => {
+        multiFormData.append('files', elem )
+    });
 
-    console.log(response);
+    let waitingTextElem = document.getElementById(mode + "-waiting");
+    
+    //Displays the waiting text during the postFiles process, removing it right after.
+    waitingTextElem.style.display = 'block';
+    console.log(await postFiles(serverAddress, multiFormData, mode));
+    waitingTextElem.style.display = "none";
+
     updateGUI(mode);
 };
 
 /**
- * Function to asynchronously update GUI after each stage submit.
+ * Fetches all files which match a user-specified pattern.
  * 
- * @param {*} mode 
+ * @param {*} serverAddress 
+ * @param {*} file_type 
  */
+async function checkFilePattern(serverAddress, file_type) {
+    document.getElementById(file_type + "-file-list").innerHTML = "";
 
-var last = "init";
-
-async function updateGUI(currentFrame) {
-    switch(currentFrame){
-        case 'ms':
-            document.getElementById("msDataDiv").style.display = "none";
-            document.getElementById("searchDiv").style.display = "block";
-            break;
-
-        case 'search':
-            document.getElementById("searchDiv").style.display = "none";
-            document.getElementById("proteomeDiv").style.display = 'block';
-            break;
-
-        case 'proteome':
-            document.getElementById("proteomeDiv").style.display = 'none';
-            document.getElementById("parametersDiv").style.display = 'block';
-            document.getElementById("executeButton").style.display = 'block';
-            break;
-
-        case 'proteomeSelect':
-            document.getElementById("parametersDiv").style.display = 'block';
-            document.getElementById("executeButton").style.display = 'block';
-            break;
-
-    };
-
-    last = currentFrame;
-}
-
-/**
- * Function to revert the GUI to the last possible frame.
- * @param {*} frame frame to be reverted to
- */
-async function revertGUI(frame) {
-    switch(frame) {
-        case "init" :
-            document.getElementById("openingDiv").style.display = "flex";
-            document.getElementById("welcomingDiv").style.display = "none";
-            document.getElementById("msDataDiv").style.display = "none";
-            cycleBackButtonVisibility();
-            break;
-            
-        case 'ms':
-            document.getElementById("msDataDiv").style.display = "block";
-            document.getElementById("searchDiv").style.display = "none";
-            last = "none"
-            break;
-
-        case 'search':
-            document.getElementById("searchDiv").style.display = "block";
-            document.getElementById("proteomeDiv").style.display = 'none';
-            last = "ms"
-            break;
-
-        case 'proteome':
-            document.getElementById("proteomeDiv").style.display = 'block';
-            document.getElementById("parametersDiv").style.display = 'none';
-            document.getElementById("executeButton").style.display = 'none';
-            last = "search"
-            break;
-
-        case 'proteomeSelect':
-            document.getElementById("parametersDiv").style.display = 'none';
-            document.getElementById("executeButton").style.display = 'none';
-            last = "proteome"
-            break;
-
-    };
-}
-
-async function onBack() {
-    if(last != null) {
-        revertGUI(last)
-    }
-}
-
-function updateListElement(listName, arrayToAdd)
-// Function to update a HTML list element with a new array.
-{
-    var ul = document.getElementById(listName);
-
-    var arrayLength = arrayToAdd.length;
-    for (var i = 0; i < arrayLength; i++) {
-        var li = document.createElement("li");
-        li.appendChild(document.createTextNode(arrayToAdd[i]));
-        ul.appendChild(li);
-    };
-    ul.style.display = 'block';
-}
-
-
-async function checkFilePattern(serverAddress, file_type)
-// Function to fetch all files which match a pattern specified by the user.
-{
-    document.getElementById(file_type + "FileList").innerHTML = "";
-    let user = document.getElementById('userSelection').value;
-    let project = document.getElementById('projectSelection').value;
-    let filePath = document.getElementById(file_type + 'FileInput').value;
+    let user = document.getElementById('user-selection').value;
+    let project = document.getElementById('project-selection').value;
+    let filePath = document.getElementById(file_type + '-file-input').value;
 
     var response = await fetch(
         'http://' + serverAddress + ':5000/interact/checkPattern/' + file_type,
@@ -309,124 +236,258 @@ async function checkFilePattern(serverAddress, file_type)
     });
 
     var filesFound = response['message'];
-    updateListElement(file_type + "FileList", filesFound)
-    
-    document.getElementById(file_type + "FileListDiv").style.display = "block";
+    updateListElement(file_type + "-file-list", filesFound)
+
+    let blockIds = [file_type + "-file-list-div"]
 
     switch (file_type){
         case 'ms':
-            document.getElementById("searchDiv").style.display = "block";
+            blockIds.push("search-div")
             break;
         case 'search':
-            document.getElementById("proteomeDiv").style.display = "block";
+            blockIds.push("proteome-div");
             break;
-        case 'proteome':
-            document.getElementById("parametersDiv").style.display = "block";
-            document.getElementById("executeButton").style.display = 'block';
+        case 'proteome': case 'pathogen-proteome':
+            blockIds.push("parameters-div");
+            blockIds.push("execute-button");
             break;
-        case 'hostProteome':
-            document.getElementById("pathogenProteomeDiv").style.display = "block";
-            break;
-        case 'pathogenProteome':
-            document.getElementById("parametersDiv").style.display = "block";
-            document.getElementById("executeButton").style.display = 'block';
+        case 'host-proteome':
+            blockIds.push("pathogen-proteome-div");
             break;
     }
+
+    setElementDisplay(blockIds)
 }
 
+
+/* ============================================= GUI FUNCTIONS ============================================= */
+
+var lastFrame = "init";
+/**
+ * Function to asynchronously update GUI after each stage submit.
+ * 
+ * @param {*} currentFrame frame currently being cycled out of.
+ */
+async function updateGUI(currentFrame) {
+    let blockIds;
+    let deletedIds;
+
+    switch(currentFrame){
+        case 'ms':
+            deletedIds = ["ms-data-div"];
+            blockIds = ["search-div"];
+            break;
+
+        case 'search':
+            deletedIds = ["search-div"];
+            blockIds = ["proteome-div"];
+            break;
+
+        case 'proteome': case 'proteome-select':
+            deletedIds = ["proteome-div"];
+            blockIds = ["parameters-div", "execute-button"];
+            break;
+    };
+    
+    setElementDisplay(blockIds);
+    setElementDisplay(deletedIds, "none");
+    lastFrame = currentFrame;
+}
+
+/**
+ * Function to revert the GUI to the previous frame.
+ * 
+ * @param {*} frame frame to be reverted to.
+ */
+async function revertGUI(frame = lastFrame) {
+    var blockIds = [];
+    let deletedIds;
+
+    switch(frame) {
+        case "init" :
+            document.getElementById("opening-div").style.display = "flex";
+            deletedIds = ["welcoming-div", "ms-data-div"]
+            document.getElementById('workflow-selection').selectedIndex = 0;
+            cycleBackButtonVisibility();
+            break;
+            
+        case 'ms':
+            blockIds = ["ms-data-div"];
+            deletedIds = ["search-div"];
+            lastFrame = "init"
+            break;
+
+        case 'search':
+            blockIds = ["search-div"];
+            deletedIds = ["proteome-div"];
+            lastFrame = "ms"
+            break;
+
+        case 'proteome': case 'proteome-select':
+            blockIds = ["proteome-div"];
+            deletedIds = ["parameters-div", "execute-button"]; 
+            lastFrame = "search"
+            break;
+    };
+
+    setElementDisplay(blockIds);
+    setElementDisplay(deletedIds, "none");
+}
+
+/**
+ * Sets the display of elements with the given ids to the desired displayType.
+ * 
+ * Defaults to 'block' display.
+ * 
+ * @param {*} ids ids of elements to affect.
+ * @param {*} displayType style type to apply to the desired elements.
+ */
+function setElementDisplay(ids, displayType = 'block') {
+    ids.forEach((id) => {
+        document.getElementById(id).style.display = displayType;
+    });
+}
+
+/**
+ * Sets the visibility of elements with the given ids to the desired visibilityType.
+ * 
+ * Defaults to 'visible' visibility.
+ * 
+ * @param {*} ids ids of elements to affect.
+ * @param {*} visibilityType style type to apply to the desired elements.
+ */
+function setElementVisibility(ids, visibilityType = 'visible') {
+    ids.forEach((id) => {
+        document.getElementById(id).style.visibility = visibilityType;
+    });
+}
+
+/**
+ * Updates an HTML list element with an array's elements.
+ * 
+ * @param {*} listName id of the already-existing list.
+ * @param {*} array array to add.
+ */
+function updateListElement(listName, array) {
+    let ul = document.getElementById(listName);
+
+    array.forEach ((elem) => {
+        ul.appendChild(
+            document.createElement("li").appendChild(document.createTextNode(elem))
+        );
+    });
+
+    ul.style.display = 'block';
+}
+
+
+/**
+ * Sets the search type according to the user's choice, additionally updating the GUI to reflect the choice.
+ * 
+ * @param {*} value chosen search type.
+ */
 function selectSearchType(value) {
+    let blockIds;
+
     switch(value){
         case 'searchDone':
-            document.getElementById('searchEngineDiv').style.display = 'block';
-            document.getElementById('searchColumn1').style.display = 'block';
-            document.getElementById('searchColumn2').style.display = 'block';
+            blockIds = ['search-engine-div', 'search-column-1', 'search-column-2']
             break;
-        case 'msFragger':
-            document.getElementById('proteomeDiv').style.display = 'block';
+        case 'searchNeeded':
+            blockIds = ['proteome-div'];
+            updateGUI('search')
             break;
     };
+
+    setElementDisplay(blockIds)
 };
 
+/**
+ * Sets the inspire type according to the user's choice, additionally updating the GUI to reflect the choice.
+ * 
+ * @param {*} value chosen inspire type.
+ */
 function selectInspireType(value) {
+    let blockIds;
+    let noneIds;
+
     switch(value){
         case 'inspireStandard':
-            document.getElementById('proteomeColumn1').style.display = 'block';
-            document.getElementById('proteomeColumn2').style.display = 'block';
-            // Allows for sequential viewing of both elements.
-            document.getElementById('proteomeSelectColumn1').style.display = 'none';
-            document.getElementById('proteomeSelectColumn2').style.display = 'none';
+            blockIds = ['proteome-column-1', 'proteome-column-2'];
+            noneIds = ['proteome-select-column-1', 'proteome-select-column-2']
             break;
         case 'inspireSelect':
-            document.getElementById('proteomeSelectColumn1').style.display = 'block';
-            document.getElementById('proteomeSelectColumn2').style.display = 'block';
-            // Allows for sequential viewing of both elements. 
-            document.getElementById('proteomeColumn1').style.display = 'none';
-            document.getElementById('proteomeColumn2').style.display = 'none';
+            blockIds = ['proteome-select-column-1', 'proteome-select-column-2']
+            noneIds = ['proteome-column-1', 'proteome-column-2'];
             break;
     };
+
+    setElementDisplay(blockIds);
+    setElementDisplay(noneIds, 'none');
 };
 
-function addConfigs() {
-// Function activated when a user wants to add more inSPIRE configurations.
-    var tbodyRef = document.getElementById('configsTable').getElementsByTagName('tbody')[0];
-    var newRow = tbodyRef.insertRow();
-    for (var i = 0; i < 3; i++) {
-        var newCell = newRow.insertCell();
-        var newInput = document.createElement("input");
-        newInput.type = "text";
-        if (i === 0) {
-            newInput.class = "configKey";
-            newCell.appendChild(newInput);
-        } else if (i === 1) {
-            newInput.class = "configVale";
-            newCell.appendChild(newInput);
-        } else {
-            var newButton = document.createElement("button");
-            newButton.innerHTML = "Delete Entry";
-            newButton.onclick = function() { 
-                deleteRow(this);
-            };
-            console.log(newButton);
-            newCell.appendChild(newButton);
-        }
+/**
+ * Provides the link to the download page.
+ * 
+ * @param {*} message server response to request. 
+ */
+function makeDownloadVisible(message) {
+    let fileDownloadTextElem = document.getElementById("file-download-text")
+
+    if (message.startsWith('inSPIRE-Interact failed')) {
+        fileDownloadTextElem.innerHTML = message;
+    } else {   
+        let a = document.getElementById('file-download');
+        a.href = message;
+        a.innerHTML = message;
     }
+
+    fileDownloadTextElem.style.display = "block";
 };
 
+/**
+ * Cycles the back button's visibility from visible to hidden and vice-versa.
+ */
+function cycleBackButtonVisibility() {
+    let button = document.getElementById("back-button")
 
-async function executePipeline(serverAddress) {
-    let user = document.getElementById('userSelection').value;
-    let project = document.getElementById('projectSelection').value;
-    var searchEngine = 'msfragger'
-    let useMsFragger = document.getElementById('searchRequired').value;
-    if (useMsFragger !== 'msFragger'){
-        searchEngine = document.getElementById('searchEngineSelection').value; // TODO handle msfragger
-    }
-    let controlFlags = document.getElementById('controlFlagInput').value;
-    var ms1Accuracy = document.getElementById('ms1AccuracyInput').value;
-    var mzAccuracy = document.getElementById('ms2AccuracyInput').value;
-    var mzUnits = document.getElementById('ms2UnitSelection').value;
-
-    var configObject = {
-        'user': user,
-        'project': project,
-        'searchEngine': searchEngine,
-        'controlFlags': controlFlags,
-        'ms1Accuracy': ms1Accuracy,
-        'mzAccuracy': mzAccuracy,
-        'mzUnits': mzUnits,
-    };
-
-    if (useMsFragger === 'msFragger'){
-        configObject['runFragger'] = 1;
-    } else {
-        configObject['runFragger'] = 0;
-    }
-
-    var response = await postJson(serverAddress, 'inspire', configObject);
-
-    makeDownloadVisible(response['message']);
+    button.style.visibility = button.style.visibility == "visible" ? "hidden" : "visible"
 }
 
+/* ============================================= BACKEND ============================================= */
+
+/**
+ * Posts the selected files to the backend.
+ * 
+ * @param {*} serverAddress  address of the server hosting inSPIRE-interact. 
+ * @param {*} formData 
+ * @param {*} mode 
+ * @returns 
+ */
+async function postFiles(serverAddress, formData, mode){
+    console.log("Form data: " + formData);
+
+    let user = document.getElementById('user-selection').value;
+    let project = document.getElementById('project-selection').value;
+    return await fetch(
+        'http://' + serverAddress + ':5000/interact/upload/' + user + '/' + project + '/' + mode,
+        {
+            method: 'POST',
+            body: formData,
+        }
+    ).then( response => {
+        return response.json();
+    });
+}
+
+/**
+ * POSTs JSON data to an Interact endpoint.
+ * 
+ * @param {*} serverAddress  address of the server hosting inSPIRE-interact. 
+ * @param {*} endPoint endpoint to POST to.
+ * @param {*} configObject 
+ * @returns reponse of the endpoint to the POST request.
+ */
 async function postJson(serverAddress, endPoint, configObject)
 // Function to POST json data to a Interact endpoint.
 {
@@ -448,22 +509,65 @@ async function postJson(serverAddress, endPoint, configObject)
     return response;
 }
 
-function makeDownloadVisible(message)
-// Function to provide link to the download page.
-{
-    if (message.startsWith('inSPIRE-Interact failed')) {
-        document.getElementById("fileDownloadText").innerHTML = message;
-        document.getElementById("fileDownloadText").style.display = "block";
-    } else {
-        document.getElementById("fileDownloadText").style.display = "block";
-        var a = document.getElementById('fileDownload');
-        a.href = message;
-        a.innerHTML = message;
-    }
-};
+/**
+ * Executes the base inSPIRE pipeline at the end of the user-led setup.
+ * 
+ * @param {*} serverAddress address of the server hosting inSPIRE-interact.
+ */
+async function executePipeline(serverAddress) {
+    let user = document.getElementById('user-selection').value;
+    let project = document.getElementById('project-selection').value;
 
-function cycleBackButtonVisibility() {
-    let button = document.getElementById("backButton")
+    
+    let useMsFragger = document.getElementById('search-required').value;
+    let searchEngine = (useMsFragger != 'searchNeeded') ? document.getElementById('search-engine-selection').value : 'msfragger'; 
+    let controlFlags = document.getElementById('control-flag-input').value;
+    let ms1Accuracy = document.getElementById('ms1-accuracy-input').value;
+    let mzAccuracy = document.getElementById('ms2-accuracy-input').value;
+    let mzUnits = document.getElementById('ms2-unit-selection').value;
 
-    button.style.visibility = button.style.visibility == "visible" ? "hidden" : "visible"
+    var configObject = {
+        'user': user,
+        'project': project,
+        'searchEngine': searchEngine,
+        'controlFlags': controlFlags,
+        'ms1Accuracy': ms1Accuracy,
+        'mzAccuracy': mzAccuracy,
+        'mzUnits': mzUnits,
+    };
+
+    configObject['runFragger'] = (useMsFragger == 'searchNeeded') ? 1 : 0;
+    
+    var response = await postJson(serverAddress, 'inspire', configObject);
+
+    makeDownloadVisible(response['message']);
 }
+
+/**
+ * Adds additional GUI elements for further inSPIRE configurations.
+ */
+function addConfigs() {
+        let newRow = document.getElementById('configs-table').getElementsByTagName('tbody')[0].insertRow();
+
+        let newButton = document.createElement("button");
+        newButton.innerHTML = "Delete Entry";
+        newButton.onclick = function() { 
+            deleteRow(this);
+        };
+
+        const CLASSES = ['config-key', 'config-value']
+
+        for (var i = 0; i < 3; i++) {
+            let newCell = newRow.insertCell();
+            let newInput = document.createElement("input");
+            newInput.type = "text";
+
+            if (i == 2) {
+                console.log(newButton);
+                newCell.appendChild(newButton);
+            } else {
+                newInput.class = CLASSES[i];
+                newCell.appendChild(newInput);
+            }
+        }
+    };
