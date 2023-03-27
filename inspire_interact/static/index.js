@@ -78,17 +78,20 @@ async function createNewUser(serverAddress) {
     //Disable the create user button.
     document.getElementById('create-user-button').disabled = "disabled";
 
+    createElement('user-selection');
+    
+    showProjectOptions([]);
+};
+
+function createSelectElement(id) {
     let opt = document.createElement('option');
     opt.value = newUser;
     opt.innerHTML = newUser;
 
-    let userSelection = document.getElementById('user-selection');
+    let userSelection = document.getElementById(id);
     userSelection.appendChild(opt);
     userSelection.selectedIndex = userSelection.options.length-1;
-
-
-    showProjectOptions([]);
-};
+}
 
 
 /* ============================================= PROJECT ============================================= */
@@ -153,13 +156,7 @@ async function createNewProject(serverAddress) {
     setElementDisplay("no-projects-error", "none");
     setElementDisplay("project-selection-form-div");
 
-    let opt = document.createElement('option');
-    opt.value = newProject;
-    opt.innerHTML = newProject;
-
-    let projectSelection = document.getElementById('project-selection');
-    projectSelection.appendChild(opt);
-    projectSelection.selectedIndex = projectSelection.options.length-1;
+    createSelectElement('project-selection');
 
     showWorkflowOptions();
 };
