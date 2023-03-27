@@ -47,6 +47,7 @@
 
 			<!-- PROJECT SELECTION -->
 			<div id="project-select-div" class="opening-sub-div" style="visibility: hidden;">
+				<h3>Project Selection</h3>
 				<p>Which project do you want to work on?.</p>
 				<p>Select existing projects.</p>
 				<form>
@@ -66,6 +67,7 @@
 			
 			<!-- WORKFLOW SELECTION -->
 			<div id="workflow-select-div" class="opening-sub-div" style="visibility: hidden;">
+				<h3>Workflow Selection</h3>
 				<p>What do you want to do?</p>
 				<form>
 					<select id="workflow-selection" autocomplete="off" onchange="selectWorkflow(this.value)">
@@ -226,16 +228,16 @@
 				<div id="proteome-select-column-1" style="margin-left: 0%;">
 					<p>Upload the host proteome file.</p>
 					<br>
-					<p>Specify the control flags (Comma-Separated).</p>
-					<form id="control-flag-form">
-						<input type="text" id="control-flag-input" name="control-flag-input" style="width:60%;">
-					</form>
-					<br>
 					<p>Host Proteome:</p>
 					<input type="file" id="host-proteome-file-upload" multiple="false" />
 					<br>
 					<p>Pathogen Proteome:</p>
 					<input type="file" id="pathogen-proteome-file-upload" multiple="false" />
+					<br>
+					<p>Specify the control flags (Comma-Separated).</p>
+					<form id="control-flag-form">
+						<input type="text" id="control-flag-input" name="control-flag-input" style="width:60%;">
+					</form>
 					<br>
 					<input type="submit" onclick="uploadFiles('{{ server_address }}', 'proteome-select')">
 					<p id="proteome-select-waiting" style="display:none;">Files uploading...</p>
