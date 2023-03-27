@@ -94,6 +94,7 @@
 					<br>
 					<input autocomplete="off" type="submit" onclick="uploadFiles('{{ server_address }}', 'ms')">
 					<p id="ms-waiting" style="display:none;">Files uploading...</p>
+					<p id="ms-no-files" style="display:none; color:red;">Please upload a file before proceeding.</p>
 				</div>
 
 				<div class="vl"></div>
@@ -151,6 +152,7 @@
 					<br>
 					<input type="submit" onclick="uploadFiles('{{ server_address }}', 'search')">
 					<p id="search-waiting" style="display:none;">Files uploading...</p>
+					<p id="search-no-files" style="display:none; color:red;">Please upload a file before proceeding.</p>
 				</div>
 				
 				<div class="vl"></div>
@@ -191,74 +193,84 @@
 
 			<br>
 
-			<div id="proteome-column-1" class="column"  style="display:none; margin-left: 0%;">
-				<p>Upload your proteome file.</p>
-				<br>
-				<input type="file" id="proteome-file-upload" multiple="true" />
-				<br>
-				<br>
-				<input type="submit" onclick="uploadFiles('{{ server_address }}', 'proteome')">
-				<p id="proteome-waiting" style="display:none;">Files uploading...</p>
-			</div>
-
-			<div id="proteome-column-2" class="column"  style="display:none; margin-left: 0%;">
-				<p>Or specify a file pattern on the inSPIRE Server.</p>
-				<form id="proteome-file-form">
-					<input type="text" id="proteome-file-input" name="proteome-file-input" style="width:60%;">
-				</form>
-				<br>
-				<input type="submit" onclick="checkFilePattern('{{ server_address }}', 'proteome')">
-				<div id="proteome-file-list-div" style="display:none; margin-left: 0%;">
-					Proteome file to be used:
-					<ul id="proteome-file-list"></ul>
-					If the file above is incorrect, adjust your file pattern and click the button again.
-				</div>
-			</div>
-
-			<div id="proteome-select-column-1" class="column"  style="display:none; margin-left: 0%;">
-				<p>Upload the host proteome file.</p>
-				<br>
-				<p>Specify the control flags (Comma-Separated).</p>
-				<form id="control-flag-form">
-					<input type="text" id="control-flag-input" name="control-flag-input" style="width:60%;">
-				</form>
-				<br>
-				<p>Host Proteome:</p>
-				<input type="file" id="host-proteome-file-upload" multiple="true" />
-				<br>
-				<p>Pathogen Proteome:</p>
-				<input type="file" id="pathogen-proteome-file-upload" multiple="true" />
-				<br>
-				<input type="submit" onclick="uploadFiles('{{ server_address }}', 'proteome-select')">
-				<p id="proteome-select-waiting" style="display:none;">Files uploading...</p>
-			</div>
-
-			<div id="proteome-select-column-2" class="column"  style="display:none; margin-left: 0%;">
-				<p>Or specify a file pattern on the inSPIRE Server.</p>
-
-				Specify Host Proteome File:
-				<form id="host-proteome-file-form">
-					<input type="text" id="host-proteome-file-input" name="host-proteome-file-input" style="width:60%;">
-				</form>
-				<br>
-				<input type="submit" onclick="checkFilePattern('{{ server_address }}', 'host-proteome')">
-				<div id="host-proteome-file-list-div" style="display:none;">
-					Host proteome file to be used:
-					<ul id="host-proteome-file-list"></ul>
-					If the file above is incorrect, adjust your file pattern and click the button again.
+			<div id="sub-proteome-div" class="row" style="display:none; margin-left: 0%;">
+				<div id="proteome-column-1" style="margin-left: 0%;">
+					<p>Upload your proteome file.</p>
+					<br>
+					<input type="file" id="proteome-file-upload" multiple="true" />
+					<br>
+					<br>
+					<input type="submit" onclick="uploadFiles('{{ server_address }}', 'proteome')">
+					<p id="proteome-waiting" style="display:none;">Files uploading...</p>
+					<p id="proteome-no-files" style="display:none; color:red;">Please upload a file before proceeding.</p>
 				</div>
 
-				<div id="pathogen-proteome-div" style="display:none; margin-left:0;">
-					Specify Pathogen Proteome File.
-					<form id="pathogen-proteome-file-form">
-						<input type="text" id="pathogen-proteome-file-input" name="pathogen-proteome-file-input" style="width:60%;">
+				<div class="vl"></div>
+
+				<div id="proteome-column-2"style="margin-left: 0%;">
+					<p>Or specify a file pattern on the inSPIRE Server.</p>
+					<form id="proteome-file-form">
+						<input type="text" id="proteome-file-input" name="proteome-file-input" style="width:60%;">
 					</form>
 					<br>
-					width: 150%;		<input type="submit" onclick="checkFilePattern('{{ server_address }}', 'pathogen-proteome')">
-					<div id="pathogen-proteome-file-list-div" style="display:none; margin-left:0;"">
-						Pathogen proteome file to be used:
-						<ul id="pathogen-proteome-file-list"></ul>
+					<input type="submit" onclick="checkFilePattern('{{ server_address }}', 'proteome')">
+					<div id="proteome-file-list-div" style="display:none; margin-left: 0%;">
+						Proteome file to be used:
+						<ul id="proteome-file-list"></ul>
 						If the file above is incorrect, adjust your file pattern and click the button again.
+					</div>
+				</div>
+			</div>
+
+			<div id="sub-proteome-select-div" class="row" style="display:none; margin-left: 0%;">
+				<div id="proteome-select-column-1" style="margin-left: 0%;">
+					<p>Upload the host proteome file.</p>
+					<br>
+					<p>Specify the control flags (Comma-Separated).</p>
+					<form id="control-flag-form">
+						<input type="text" id="control-flag-input" name="control-flag-input" style="width:60%;">
+					</form>
+					<br>
+					<p>Host Proteome:</p>
+					<input type="file" id="host-proteome-file-upload" multiple="false" />
+					<br>
+					<p>Pathogen Proteome:</p>
+					<input type="file" id="pathogen-proteome-file-upload" multiple="false" />
+					<br>
+					<input type="submit" onclick="uploadFiles('{{ server_address }}', 'proteome-select')">
+					<p id="proteome-select-waiting" style="display:none;">Files uploading...</p>
+					<p id="proteome-select-no-files" style="display:none; color:red;">Please upload both files before proceeding.</p>
+				</div>
+
+				<div class="vl"></div>
+
+				<div id="proteome-select-column-2" style="margin-left: 0%;">
+					<p>Or specify a file pattern on the inSPIRE Server.</p>
+
+					Specify Host Proteome File:
+					<form id="host-proteome-file-form">
+						<input type="text" id="host-proteome-file-input" name="host-proteome-file-input" style="width:60%;">
+					</form>
+					<br>
+					<input type="submit" onclick="checkFilePattern('{{ server_address }}', 'host-proteome')">
+					<div id="host-proteome-file-list-div" style="display:none;">
+						Host proteome file to be used:
+						<ul id="host-proteome-file-list"></ul>
+						If the file above is incorrect, adjust your file pattern and click the button again.
+					</div>
+
+					<div id="pathogen-proteome-div" style="display:none; margin-left:0;">
+						Specify Pathogen Proteome File.
+						<form id="pathogen-proteome-file-form">
+							<input type="text" id="pathogen-proteome-file-input" name="pathogen-proteome-file-input" style="width:60%;">
+						</form>
+						<br>
+						width: 150%;		<input type="submit" onclick="checkFilePattern('{{ server_address }}', 'pathogen-proteome')">
+						<div id="pathogen-proteome-file-list-div" style="display:none; margin-left:0;"">
+							Pathogen proteome file to be used:
+							<ul id="pathogen-proteome-file-list"></ul>
+							If the file above is incorrect, adjust your file pattern and click the button again.
+						</div>
 					</div>
 				</div>
 			</div>

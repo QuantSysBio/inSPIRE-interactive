@@ -1,3 +1,11 @@
+/**
+ * 
+ * 
+ * @author {John A. Cormican}
+ * @author {Manuel Santos Pereira}
+ */
+
+
 /* ============================================= USER ============================================= */
 
 /**
@@ -189,9 +197,12 @@ async function uploadFiles(serverAddress, mode) {
             document.getElementById('host-proteome-file-upload').files[0], 
             document.getElementById('pathogen-proteome-file-upload').files[0]
         ] 
-        : Arrays.from(document.getElementById(mode + '-file-upload').files);
-        
-    console.log(selectedFiles);
+        : Array.from(document.getElementById(mode + '-file-upload').files);
+
+    console.log(selectedFiles)
+
+    //If file upload was not completed, do not allow users to proceed.
+    if(!checkPreconditions(mode, selectedFiles)) return;
 
     var multiFormData = new FormData();
     selectedFiles.forEach ((elem) => {
@@ -207,6 +218,18 @@ async function uploadFiles(serverAddress, mode) {
 
     updateGUI(mode);
 };
+
+function checkPreconditions(mode, files) {
+    let noFilesText = document.getElementById(mode + "-no-files");
+
+    if(files.length == 0 || (mode == "proteome-select" && (typeof files[0] == "undefined" || typeof files[1] == "undefined"))) {
+        noFilesText.style.display = "block";
+        return false;
+    }
+
+    noFilesText.style.display = "none";
+    return true;
+}
 
 /**
  * Fetches all files which match a user-specified pattern.
@@ -407,21 +430,21 @@ function selectSearchType(value) {
  * @param {*} value chosen inspire type.
  */
 function selectInspireType(value) {
-    let blockIds;
+    let flexIds;
     let noneIds;
 
     switch(value){
         case 'inspireStandard':
-            blockIds = ['proteome-column-1', 'proteome-column-2'];
-            noneIds = ['proteome-select-column-1', 'proteome-select-column-2']
+            blockIds = ["sub-proteome-div"];
+            noneIds = ["sub-proteome-select-div"]
             break;
         case 'inspireSelect':
-            blockIds = ['proteome-select-column-1', 'proteome-select-column-2']
-            noneIds = ['proteome-column-1', 'proteome-column-2'];
+            blockIds = ["sub-proteome-select-div"]
+            noneIds = ["sub-proteome-div"];
             break;
     };
 
-    setElementDisplay(blockIds);
+    setElementDisplay(blockIds, "flex");
     setElementDisplay(noneIds, 'none');
 };
 
@@ -450,7 +473,7 @@ function makeDownloadVisible(message) {
 function cycleBackButtonVisibility() {
     let button = document.getElementById("back-button")
 
-    button.style.visibility = button.style.visibility == "visible" ? "hidden" : "visible"
+    button.style.visibility = (button.style.visibility == "visible") ? "hidden" : "visible"
 }
 
 /* ============================================= BACKEND ============================================= */
@@ -516,8 +539,6 @@ async function postJson(serverAddress, endPoint, configObject)
 async function executePipeline(serverAddress) {
     let user = document.getElementById('user-selection').value;
     let project = document.getElementById('project-selection').value;
-
-    
     let useMsFragger = document.getElementById('search-required').value;
     let searchEngine = (useMsFragger != 'searchNeeded') ? document.getElementById('search-engine-selection').value : 'msfragger'; 
     let controlFlags = document.getElementById('control-flag-input').value;
