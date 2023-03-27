@@ -50,12 +50,16 @@
 			<div id="project-select-div" class="opening-sub-div" style="visibility: hidden;">
 				<h3>Project Selection</h3>
 				<p>Which project do you want to work on?.</p>
-				<p>Select existing projects.</p>
-				<form>
-					<select id="project-selection" autocomplete="off" onchange="selectProject('{{ server_address }}', this.value)">
-						<option class = "default" selected disabled hidden>Select Project</option>
-					</select>
-				</form>
+				<div id="project-selection-form-div">
+					<p>Select existing projects.</p>
+					<form>
+						<select id="project-selection" autocomplete="off" onchange="selectProject('{{ server_address }}', this.value)">
+							<option class = "default" selected disabled hidden>Select Project</option>
+						</select>
+					</form>
+				</div>
+				<p id="no-projects-error" class="error-message">No projects exist for this user.</p>
+				<br>
 				<form>
 					<label>Or enter your new project title:</label><br>
 					<input autocomplete="off" type="text" id="new-project-input" name="new-project-input">

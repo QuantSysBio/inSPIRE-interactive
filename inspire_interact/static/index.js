@@ -20,10 +20,9 @@
  * @returns 
  */
 async function request(url, args) {
-    if(typeof args != "object") args = {args};
-
+    
     let response = await fetch(
-        url, { args } 
+        url, args 
     ).then( response => {
         return response.json();
     }).catch( error => {
@@ -48,10 +47,9 @@ async function request(url, args) {
 async function selectUser(serverAddress, selectedUser) {
     let response = await request(
         'http://' + serverAddress + ':5000/interact/user/' + selectedUser,
-        "GET"
+        { method : 'GET' }
     );
     
-    console.log(response)
     showProjectOptions(response["message"]);
 };
 
@@ -65,18 +63,17 @@ async function createNewUser(serverAddress) {
     let newUser = document.getElementById('new-user-input').value;
 
     try {
-        var response = await request(
+        await request(
             'http://' + serverAddress + ':5000/interact/user/' + newUser,
-            "PUT"
+            { method : 'PUT'}
         );
     } catch (e) {
         document.getElementById("create-user-error").innerHTML = e.message;
-        setElementVisibility("create-user-error");
+        setElementDisplay("create-user-error");
         return;
     }
 
-
-    setElementVisibility("create-user-error", "hidden");
+    setElementDisplay("create-user-error", "none");
 
     //Disable the create user button.
     document.getElementById('create-user-button').disabled = "disabled";
@@ -90,7 +87,7 @@ async function createNewUser(serverAddress) {
     userSelection.selectedIndex = userSelection.options.length-1;
 
 
-    showProjectOptions(response);
+    showProjectOptions([]);
 };
 
 
@@ -104,16 +101,22 @@ async function createNewUser(serverAddress) {
 function showProjectOptions(options) {
     let projectSelection = document.getElementById("project-selection");
 
-    console.log(options)
     resetSelect(projectSelection);
 
+    if(options.length != 0) {
     options.forEach ((option) => {
         let optionElem = document.createElement('option');
         optionElem.value = option;
         optionElem.innerHTML = option;
 
         projectSelection.appendChild(optionElem);
+        setElementDisplay("no-projects-error", "none");
+        setElementDisplay("project-selection-form-div");
     });
+    } else {
+        setElementDisplay("no-projects-error");
+        setElementDisplay("project-selection-form-div", "none");
+    }
 
     setElementVisibility(["project-select-div", "opening-Vl-1"])
 };
@@ -144,8 +147,11 @@ async function createNewProject(serverAddress) {
     let newProject = document.getElementById('new-project-input').value;
     await request(
         'http://' + serverAddress + ':5000/interact/project/' + user + '/' + newProject,
-        'GET'   
+        { method : 'GET'}   
     );
+
+    setElementDisplay("no-projects-error", "none");
+    setElementDisplay("project-selection-form-div");
 
     let opt = document.createElement('option');
     opt.value = newProject;
@@ -168,7 +174,7 @@ async function selectProject(serverAddress, selectedProject) {
     let user = document.getElementById('user-selection').value;
     await request(
         'http://' + serverAddress + ':5000/interact/project/' + user + '/' + selectedProject,
-        'GET'  
+        { method : 'GET' }  
     );
    
     showWorkflowOptions();

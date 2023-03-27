@@ -32,7 +32,7 @@ hr {
 
 .error-message {
     color: red;
-    visibility: hidden;
+    display: none;
 }
 
 .vl {
