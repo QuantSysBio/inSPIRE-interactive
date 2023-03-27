@@ -30,6 +30,11 @@ hr {
     height: 100px;
 } */
 
+.error-message {
+    color: red;
+    visibility: hidden;
+}
+
 .vl {
     border-left:#165a19 dotted 2px;
     height: 200px;

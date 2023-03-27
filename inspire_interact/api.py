@@ -5,7 +5,7 @@ import os
 import socket
 
 import flask
-from flask import request, Response, render_template, send_from_directory
+from flask import request, Response, render_template, send_from_directory, abort
 from flask.json import jsonify
 from flask_cors import cross_origin
 import yaml
@@ -23,7 +23,6 @@ from inspire_interact.constants import (
 from inspire_interact.utils import check_pids, prepare_inspire
 
 app = flask.Flask(__name__, template_folder='templates')
-
 
 @app.route('/favicon.ico')
 @cross_origin()
@@ -47,15 +46,27 @@ def send_static(path):
 @cross_origin()
 def get_user(user):
     """ Function to check for existing user or create a new user folder.
-    """
-    if os.path.isdir(f'{app.config[INTERACT_HOME_KEY]}/projects/{user}'):
-        projects = os.listdir(f'projects/{user}')
-        projects = [project for project in projects if not project.endswith('.tar')]
-    else:
-        os.mkdir(f'projects/{user}')
-        projects = []
-    response =  jsonify(message=projects)
-    return response
+    """  
+    projects = os.listdir(f'projects/{user}')
+    projects = [project for project in projects if not project.endswith('.tar')]
+   
+    return jsonify(message=projects)
+
+@app.route('/interact/user/<user>', methods=['PUT'])
+@cross_origin()
+def put_user(user):
+    if(os.path.isdir(f'{app.config[INTERACT_HOME_KEY]}/projects/{user}')):
+        abort(405, description="Resource already exists.")
+    
+    os.mkdir(f'projects/{user}')
+    projects = []
+            
+    return jsonify(message = projects)
+
+@app.errorhandler(405)
+@cross_origin()
+def resource_not_accessible(e):
+    return jsonify(error=(str(e))), 405
 
 @app.route('/interact/project/<user>/<project>', methods=['GET'])
 @cross_origin()

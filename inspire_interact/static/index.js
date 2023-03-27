@@ -5,6 +5,38 @@
  * @author {Manuel Santos-Pereira}
  */
 
+
+/*  ============================================= REQUESTS =============================================  */
+
+/**
+ * Deals with the request logic to backend.
+ * 
+ * Deals with error handling, offering the basic JS error API to deal with them instead of HTTP errors.
+ * 
+ * @throws error whose message is that of the backend error.
+ * 
+ * @param {*} body
+ * @param {*} method
+ * @returns 
+ */
+async function request(url, args) {
+    if(typeof args != "object") args = {args};
+
+    let response = await fetch(
+        url, { args } 
+    ).then( response => {
+        return response.json();
+    }).catch( error => {
+        return error.json();
+    });
+
+    if(typeof response.error != 'undefined') {
+       throw new Error(response.error.message);
+    }
+
+    return response;
+}
+
 /* ============================================= USER ============================================= */
 
 /**
@@ -14,17 +46,15 @@
  * @param {*} selectedUser user selected by user.
  */
 async function selectUser(serverAddress, selectedUser) {
-    var response = await fetch(
+    let response = await request(
         'http://' + serverAddress + ':5000/interact/user/' + selectedUser,
-        {
-            method: 'GET',
-        }
-    ).then( response => {
-        return response.json();
-    });
-
+        "GET"
+    );
+    
+    console.log(response)
     showProjectOptions(response["message"]);
 };
+
 
 /**
  * Creates a new inSPIRE-interact user, forcing a GUI update to show the user's projects.
@@ -32,19 +62,24 @@ async function selectUser(serverAddress, selectedUser) {
  * @param {*} serverAddress address of the server hosting inSPIRE-interact.
  */
 async function createNewUser(serverAddress) {
-    //Disable the create user button.
-    document.getElementById('create-user-button').disabled = "disabled";
-    
     let newUser = document.getElementById('new-user-input').value;
 
-    var response = await fetch(
-        'http://' + serverAddress + ':5000/interact/user/' + newUser,
-        {
-            method: 'GET',
-        }
-    ).then( response => {
-        return response.json();
-    });
+    try {
+        var response = await request(
+            'http://' + serverAddress + ':5000/interact/user/' + newUser,
+            "PUT"
+        );
+    } catch (e) {
+        document.getElementById("create-user-error").innerHTML = e.message;
+        setElementVisibility("create-user-error");
+        return;
+    }
+
+
+    setElementVisibility("create-user-error", "hidden");
+
+    //Disable the create user button.
+    document.getElementById('create-user-button').disabled = "disabled";
 
     let opt = document.createElement('option');
     opt.value = newUser;
@@ -55,7 +90,7 @@ async function createNewUser(serverAddress) {
     userSelection.selectedIndex = userSelection.options.length-1;
 
 
-    showProjectOptions(response["message"]);
+    showProjectOptions(response);
 };
 
 
@@ -69,6 +104,7 @@ async function createNewUser(serverAddress) {
 function showProjectOptions(options) {
     let projectSelection = document.getElementById("project-selection");
 
+    console.log(options)
     resetSelect(projectSelection);
 
     options.forEach ((option) => {
@@ -106,14 +142,10 @@ async function createNewProject(serverAddress) {
 
     let user = document.getElementById('user-selection').value;
     let newProject = document.getElementById('new-project-input').value;
-    var response = await fetch(
+    await request(
         'http://' + serverAddress + ':5000/interact/project/' + user + '/' + newProject,
-        {
-            method: 'GET',
-        }
-    ).then( response => {
-        return response.json();
-    });
+        'GET'   
+    );
 
     let opt = document.createElement('option');
     opt.value = newProject;
@@ -134,15 +166,10 @@ async function createNewProject(serverAddress) {
  */
 async function selectProject(serverAddress, selectedProject) {
     let user = document.getElementById('user-selection').value;
-    var response = await fetch(
+    await request(
         'http://' + serverAddress + ':5000/interact/project/' + user + '/' + selectedProject,
-        {
-            method: 'GET',
-        }
-    ).then( response => {
-        return response.json();
-    });
-   
+        'GET'  
+    );
    
     showWorkflowOptions();
 };
@@ -245,7 +272,7 @@ async function checkFilePattern(serverAddress, file_type) {
     let project = document.getElementById('project-selection').value;
     let filePath = document.getElementById(file_type + '-file-input').value;
 
-    var response = await fetch(
+    var response = await request(
         'http://' + serverAddress + ':5000/interact/checkPattern/' + file_type,
         {
             method: 'POST',
@@ -254,9 +281,7 @@ async function checkFilePattern(serverAddress, file_type) {
             },
             body: JSON.stringify({'user': user, 'project': project, 'filePattern': filePath})
         }
-    ).then( response => {
-        return response.json();
-    });
+    );
 
     var filesFound = response['message'];
     updateListElement(file_type + "-file-list", filesFound)
@@ -534,7 +559,7 @@ async function postFiles(serverAddress, formData, mode){
 async function postJson(serverAddress, endPoint, configObject)
 // Function to POST json data to a Interact endpoint.
 {
-    var response = await fetch(
+    var response = await request(
         'http://' + serverAddress + ':5000/interact/' + endPoint,
         {
             method: 'POST',
@@ -544,10 +569,8 @@ async function postJson(serverAddress, endPoint, configObject)
             body: JSON.stringify(
                 configObject
             )
-        },
-    ).then( response => {
-        return response.json();
-    });
+        }
+    );
 
     return response;
 }

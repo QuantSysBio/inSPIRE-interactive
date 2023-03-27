@@ -41,6 +41,7 @@
 				</form>
 				<br>
 				<button id="create-user-button" onclick="createNewUser('{{ server_address }}')">Create New User</button>
+				<p id="create-user-error" class="error-message"></p>
 			</div>
 
 			<div id="opening-Vl-1" class="vl" style="visibility: hidden;"></div>
@@ -345,7 +346,7 @@
 		&xlarr; Back
 	</button>
 
-	
+
 	<button id="forward-button" class="text-button" onclick="updateGUI()" style="visibility: hidden;">
 		&xrarr; Forward
 	</button>
