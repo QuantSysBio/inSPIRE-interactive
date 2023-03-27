@@ -83,16 +83,6 @@ async function createNewUser(serverAddress) {
     showProjectOptions([]);
 };
 
-function createSelectElement(newElem, id) {
-    let opt = document.createElement('option');
-    opt.value = newElem;
-    opt.innerHTML = newElem;
-
-    let selection = document.getElementById(id);
-    selection.appendChild(opt);
-    selection.selectedIndex = selection.options.length-1;
-}
-
 
 /* ============================================= PROJECT ============================================= */
 
@@ -124,17 +114,6 @@ function showProjectOptions(options) {
     setElementVisibility(["project-select-div", "opening-Vl-1"])
 };
 
-/**
- * Resets the project selections displayed in the drop-down menu in case the user is re-selected.
- * 
- * @param {HTMLElement} element drop-down menu element containing the projects.
- */
-function resetSelect(element) {
-    while(element.lastChild.className != "default")
-        element.lastChild.remove()
-    
-    element.selectedIndex = 0;
-}
 
 /**
  * Creates a new project for the chosen user, calls the backend services and updates the GUI to reflect the addition.
@@ -524,6 +503,37 @@ function cycleBackButtonVisibility() {
 
     button.style.visibility = (button.style.visibility == "visible") ? "hidden" : "visible"
 }
+
+
+/**
+ * Creates a new sub-element for select drop down menus.
+ * 
+ * @param {*} obj  data for which the sub-element is created.
+ * @param {*} id id of the select menu which will hold the subelement.
+ */
+function createSelectElement(obj, id) {
+    let opt = document.createElement('option');
+    opt.value = obj;
+    opt.innerHTML = obj;
+
+    let selection = document.getElementById(id);
+    selection.appendChild(opt);
+    selection.selectedIndex = selection.options.length-1;
+}
+
+
+/**
+ * Resets the project selections displayed in the drop-down menu in case the user is re-selected.
+ * 
+ * @param {HTMLElement} element drop-down menu element containing the projects.
+ */
+function resetSelect(element) {
+    while(element.lastChild.className != "default")
+        element.lastChild.remove()
+    
+    element.selectedIndex = 0;
+}
+
 
 /* ============================================= BACKEND ============================================= */
 

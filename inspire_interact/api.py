@@ -40,6 +40,7 @@ def favicon():
 def send_static(path):
     """ Function to send static files from the static folder.
     """
+
     return send_from_directory('static', path)
 
 @app.route('/interact/user/<user>', methods=['GET'])
