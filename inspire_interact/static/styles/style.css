@@ -143,7 +143,13 @@ hr {
     background-color: inherit;
     font-size: inherit;
     cursor: pointer;
-    margin-left: 5%;
+    margin-left: 15%;
+    
+}
+
+#forward-button {
+    margin-right: 20%;
+    float: right;
 }
 
 .text-button:hover {background: #eee;}

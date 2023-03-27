@@ -1,10 +1,9 @@
 /**
- * 
+ * Easy GUI/webserver access for the inSPIRE platform.
  * 
  * @author {John A. Cormican}
- * @author {Manuel Santos Pereira}
+ * @author {Manuel Santos-Pereira}
  */
-
 
 /* ============================================= USER ============================================= */
 
@@ -169,12 +168,14 @@ function selectWorkflow(value) {
     let project = document.getElementById('project-selection').value;
     let message = "User <b>" + user + "</b> is working on <b>" + project + "</b> to run <b>" + value + "</b>.";
 
-    document.getElementById("opening-div").style.display = "none";
     document.getElementById("welcoming-div").innerHTML = message;
-    cycleBackButtonVisibility();
-
+    //TODO: DOWNLOAD and DELETE still do not support frame cycling, let that be for later, functional for now.
+    
     switch(value){
         case 'deleteProjectData': case 'downloadProjectData': {
+            setElementDisplay("opening-div", "none");
+            setElementVisibility("forward-button", "hidden");
+
             let executeButtonElmt = document.getElementById('execute-button');
 
             executeButtonElmt.innerHTML = (value == 'deleteProjectData') ? 'Delete All Project Data' : 'Download All Project Files';
@@ -185,7 +186,7 @@ function selectWorkflow(value) {
             break;
 
         case 'inspire':
-            document.getElementById("ms-data-div").style.display = "block";
+            updateGUI();
             break;
     };
 };
@@ -216,7 +217,7 @@ async function uploadFiles(serverAddress, mode) {
     console.log(await postFiles(serverAddress, multiFormData, mode));
     waitingTextElem.style.display = "none";
 
-    updateGUI(mode);
+    updateGUI();
 };
 
 function checkPreconditions(mode, files) {
@@ -284,36 +285,51 @@ async function checkFilePattern(serverAddress, file_type) {
 
 /* ============================================= GUI FUNCTIONS ============================================= */
 
-var lastFrame = "init";
+const FRAMES = ["init", "ms", "search", "proteome"]
+var curFrameIx = 0;
+var maxFrameIx = curFrameIx;
 /**
  * Function to asynchronously update GUI after each stage submit.
  * 
  * @param {*} currentFrame frame currently being cycled out of.
  */
-async function updateGUI(currentFrame) {
+async function updateGUI(frame = FRAMES[curFrameIx++]) {
     let blockIds;
     let deletedIds;
+    
+    switch(frame){
+        case 'init':
+            cycleBackButtonVisibility();
+            deletedIds = "opening-div";
+            blockIds = "ms-data-div";
+            break;
 
-    switch(currentFrame){
         case 'ms':
-            deletedIds = ["ms-data-div"];
-            blockIds = ["search-div"];
+            deletedIds = "ms-data-div";
+            blockIds = "search-div";
             break;
 
         case 'search':
-            deletedIds = ["search-div"];
-            blockIds = ["proteome-div"];
+            deletedIds = "search-div";
+            blockIds = "proteome-div";
             break;
 
         case 'proteome': case 'proteome-select':
-            deletedIds = ["proteome-div"];
+            deletedIds = "proteome-div";
             blockIds = ["parameters-div", "execute-button"];
             break;
     };
+
+    if(curFrameIx >= maxFrameIx) { 
+        setElementVisibility("forward-button", "hidden");
+
+        if(curFrameIx > maxFrameIx) maxFrameIx++;
+    }
+
+    console.log(curFrameIx + " " + maxFrameIx);
     
     setElementDisplay(blockIds);
     setElementDisplay(deletedIds, "none");
-    lastFrame = currentFrame;
 }
 
 /**
@@ -321,40 +337,85 @@ async function updateGUI(currentFrame) {
  * 
  * @param {*} frame frame to be reverted to.
  */
-async function revertGUI(frame = lastFrame) {
+async function revertGUI(frame = FRAMES[--curFrameIx]) {
     var blockIds = [];
     let deletedIds;
 
     switch(frame) {
         case "init" :
+            cycleBackButtonVisibility();
             document.getElementById("opening-div").style.display = "flex";
             deletedIds = ["welcoming-div", "ms-data-div"]
-            document.getElementById('workflow-selection').selectedIndex = 0;
-            cycleBackButtonVisibility();
             break;
             
         case 'ms':
-            blockIds = ["ms-data-div"];
-            deletedIds = ["search-div"];
+            blockIds = "ms-data-div";
+            deletedIds = "search-div";
             lastFrame = "init"
             break;
 
         case 'search':
-            blockIds = ["search-div"];
-            deletedIds = ["proteome-div"];
+            blockIds = "search-div";
+            deletedIds = "proteome-div";
             lastFrame = "ms"
             break;
 
         case 'proteome': case 'proteome-select':
-            blockIds = ["proteome-div"];
+            blockIds = "proteome-div";
             deletedIds = ["parameters-div", "execute-button"]; 
             lastFrame = "search"
             break;
     };
 
+    setElementVisibility("forward-button");
+
     setElementDisplay(blockIds);
     setElementDisplay(deletedIds, "none");
 }
+
+/**
+ * Sets the search type according to the user's choice, additionally updating the GUI to reflect the choice.
+ * 
+ * @param {*} value chosen search type.
+ */
+function selectSearchType(value) {
+    let blockIds;
+
+    switch(value){
+        case 'searchDone':
+            blockIds = ['search-engine-div', 'search-column-1', 'search-column-2']
+            break;
+        case 'searchNeeded':
+            updateGUI();
+            break;
+    };
+
+    setElementDisplay(blockIds)
+};
+
+/**
+ * Sets the inspire type according to the user's choice, additionally updating the GUI to reflect the choice.
+ * 
+ * @param {*} value chosen inspire type.
+ */
+function selectInspireType(value) {
+    let flexIds;
+    let noneIds;
+
+    switch(value){
+        case 'inspireStandard':
+            flexIds = ["sub-proteome-div"];
+            noneIds = ["sub-proteome-select-div"]
+            break;
+        case 'inspireSelect':
+            flexIds = ["sub-proteome-select-div"]
+            noneIds = ["sub-proteome-div"];
+            break;
+    };
+
+    setElementDisplay(flexIds, "flex");
+    setElementDisplay(noneIds, 'none');
+};
 
 /**
  * Sets the display of elements with the given ids to the desired displayType.
@@ -365,6 +426,8 @@ async function revertGUI(frame = lastFrame) {
  * @param {*} displayType style type to apply to the desired elements.
  */
 function setElementDisplay(ids, displayType = 'block') {
+    if(!Array.isArray(ids)) ids = [ids];
+
     ids.forEach((id) => {
         document.getElementById(id).style.display = displayType;
     });
@@ -379,6 +442,8 @@ function setElementDisplay(ids, displayType = 'block') {
  * @param {*} visibilityType style type to apply to the desired elements.
  */
 function setElementVisibility(ids, visibilityType = 'visible') {
+    if(!Array.isArray(ids)) ids = [ids];
+
     ids.forEach((id) => {
         document.getElementById(id).style.visibility = visibilityType;
     });
@@ -403,50 +468,6 @@ function updateListElement(listName, array) {
 }
 
 
-/**
- * Sets the search type according to the user's choice, additionally updating the GUI to reflect the choice.
- * 
- * @param {*} value chosen search type.
- */
-function selectSearchType(value) {
-    let blockIds;
-
-    switch(value){
-        case 'searchDone':
-            blockIds = ['search-engine-div', 'search-column-1', 'search-column-2']
-            break;
-        case 'searchNeeded':
-            blockIds = ['proteome-div'];
-            updateGUI('search')
-            break;
-    };
-
-    setElementDisplay(blockIds)
-};
-
-/**
- * Sets the inspire type according to the user's choice, additionally updating the GUI to reflect the choice.
- * 
- * @param {*} value chosen inspire type.
- */
-function selectInspireType(value) {
-    let flexIds;
-    let noneIds;
-
-    switch(value){
-        case 'inspireStandard':
-            blockIds = ["sub-proteome-div"];
-            noneIds = ["sub-proteome-select-div"]
-            break;
-        case 'inspireSelect':
-            blockIds = ["sub-proteome-select-div"]
-            noneIds = ["sub-proteome-div"];
-            break;
-    };
-
-    setElementDisplay(blockIds, "flex");
-    setElementDisplay(noneIds, 'none');
-};
 
 /**
  * Provides the link to the download page.
