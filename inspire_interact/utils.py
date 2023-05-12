@@ -3,9 +3,13 @@
 import os
 
 import yaml
-
+from inspire_interact.constants import (
+    CPUS_KEY,
+    FRAGGER_MEMORY_KEY,
+    FRAGGER_PATH_KEY,
+)
 #TODO: break up into small functions, readability issues
-def prepare_inspire(config_dict, project_home, fragger_path, fragger_memory):
+def prepare_inspire(config_dict, project_home, app_config):
     """ Function to prepare the inSPIRE run.
     """
     inspire_settings = {
@@ -13,6 +17,7 @@ def prepare_inspire(config_dict, project_home, fragger_path, fragger_memory):
         'fragger': False,
         'select': False,
     }
+    inspire_settings['quantify'] = bool(config_dict['runQuantification'])
 
     output_config = {
         'experimentTitle': config_dict['project'],
@@ -24,17 +29,12 @@ def prepare_inspire(config_dict, project_home, fragger_path, fragger_memory):
         'rescoreMethod': 'percolator',
         'silentExecution': True,
         'reuseInput': True,
-        'fraggerPath': fragger_path,
-        'fraggerMemory': fragger_memory,
+        'fraggerPath': app_config[FRAGGER_PATH_KEY],
+        'fraggerMemory': app_config[FRAGGER_MEMORY_KEY],
+        'nCores': app_config[CPUS_KEY]
     }
 
-    if os.path.exists(f'{project_home}/search_file_list.txt'):
-        with open(
-            f'{project_home}/search_file_list.txt', mode='r', encoding='UTF-8'
-        ) as list_file:
-            file_list = list_file.readlines()
-            output_config['searchResults'] = [x.split()[-1].split('\n')[0] for x in file_list]
-    elif config_dict['runFragger'] == 1:
+    if config_dict['runFragger'] == 1:
         inspire_settings['fragger'] = True
     else:
         output_config['searchResults'] = [
@@ -43,55 +43,40 @@ def prepare_inspire(config_dict, project_home, fragger_path, fragger_memory):
             )
         ]
 
-    if os.path.exists(f'{project_home}/ms_file_list.txt'):
-        with open(
-            f'{project_home}/ms_file_list.txt', mode='r', encoding='UTF-8'
-        ) as list_file:
-            file_list = list_file.readlines()
-            output_config['scansFiles'] = [x.split()[-1].split('\n')[0] for x in file_list]
-    else:
-        output_config['scansFolder'] = f'{project_home}/ms'
+    output_config['scansFolder'] = f'{project_home}/ms'
 
     ms_files = os.listdir(f'{project_home}/ms')
     if ms_files[0].lower().endswith('.raw'):
         inspire_settings['convert'] = True
-
 
     if config_dict['searchEngine'] in ('mascot', 'msfragger'):
         output_config['rescoreMethod'] = 'percolator'
     else:
         output_config['rescoreMethod'] = 'percolatorSeparate'
 
-    if os.path.exists(f'{project_home}/proteome_file_list.txt'):
-        with open(
-            f'{project_home}/proteome_file_list.txt', mode='r', encoding='UTF-8'
-        ) as list_file:
-            file_list = list_file.readlines()
-            output_config['proteome'] = [x.split()[-1].split('\n')[0] for x in file_list][0]
-    elif not inspire_settings['select']:
-        output_config['proteome'] = f'{project_home}/proteome/proteome.fasta'
-
-    if os.path.exists(f'{project_home}/proteomeSelect/pathogenProteome.fasta'):
-        output_config['pathogenProteome'] = f'{project_home}/proteome/pathogenProteome.fasta'
-        output_config['hostProteome'] = f'{project_home}/proteome/hostProteome.fasta'
-        output_config['controlFlags'] = [elem.strip() for elem in  config_dict["controlFlags"].split(",")]
-    elif os.path.exists(f'{project_home}/proteomeSelect_file_list.txt'):
-        with open(
-            f'{project_home}/proteome_file_list.txt', mode='r', encoding='UTF-8'
-        ) as list_file:
-            file_list = list_file.readlines()
-            proteome_files = [x.split()[-1].split('\n')[0] for x in file_list]
-            output_config['hostProteome'] = proteome_files[0]
-            output_config['pathogenProteome'] = proteome_files[1]
+    
+    if os.path.exists(f'{project_home}/proteome'):
+        proteome_files = os.listdir(f'{project_home}/proteome')
+        prot_file_name = proteome_files[0]
+        output_config['proteome'] = f'{project_home}/proteome/{prot_file_name}'
+    else:
+        proteome_files = os.listdir(f'{project_home}/proteome-select')
+        inspire_settings['select'] = True
+        output_config['proteome'] = f'{project_home}/proteome-select/proteome_combined.fasta'
+        path_name = [
+            prot_file for prot_file in proteome_files if prot_file.startswith('pathogen_')
+        ][0]
+        host_name = [
+            prot_file for prot_file in proteome_files if prot_file.startswith('host_')
+        ][0]
+        output_config['pathogenProteome'] = f'{project_home}/proteome-select/{path_name}'
+        output_config['hostProteome'] = f'{project_home}/proteome-select/{host_name}'
+        output_config['controlFlags'] = [
+            elem.strip() for elem in  config_dict["controlFlags"].split(",")
+        ]
 
     with open(f'{project_home}/config.yml', 'w', encoding='UTF-8') as yaml_out:
         yaml.dump(output_config, yaml_out)
-
-    if (
-        os.path.exists(f'{project_home}/proteome/pathogenProteome.fasta') or
-        os.path.exists(f'{project_home}/proteomeSelect_file_list.txt')
-    ):
-        inspire_settings['select'] = True
 
     return inspire_settings
 

@@ -19,9 +19,15 @@ setup(
             'inspire-interact=inspire_interact.api:main'
         ]
     },
-    python_requires='>=3.8',
+    python_requires='==3.11',
     install_requires=[
-        #'inspirems',
+        #'inspirems==2.0',
+        'Werkzeug==2.3.4',
+        'blinker==1.6.2',
+        'click==8.1.3',
+        'flask==2.3.2',
+        'flask_cors==3.0.10',
+        'itsdangerous==2.1.2',
     ],
     project_urls={
         'Homepage': 'https://github.com/QuantSysBio/inSPIRE',

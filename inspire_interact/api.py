@@ -12,6 +12,7 @@ import yaml
 
 from inspire_interact.constants import (
     ALL_CONFIG_KEYS,
+    CPUS_KEY,
     FILESERVER_NAME_KEY,
     FRAGGER_MEMORY_KEY,
     FRAGGER_PATH_KEY,
@@ -81,31 +82,51 @@ def upload_file(user, project, file_type):
 
     if file_type == 'proteome':
         uploaded_files[0].save(
-            f'{upload_home}/proteome.fasta'
+            f'{upload_home}/proteome_{uploaded_files[0].filename}'
         )
-    elif file_type == 'proteomeSelect':
+    elif file_type == 'proteome-select':
         uploaded_files[0].save(
-            f'{upload_home}/hostProteome.fasta'
+            f'{upload_home}/host_{uploaded_files[0].filename}'
         )
         uploaded_files[1].save(
-            f'{upload_home}/pathogenProteome.fasta'
+            f'{upload_home}/pathogen_{uploaded_files[1].filename}'
         )
-        with open(f'{upload_home}/proteome.fasta', 'w', encoding='UTF-8') as total_file:
-            for prot_type in ['host', 'pathogen']:
+        with open(f'{upload_home}/proteome_combined.fasta', mode='w', encoding='UTF-8') as total_file:
+            for prot_file in (
+                f'{upload_home}/host_{uploaded_files[0].filename}',
+                f'{upload_home}/pathogen_{uploaded_files[1].filename}',
+            ):
                 with open(
-                    f'{upload_home}/{prot_type}Proteome.fasta',
-                    mode='r',
-                    encoding='UTF-8',
+                    prot_file, mode='r', encoding='UTF-8'
                 ) as source_file:
                     for line in source_file:
                         total_file.write(line)
+    elif file_type == 'search':
+        # For search if there are multiple msms.txt, etc, we avoid overwriting
+        for idx, u_file in enumerate(uploaded_files):
+            renamed_file = f'{str(idx+1)}_' + u_file.filename.replace(" ", "_")
+            u_file.save(
+                f'{upload_home}/{renamed_file}'
+            )
     else:
+        # For raw files we preserve name
         for u_file in uploaded_files:
             u_file.save(
                 f'{upload_home}/{u_file.filename}'
             )
 
     return jsonify(message='Ok')
+
+
+@app.route('/interact/clearPattern/<file_type>', methods=['POST'])
+@cross_origin()
+def clear_file_pattern(file_type):
+    """ Function for checking which files match a particular file pattern provided.
+    """
+    config_data = request.json
+    user = config_data['user']
+    project = config_data['project']
+    os.system(f'projects/{user}/{project}/{file_type}/*')
 
 @app.route('/interact/checkPattern/<file_type>', methods=['POST'])
 @cross_origin()
@@ -115,27 +136,18 @@ def check_file_pattern(file_type):
     config_data = request.json
     user = config_data['user']
     project = config_data['project']
-    file_pattern = config_data['filePattern']
-
-    if file_pattern.startswith('FILESERVER:') and app.config[FILESERVER_NAME_KEY] is None:
-        return jsonify(
-            message=['Error: A file server name has not been passed to inSPIRE-Interact.']
-        )
 
     if os.path.exists(
         f'{app.config[INTERACT_HOME_KEY]}/projects/{user}/{project}/{file_type}_file_list.txt'
     ):
         os.remove(f'projects/{user}/{project}/{file_type}_file_list.txt')
 
-    if file_pattern.startswith('FILESERVER:'):
-        fetch_matched_files = (
-            f"ssh {app.config[FILESERVER_NAME_KEY]} 'ls -al {file_pattern}' | "+
-            f" cat >> projects/{user}/{project}/{file_type}_file_list.txt"
-        )
-    else:
-        fetch_matched_files = (
-            f"ls -al {file_pattern} >> projects/{user}/{project}/{file_type}_file_list.txt"
-        )
+    if not os.path.exists(f'projects/{user}/{project}/{file_type}'):
+        return jsonify(message=[])
+
+    fetch_matched_files = (
+        f"ls -l projects/{user}/{project}/{file_type} >> projects/{user}/{project}/{file_type}_file_list.txt"
+    )
 
     os.system(fetch_matched_files)
 
@@ -143,7 +155,7 @@ def check_file_pattern(file_type):
         f'projects/{user}/{project}/{file_type}_file_list.txt', mode='r', encoding='UTF-8'
     ) as list_file:
         file_list = list_file.readlines()
-        all_files = [x.split()[-1].split('\n')[0] for x in file_list]
+        all_files = [x.split()[-1].split('\n')[0] for x in file_list][1:]
 
     return jsonify(message=all_files)
 
@@ -176,11 +188,9 @@ def run_inspire_core():
         project_title = config_dict['project']
         server_address = app.config[SERVER_ADDRESS_KEY]
         home_key= app.config[INTERACT_HOME_KEY]
-        fragger_path = app.config[FRAGGER_PATH_KEY]
-        fragger_memory = app.config[FRAGGER_MEMORY_KEY]
         project_home = f'{home_key}/projects/{user}/{project_title}'
 
-        inspire_settings = prepare_inspire(config_dict, project_home, fragger_path, fragger_memory)
+        inspire_settings = prepare_inspire(config_dict, project_home, app.config)
 
         with open(
             f'projects/{user}/{project_title}/inspire_script.sh',
@@ -210,6 +220,14 @@ def run_inspire_core():
                 bash_file.write(
                     f'inspire --pipeline extractCandidates --config_file {project_home}/config.yml\n'
                 )
+            if inspire_settings['quantify']:
+                bash_file.write(
+                    f'inspire --pipeline quantify --config_file {project_home}/config.yml\n'
+                )
+                bash_file.write(
+                    f'inspire --pipeline analysis --config_file {project_home}/config.yml\n'
+                )
+
             for intermediate_file in INTERMEDIATE_FILES:
                 bash_file.write(
                     f'rm -rf projects/{user}/{project_title}/inspireOutput/{intermediate_file}\n'
@@ -373,6 +391,7 @@ def main():
     app.config[FILESERVER_NAME_KEY] = config_dict.get(FILESERVER_NAME_KEY)
     app.config[FRAGGER_PATH_KEY] = config_dict.get(FRAGGER_PATH_KEY)
     app.config[FRAGGER_MEMORY_KEY] = config_dict.get(FRAGGER_MEMORY_KEY)
+    app.config[CPUS_KEY] = config_dict.get(CPUS_KEY, 1)
     app.config[MODE_KEY] = args.mode
 
     app.run(host='0.0.0.0', debug = False)

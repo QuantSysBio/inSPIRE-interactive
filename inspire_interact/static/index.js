@@ -164,14 +164,15 @@ function showWorkflowOptions() {
  * 
  * @param {*} value user's choice of workflow. 
  */
-function selectWorkflow(value) {
+function selectWorkflow(value, serverAddress) {
     let user = document.getElementById('user-selection').value;
     let project = document.getElementById('project-selection').value;
     let message = "User <b>" + user + "</b> is working on <b>" + project + "</b> to run <b>" + value + "</b>.";
 
     document.getElementById("opening-div").style.display = "none";
     document.getElementById("welcoming-div").innerHTML = message;
-    cycleBackButtonVisibility();
+    cycleButtonVisibility("back");
+    cycleButtonVisibility("forward");
 
     switch(value){
         case 'deleteProjectData': case 'downloadProjectData': {
@@ -186,6 +187,7 @@ function selectWorkflow(value) {
 
         case 'inspire':
             document.getElementById("ms-data-div").style.display = "block";
+            checkFilePattern(serverAddress, 'ms');
             break;
     };
 };
@@ -216,7 +218,7 @@ async function uploadFiles(serverAddress, mode) {
     console.log(await postFiles(serverAddress, multiFormData, mode));
     waitingTextElem.style.display = "none";
 
-    updateGUI(mode);
+    updateGUI(mode, serverAddress);
 };
 
 function checkPreconditions(mode, files) {
@@ -242,7 +244,6 @@ async function checkFilePattern(serverAddress, file_type) {
 
     let user = document.getElementById('user-selection').value;
     let project = document.getElementById('project-selection').value;
-    let filePath = document.getElementById(file_type + '-file-input').value;
 
     var response = await fetch(
         'http://' + serverAddress + ':5000/interact/checkPattern/' + file_type,
@@ -251,34 +252,47 @@ async function checkFilePattern(serverAddress, file_type) {
             headers: {
                 'Content-Type': 'application/json',
             },
-            body: JSON.stringify({'user': user, 'project': project, 'filePattern': filePath})
+            body: JSON.stringify({'user': user, 'project': project})
         }
     ).then( response => {
         return response.json();
     });
+    console.log(response);
 
     var filesFound = response['message'];
+    console.log(filesFound);
     updateListElement(file_type + "-file-list", filesFound)
+}
 
-    let blockIds = [file_type + "-file-list-div"]
+/**
+ * Clear all files which match a user-specified pattern.
+ * 
+ * @param {*} serverAddress 
+ * @param {*} file_type 
+ */
+async function clearFilePattern(serverAddress, file_type) {
+    document.getElementById(file_type + "-file-list").innerHTML = "";
 
-    switch (file_type){
-        case 'ms':
-            blockIds.push("search-div")
-            break;
-        case 'search':
-            blockIds.push("proteome-div");
-            break;
-        case 'proteome': case 'pathogen-proteome':
-            blockIds.push("parameters-div");
-            blockIds.push("execute-button");
-            break;
-        case 'host-proteome':
-            blockIds.push("pathogen-proteome-div");
-            break;
-    }
+    let user = document.getElementById('user-selection').value;
+    let project = document.getElementById('project-selection').value;
 
-    setElementDisplay(blockIds)
+    var response = await fetch(
+        'http://' + serverAddress + ':5000/interact/clearPattern/' + file_type,
+        {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json',
+            },
+            body: JSON.stringify({'user': user, 'project': project})
+        }
+    ).then( response => {
+        return response.json();
+    });
+    console.log(response);
+
+    var filesFound = response['message'];
+    console.log(filesFound);
+    updateListElement(file_type + "-file-list", filesFound)
 }
 
 
@@ -290,12 +304,13 @@ var lastFrame = "init";
  * 
  * @param {*} currentFrame frame currently being cycled out of.
  */
-async function updateGUI(currentFrame) {
+async function updateGUI(currentFrame, serverAddress) {
     let blockIds;
     let deletedIds;
 
     switch(currentFrame){
         case 'ms':
+            checkFilePattern(serverAddress, 'search');
             deletedIds = ["ms-data-div"];
             blockIds = ["search-div"];
             break;
@@ -306,8 +321,10 @@ async function updateGUI(currentFrame) {
             break;
 
         case 'proteome': case 'proteome-select':
+            presentFrame = "configs";
             deletedIds = ["proteome-div"];
             blockIds = ["parameters-div", "execute-button"];
+            document.getElementById("forward-button").style.display = 'none';
             break;
     };
     
@@ -321,7 +338,7 @@ async function updateGUI(currentFrame) {
  * 
  * @param {*} frame frame to be reverted to.
  */
-async function revertGUI(frame = lastFrame) {
+async function revertGUI(serverAddress, frame = lastFrame) {
     var blockIds = [];
     let deletedIds;
 
@@ -330,7 +347,8 @@ async function revertGUI(frame = lastFrame) {
             document.getElementById("opening-div").style.display = "flex";
             deletedIds = ["welcoming-div", "ms-data-div"]
             document.getElementById('workflow-selection').selectedIndex = 0;
-            cycleBackButtonVisibility();
+            cycleButtonVisibility("back");
+            cycleButtonVisibility("forward");
             break;
             
         case 'ms':
@@ -349,8 +367,42 @@ async function revertGUI(frame = lastFrame) {
             blockIds = ["proteome-div"];
             deletedIds = ["parameters-div", "execute-button"]; 
             lastFrame = "search"
+            document.getElementById("forward-button").style.display = 'block';
             break;
     };
+    if (frame !== "init"){
+        checkFilePattern(serverAddress, frame);
+    }
+    setElementDisplay(blockIds);
+    setElementDisplay(deletedIds, "none");
+}
+
+async function forwardGUI(serverAddress, frame = lastFrame) {
+    var blockIds = [];
+    let deletedIds;
+    console.log(frame);
+    switch(frame) {
+        case 'init':
+            blockIds = ["search-div"];
+            deletedIds = ["ms-data-div"];
+            lastFrame = "ms";
+            checkFilePattern(serverAddress, 'search');
+            break;
+        case 'ms':
+            blockIds = ["proteome-div"];
+            deletedIds = ["search-div",]; 
+            lastFrame = "search";
+            checkFilePattern(serverAddress, 'proteome');
+            checkFilePattern(serverAddress, 'proteome-select');
+            break;
+        case 'search':
+            blockIds = ["parameters-div", "execute-button"];
+            deletedIds = ["proteome-div",]; 
+            lastFrame = "proteome";
+            document.getElementById("forward-button").style.display = 'none';
+            break;
+    };
+
 
     setElementDisplay(blockIds);
     setElementDisplay(deletedIds, "none");
@@ -394,9 +446,10 @@ function updateListElement(listName, array) {
     let ul = document.getElementById(listName);
 
     array.forEach ((elem) => {
-        ul.appendChild(
-            document.createElement("li").appendChild(document.createTextNode(elem))
-        );
+        console.log(elem);
+        var li = document.createElement("li");
+        li.appendChild(document.createTextNode(elem));
+        ul.appendChild(li);
     });
 
     ul.style.display = 'block';
@@ -408,7 +461,7 @@ function updateListElement(listName, array) {
  * 
  * @param {*} value chosen search type.
  */
-function selectSearchType(value) {
+function selectSearchType(value, serverAddress) {
     let blockIds;
 
     switch(value){
@@ -417,7 +470,7 @@ function selectSearchType(value) {
             break;
         case 'searchNeeded':
             blockIds = ['proteome-div'];
-            updateGUI('search')
+            updateGUI('search', serverAddress)
             break;
     };
 
@@ -429,18 +482,20 @@ function selectSearchType(value) {
  * 
  * @param {*} value chosen inspire type.
  */
-function selectInspireType(value) {
+function selectInspireType(value, serverAddress) {
     let flexIds;
     let noneIds;
 
     switch(value){
         case 'inspireStandard':
             blockIds = ["sub-proteome-div"];
-            noneIds = ["sub-proteome-select-div"]
+            noneIds = ["sub-proteome-select-div"];
+            checkFilePattern(serverAddress, 'proteome');
             break;
         case 'inspireSelect':
             blockIds = ["sub-proteome-select-div"]
             noneIds = ["sub-proteome-div"];
+            checkFilePattern(serverAddress, 'proteome-select');
             break;
     };
 
@@ -470,8 +525,8 @@ function makeDownloadVisible(message) {
 /**
  * Cycles the back button's visibility from visible to hidden and vice-versa.
  */
-function cycleBackButtonVisibility() {
-    let button = document.getElementById("back-button")
+function cycleButtonVisibility(buttonType) {
+    let button = document.getElementById(buttonType+"-button")
 
     button.style.visibility = (button.style.visibility == "visible") ? "hidden" : "visible"
 }
@@ -540,11 +595,14 @@ async function executePipeline(serverAddress) {
     let user = document.getElementById('user-selection').value;
     let project = document.getElementById('project-selection').value;
     let useMsFragger = document.getElementById('search-required').value;
-    let searchEngine = (useMsFragger != 'searchNeeded') ? document.getElementById('search-engine-selection').value : 'msfragger'; 
+    let searchEngine = (
+        useMsFragger != 'searchNeeded'
+    ) ? document.getElementById('search-engine-selection').value : 'msfragger'; 
     let controlFlags = document.getElementById('control-flag-input').value;
     let ms1Accuracy = document.getElementById('ms1-accuracy-input').value;
     let mzAccuracy = document.getElementById('ms2-accuracy-input').value;
     let mzUnits = document.getElementById('ms2-unit-selection').value;
+
 
     var configObject = {
         'user': user,
@@ -557,6 +615,9 @@ async function executePipeline(serverAddress) {
     };
 
     configObject['runFragger'] = (useMsFragger == 'searchNeeded') ? 1 : 0;
+    configObject['runQuantification'] = (
+        document.getElementById('quantification'
+    ).checked) ? 1 : 0;
     
     var response = await postJson(serverAddress, 'inspire', configObject);
 
