@@ -229,9 +229,9 @@
 					<p>Pathogen Proteome:</p>
 					<input type="file" id="pathogen-proteome-file-upload" multiple="false" />
 					<br>
-					<p>Specify the control flags (Comma-Separated).</p>
+					<p>&ensp;Specify the control flags (Comma-Separated).</p>
 					<form id="control-flag-form">
-						<input type="text" id="control-flag-input" name="control-flag-input" style="width:60%;">
+						<input type="text" id="control-flag-input" name="control-flag-input" style="width:100%;">
 					</form>
 					<br>
 					<input type="submit" onclick="uploadFiles('{{ server_address }}', 'proteome-select')">
@@ -258,11 +258,7 @@
 		<br>
 
 		<div id="parameters-div" style="display:none;" class="row">
-			<h3>Parameters</h3>
-			<p> 
-				Here you provide the accuracy of the mass spectrometer used.
-				You also have the option of setting any other inSPIRE config that you require.
-			</p>
+			<h3>inSPIRE Configuration</h3>
 			<div id="params-col-1" class="column"  style="margin-left: 0%;">
 				Enter the MS1 Accuracy of the Mass Spectrometer:
 				<div id="ms1-settings-entry" style="width:600; margin-left:0;">
@@ -286,12 +282,41 @@
 				</div>
 			</div>
 
+			<br><br>
+
+			<table><tr>
+				<td>Run Quantification</td>
+				<td><input type="checkbox" id="quantification" name="quantification"></td>
+			</tr></table>
 
 			<br><br>
+
+			Use NetMHCpan Binding affinity?
+			<table><tr>
+				<td>As a feature for assignment (best for mono-allelic immunopeptidome data): </td>
+				<td><input type="checkbox" class="pancheckbox" id="panfeature" name="panfeature" onclick="competingCheckboxes(this, 'pancheckbox')"></td>
+			</tr><tr>
+				<td>In reporting after assignment (best for multi-allelic immunopeptidome data): </td>
+				<td><input type="checkbox" class="pancheckbox" id="panvalidation" name="panvalidation" onclick="competingCheckboxes(this, 'pancheckbox')"></td>
+			</tr></table>
+			<br>
+			<div id="netmhcpan-allele-div" style="width:600; margin-left:0; display:none">
+				&emsp;Specify the allele(s) to be predicted for (eg. HLA-B07:02). For multi-allelic data provide comma separated list.
+				<form id="netmhcpan-allele-form">
+					<input type="text" id="netmhcpan-allele-input" name="netmhcpan-allele-input" style="width:100%;">
+				</form>
+				<br>
+			</div>
+			<br>
 			<div id="params-col-2" class="column"  style="margin-left: 0%;">
 				(Optional) Additional inSPIRE configurations.
 				<table id="configs-table" style="width: 60%; border: 2px solid darkgreen; border-collapse: collapse;">
-				<br>configKey
+				<br>
+					<tr>
+						<td>Config Key</td>
+						<td>Config Setting</td>
+						<td></td>
+					</tr>
 					<tr>
 						<td><input type="text" class="config-key" /></td>
 						<td><input type="text" class="config-value" /></td>
@@ -301,12 +326,6 @@
 				<button id="add-configs" onclick="addConfigs()">Add Additional Configurations</button>
 			</div>
 
-			<br><br>
-
-			<table><tr>
-				<td>Run Quantification</td>
-				<td><input type="checkbox" id="quantification" name="quantification"></td>
-			</tr></table>
 	
 			<br><br>
 		</div>
@@ -338,7 +357,6 @@
 
 		<p>PLACEHOLDER TEXT: ACKNOWLEDGEMENTS, IMPORTANT LINKS</p>
 	</div>
-
 
 </body>
 </html>

@@ -201,8 +201,6 @@ async function uploadFiles(serverAddress, mode) {
         ] 
         : Array.from(document.getElementById(mode + '-file-upload').files);
 
-    console.log(selectedFiles)
-
     //If file upload was not completed, do not allow users to proceed.
     if(!checkPreconditions(mode, selectedFiles)) return;
 
@@ -215,7 +213,6 @@ async function uploadFiles(serverAddress, mode) {
     
     //Displays the waiting text during the postFiles process, removing it right after.
     waitingTextElem.style.display = 'block';
-    console.log(await postFiles(serverAddress, multiFormData, mode));
     waitingTextElem.style.display = "none";
 
     updateGUI(mode, serverAddress);
@@ -257,10 +254,8 @@ async function checkFilePattern(serverAddress, file_type) {
     ).then( response => {
         return response.json();
     });
-    console.log(response);
 
     var filesFound = response['message'];
-    console.log(filesFound);
     updateListElement(file_type + "-file-list", filesFound)
 }
 
@@ -288,10 +283,8 @@ async function clearFilePattern(serverAddress, file_type) {
     ).then( response => {
         return response.json();
     });
-    console.log(response);
 
     var filesFound = response['message'];
-    console.log(filesFound);
     updateListElement(file_type + "-file-list", filesFound)
 }
 
@@ -380,7 +373,7 @@ async function revertGUI(serverAddress, frame = lastFrame) {
 async function forwardGUI(serverAddress, frame = lastFrame) {
     var blockIds = [];
     let deletedIds;
-    console.log(frame);
+
     switch(frame) {
         case 'init':
             blockIds = ["search-div"];
@@ -446,7 +439,6 @@ function updateListElement(listName, array) {
     let ul = document.getElementById(listName);
 
     array.forEach ((elem) => {
-        console.log(elem);
         var li = document.createElement("li");
         li.appendChild(document.createTextNode(elem));
         ul.appendChild(li);
@@ -542,8 +534,6 @@ function cycleButtonVisibility(buttonType) {
  * @returns 
  */
 async function postFiles(serverAddress, formData, mode){
-    console.log("Form data: " + formData);
-
     let user = document.getElementById('user-selection').value;
     let project = document.getElementById('project-selection').value;
     return await fetch(
@@ -614,6 +604,15 @@ async function executePipeline(serverAddress) {
         'mzUnits': mzUnits,
     };
 
+
+    if (document.getElementById('panfeature').checked){
+        configObject['useBindingAffinity'] = 'asFeature';
+        configObject['alleles'] =  document.getElementById('netmhcpan-allele-input').value;
+    } else if (document.getElementById('panvalidation').checked) {
+        configObject['useBindingAffinity'] = 'asValidation';
+        configObject['alleles'] =  document.getElementById('netmhcpan-allele-input').value;
+    };
+
     configObject['runFragger'] = (useMsFragger == 'searchNeeded') ? 1 : 0;
     configObject['runQuantification'] = (
         document.getElementById('quantification'
@@ -622,6 +621,27 @@ async function executePipeline(serverAddress) {
     var response = await postJson(serverAddress, 'inspire', configObject);
 
     makeDownloadVisible(response['message']);
+}
+
+function deleteRow(r)
+// Function to delete a row from the table.
+{
+    var i = r.parentNode.parentNode.rowIndex;
+    document.getElementById("configs-table").deleteRow(i);
+};
+
+function competingCheckboxes(checkbox, checkboxClass)
+// 
+{
+    if (checkbox.checked){
+        Array.from(
+            document.getElementsByClassName(checkboxClass)
+        ).forEach((box) => {
+            box.checked = false;
+        });
+        checkbox.checked = true;
+        setElementDisplay(['netmhcpan-allele-div']);
+    }
 }
 
 /**
@@ -644,7 +664,6 @@ function addConfigs() {
             newInput.type = "text";
 
             if (i == 2) {
-                console.log(newButton);
                 newCell.appendChild(newButton);
             } else {
                 newInput.class = CLASSES[i];

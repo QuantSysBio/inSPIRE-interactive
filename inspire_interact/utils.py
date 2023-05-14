@@ -34,6 +34,12 @@ def prepare_inspire(config_dict, project_home, app_config):
         'nCores': app_config[CPUS_KEY]
     }
 
+    if 'useBindingAffinity' in config_dict:
+        output_config['useBindingAffinity'] = config_dict['useBindingAffinity']
+        output_config['alleles'] = [
+            elem.strip() for elem in  config_dict["alleles"].split(",")
+        ]
+
     if config_dict['runFragger'] == 1:
         inspire_settings['fragger'] = True
     else:
