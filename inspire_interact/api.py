@@ -143,6 +143,7 @@ def check_file_pattern(file_type):
         os.remove(f'projects/{user}/{project}/{file_type}_file_list.txt')
 
     if not os.path.exists(f'projects/{user}/{project}/{file_type}'):
+        os.mkdir(f'projects/{user}/{project}/{file_type}')
         return jsonify(message=[])
 
     fetch_matched_files = (
@@ -198,7 +199,7 @@ def run_inspire_core():
             encoding='UTF-8'
         ) as bash_file:
             bash_file.write(
-                f'echo $$ > {project_home}/inspire_pids.txt ; '
+                f'echo $$ > {project_home}/inspire_pids.txt ;\n'
             )
             if inspire_settings['convert']:
                 bash_file.write(

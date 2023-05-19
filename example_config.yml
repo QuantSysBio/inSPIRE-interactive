@@ -1,6 +1,0 @@
----
-serverAddress: fileserver
-fraggerPath: /home/john.cormican/Downloads/fragpipe/tools/MSFragger-3.7/MSFragger-3.7.jar
-#netMHCpan: tcsh /home/john.cormican/netMHCpan-4.1/netMHCpan
-fraggerMemory: 14
-#maxInspireCpus: 8

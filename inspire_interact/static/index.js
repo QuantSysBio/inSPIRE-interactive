@@ -167,12 +167,7 @@ function showWorkflowOptions() {
 function selectWorkflow(value, serverAddress) {
     let user = document.getElementById('user-selection').value;
     let project = document.getElementById('project-selection').value;
-    let message = "User <b>" + user + "</b> is working on <b>" + project + "</b> to run <b>" + value + "</b>.";
 
-    document.getElementById("opening-div").style.display = "none";
-    document.getElementById("welcoming-div").innerHTML = message;
-    cycleButtonVisibility("back");
-    cycleButtonVisibility("forward");
 
     switch(value){
         case 'deleteProjectData': case 'downloadProjectData': {
@@ -182,10 +177,18 @@ function selectWorkflow(value, serverAddress) {
             executeButtonElmt.style.display = 'block';
         } break;
             
-        case 'inspireSelect':
-            break;
+        case 'results': {
+            window.location.href = 'http://' + serverAddress + ':5000/interact/' + user + '/' + project + '/inspire'
+         } break;
 
         case 'inspire':
+            let message = "User <b>" + user + "</b> is working on <b>" + project + "</b> to run <b>" + value + "</b>.";
+
+            document.getElementById("opening-div").style.display = "none";
+            document.getElementById("welcoming-div").innerHTML = message;
+            cycleButtonVisibility("back");
+            cycleButtonVisibility("forward");
+
             document.getElementById("ms-data-div").style.display = "block";
             checkFilePattern(serverAddress, 'ms');
             break;
@@ -213,6 +216,7 @@ async function uploadFiles(serverAddress, mode) {
     
     //Displays the waiting text during the postFiles process, removing it right after.
     waitingTextElem.style.display = 'block';
+    console.log(await postFiles(serverAddress, multiFormData, mode));
     waitingTextElem.style.display = "none";
 
     updateGUI(mode, serverAddress);
@@ -613,10 +617,27 @@ async function executePipeline(serverAddress) {
         configObject['alleles'] =  document.getElementById('netmhcpan-allele-input').value;
     };
 
+    //gets rows of table
+    var configTable = document.getElementById('configs-table');
+    var rowLength = configTable.rows.length;
+
+
+    var additionalConfigs = {};
+    //loops through rows    
+    for (i = 1; i < rowLength; i++){
+        //gets cells of current row
+        var configCells = configTable.rows.item(i).cells;
+        var configKey = configCells[0].children[0].value;
+        var configValue = configCells[1].children[0].value;
+        additionalConfigs[configKey] = configValue;
+    }
+    console.log(additionalConfigs)
+
     configObject['runFragger'] = (useMsFragger == 'searchNeeded') ? 1 : 0;
     configObject['runQuantification'] = (
         document.getElementById('quantification'
     ).checked) ? 1 : 0;
+    configObject['additionalConfigs'] = additionalConfigs;
     
     var response = await postJson(serverAddress, 'inspire', configObject);
 

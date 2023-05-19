@@ -1,5 +1,6 @@
 """ Utility functions for inSPIRE-interact.
 """
+import ast
 import os
 
 import yaml
@@ -26,7 +27,6 @@ def prepare_inspire(config_dict, project_home, app_config):
         'outputFolder': f'{project_home}/inspireOutput',
         'mzAccuracy': float(config_dict['mzAccuracy']),
         'mzUnits': config_dict['mzUnits'],
-        'rescoreMethod': 'percolator',
         'silentExecution': True,
         'reuseInput': True,
         'fraggerPath': app_config[FRAGGER_PATH_KEY],
@@ -42,6 +42,7 @@ def prepare_inspire(config_dict, project_home, app_config):
 
     if config_dict['runFragger'] == 1:
         inspire_settings['fragger'] = True
+        output_config['ms1Accuracy'] = float(config_dict['ms1Accuracy'])
     else:
         output_config['searchResults'] = [
             f'{project_home}/search/{filename}' for filename in os.listdir(
@@ -56,9 +57,9 @@ def prepare_inspire(config_dict, project_home, app_config):
         inspire_settings['convert'] = True
 
     if config_dict['searchEngine'] in ('mascot', 'msfragger'):
-        output_config['rescoreMethod'] = 'percolator'
-    else:
         output_config['rescoreMethod'] = 'percolatorSeparate'
+    else:
+        output_config['rescoreMethod'] = 'percolator'
 
     
     if os.path.exists(f'{project_home}/proteome'):
@@ -80,6 +81,9 @@ def prepare_inspire(config_dict, project_home, app_config):
         output_config['controlFlags'] = [
             elem.strip() for elem in  config_dict["controlFlags"].split(",")
         ]
+
+    for config_key, config_value in config_dict['additionalConfigs'].items():
+        output_config[config_key] = ast.literal_eval(config_value)
 
     with open(f'{project_home}/config.yml', 'w', encoding='UTF-8') as yaml_out:
         yaml.dump(output_config, yaml_out)
