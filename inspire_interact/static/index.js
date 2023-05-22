@@ -629,7 +629,9 @@ async function executePipeline(serverAddress) {
         var configCells = configTable.rows.item(i).cells;
         var configKey = configCells[0].children[0].value;
         var configValue = configCells[1].children[0].value;
-        additionalConfigs[configKey] = configValue;
+        if (configKey){
+            additionalConfigs[configKey] = configValue;
+        }
     }
     console.log(additionalConfigs)
 

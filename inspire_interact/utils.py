@@ -8,6 +8,7 @@ from inspire_interact.constants import (
     CPUS_KEY,
     FRAGGER_MEMORY_KEY,
     FRAGGER_PATH_KEY,
+    MHCPAN_KEY,
 )
 #TODO: break up into small functions, readability issues
 def prepare_inspire(config_dict, project_home, app_config):
@@ -39,6 +40,7 @@ def prepare_inspire(config_dict, project_home, app_config):
         output_config['alleles'] = [
             elem.strip() for elem in  config_dict["alleles"].split(",")
         ]
+        output_config['netMHCpan'] = app_config[MHCPAN_KEY]
 
     if config_dict['runFragger'] == 1:
         inspire_settings['fragger'] = True

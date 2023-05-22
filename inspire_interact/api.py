@@ -16,6 +16,7 @@ from inspire_interact.constants import (
     FILESERVER_NAME_KEY,
     FRAGGER_MEMORY_KEY,
     FRAGGER_PATH_KEY,
+    MHCPAN_KEY,
     INTERACT_HOME_KEY,
     INTERMEDIATE_FILES,
     MODE_KEY,
@@ -390,6 +391,7 @@ def main():
     host_name = socket.gethostname()
     app.config[SERVER_ADDRESS_KEY] = socket.gethostbyname(host_name + ".local")
     app.config[FILESERVER_NAME_KEY] = config_dict.get(FILESERVER_NAME_KEY)
+    app.config[MHCPAN_KEY] = config_dict.get(MHCPAN_KEY)
     app.config[FRAGGER_PATH_KEY] = config_dict.get(FRAGGER_PATH_KEY)
     app.config[FRAGGER_MEMORY_KEY] = config_dict.get(FRAGGER_MEMORY_KEY)
     app.config[CPUS_KEY] = config_dict.get(CPUS_KEY, 1)
