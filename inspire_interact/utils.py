@@ -23,7 +23,6 @@ def prepare_inspire(config_dict, project_home, app_config):
 
     output_config = {
         'experimentTitle': config_dict['project'],
-        'searchEngine': config_dict['searchEngine'],
         'scansFormat': 'mgf',
         'outputFolder': f'{project_home}/inspireOutput',
         'mzAccuracy': float(config_dict['mzAccuracy']),
@@ -35,6 +34,20 @@ def prepare_inspire(config_dict, project_home, app_config):
         'nCores': app_config[CPUS_KEY]
     }
 
+    if not os.path.exists(
+        f'{project_home}/search_metadata.yml'
+    ):
+        return {}
+    else:
+        with open(
+            f'{project_home}/search_metadata.yml',
+            'r',
+            encoding='UTF-8',
+        ) as stream:
+            meta_dict = yaml.safe_load(stream)
+        output_config['searchEngine'] = meta_dict.get('searchEngine', 'msfragger')
+        inspire_settings['fragger'] = bool(meta_dict.get('runFragger', 1))
+
     if 'useBindingAffinity' in config_dict:
         output_config['useBindingAffinity'] = config_dict['useBindingAffinity']
         output_config['alleles'] = [
@@ -42,10 +55,7 @@ def prepare_inspire(config_dict, project_home, app_config):
         ]
         output_config['netMHCpan'] = app_config[MHCPAN_KEY]
 
-    if config_dict['runFragger'] == 1:
-        inspire_settings['fragger'] = True
-        output_config['ms1Accuracy'] = float(config_dict['ms1Accuracy'])
-    else:
+    if not inspire_settings['fragger']:
         output_config['searchResults'] = [
             f'{project_home}/search/{filename}' for filename in os.listdir(
                 f'{project_home}/search/'
@@ -58,7 +68,7 @@ def prepare_inspire(config_dict, project_home, app_config):
     if ms_files[0].lower().endswith('.raw'):
         inspire_settings['convert'] = True
 
-    if config_dict['searchEngine'] in ('mascot', 'msfragger'):
+    if output_config['searchEngine'] in ('mascot', 'msfragger'):
         output_config['rescoreMethod'] = 'percolatorSeparate'
     else:
         output_config['rescoreMethod'] = 'percolator'

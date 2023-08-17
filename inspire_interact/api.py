@@ -59,6 +59,45 @@ def get_user(user):
     response =  jsonify(message=projects)
     return response
 
+
+@app.route('/interact-page/<page>', methods=['GET'])
+@cross_origin()
+def fetch_page_no_arguments(page):
+    """ Endpoint serving the spi_serverive Home Page.
+    """
+    return render_template(
+        f'{page}.html',
+        server_address=app.config[SERVER_ADDRESS_KEY],
+        mode=app.config[MODE_KEY],
+    )
+
+@app.route('/interact-page/<page>/<user>/<project>', methods=['GET'])
+@cross_origin()
+def fetch_page(page, user, project):
+    """ Endpoint serving the spi_serverive Home Page.
+    """
+    if not os.path.exists(f'projects/{user}/{project}/core_metadata.yml'):
+        return render_template(
+            f'{page}.html',
+            server_address=app.config[SERVER_ADDRESS_KEY],
+            mode=app.config[MODE_KEY],
+            user=user,
+            project=project,
+        )
+    with open(f'projects/{user}/{project}/core_metadata.yml', 'r', encoding='UTF-8') as stream:
+        core_config = yaml.safe_load(stream)
+        variant = core_config['variant']
+    if page == 'proteome':
+        page += f'-{variant}'
+    return render_template(
+        f'{page}.html',
+        server_address=app.config[SERVER_ADDRESS_KEY],
+        mode=app.config[MODE_KEY],
+        user=user,
+        project=project,
+        variant=variant,
+    )
+
 @app.route('/interact/project/<user>/<project>', methods=['GET'])
 @cross_origin()
 def create_project(user, project):
@@ -127,7 +166,38 @@ def clear_file_pattern(file_type):
     config_data = request.json
     user = config_data['user']
     project = config_data['project']
-    os.system(f'projects/{user}/{project}/{file_type}/*')
+    os.system(f'rm -rf projects/{user}/{project}/{file_type}/*')
+    return jsonify(message=os.listdir(f'projects/{user}/{project}/{file_type}'))
+
+@app.route('/interact/metadata', methods=['POST'])
+@cross_origin()
+def upload_metadata():
+    """ Function for checking which files match a particular file pattern provided.
+    """
+    config_data = request.json
+    user = config_data.pop('user')
+    project = config_data.pop('project')
+    metadata_type = config_data.pop('metadata_type')
+    with open(f'projects/{user}/{project}/{metadata_type}_metadata.yml', 'w', encoding='UTF-8') as yaml_out:
+        yaml.dump(config_data, yaml_out)
+    return jsonify(message='Ok')
+
+@app.route('/interact/metadata/<user>/<project>/<metadata_type>', methods=['GET'])
+@cross_origin()
+def get_metadata(user, project, metadata_type):
+    """ Function for checking which files match a particular file pattern provided.
+    """
+    if not os.path.exists(
+        f'projects/{user}/{project}/{metadata_type}_metadata.yml'
+    ):
+        return jsonify(message={})
+    with open(
+        f'projects/{user}/{project}/{metadata_type}_metadata.yml',
+        'r',
+        encoding='UTF-8',
+    ) as stream:
+        meta_dict = yaml.safe_load(stream)
+    return jsonify(message=meta_dict)
 
 @app.route('/interact/checkPattern/<file_type>', methods=['POST'])
 @cross_origin()
@@ -161,9 +231,22 @@ def check_file_pattern(file_type):
 
     return jsonify(message=all_files)
 
-@app.route('/interact', methods=['GET'])
+
+@app.route('/interact-home', methods=['GET'])
 @cross_origin()
 def interact_home():
+    """ Endpoint serving the inspire_interactive Home Page.
+    """
+    return render_template(
+        'home.html',
+        server_address=app.config[SERVER_ADDRESS_KEY],
+        mode=app.config[MODE_KEY],
+    )
+
+
+@app.route('/interact', methods=['GET'])
+@cross_origin()
+def interact_landing_page():
     """ Endpoint serving the inspire_interactive Home Page.
     """
     usernames = os.listdir(f'{app.config[INTERACT_HOME_KEY]}/projects')
@@ -388,8 +471,13 @@ def main():
     app.config[INTERACT_HOME_KEY] = os.getcwd()
     if not os.path.exists('projects'):
         os.mkdir('projects')
-    host_name = socket.gethostname()
-    app.config[SERVER_ADDRESS_KEY] = socket.gethostbyname(host_name + ".local")
+    
+    if False:
+        host_name = socket.gethostname()
+        app.config[SERVER_ADDRESS_KEY] = socket.gethostbyname(host_name + ".local")
+    else:
+        app.config[SERVER_ADDRESS_KEY] = '127.0.0.1'
+
     app.config[FILESERVER_NAME_KEY] = config_dict.get(FILESERVER_NAME_KEY)
     app.config[MHCPAN_KEY] = config_dict.get(MHCPAN_KEY)
     app.config[FRAGGER_PATH_KEY] = config_dict.get(FRAGGER_PATH_KEY)

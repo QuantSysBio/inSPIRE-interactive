@@ -1,0 +1,126 @@
+<!DOCTYPE html>
+<html>
+<head>
+	<link rel='stylesheet' type="text/css" href="{{ url_for('static',filename='styles/style.css') }}">
+	<script src="{{url_for('static', filename='index.js')}}"></script>
+	<title>inSPIRE-Interactive</title>
+</head>
+<body onload="parametersCheck('{{ server_address }}', '{{ user }}', '{{ project }}')">	
+	<div class="header">
+		<img src="{{url_for('static', filename='inSPIRE-logo-nobg.png')}}" class="icon-top"/>		
+		<h1>Welcome to inSPIRE-Interactive!</h1>
+		<div id="welcoming-div"></div>
+	</div>
+
+	<hr>
+
+	<div class="center-content">
+		<div id="parameters-div">
+			<h3>inSPIRE Configuration</h3>
+			<div id="params-col-1" class="column"  style="margin-left: 0%;">
+				Enter the MS1 Accuracy of the Mass Spectrometer:
+				<div id="ms1-settings-entry" style="width:600; margin-left:0;">
+					<form id="ms1-settings-form">
+						<input type="text" id="ms1-accuracy-input" name="mz-accuracy-input">
+						<select id="ms1-unit-selection">
+							<option value="ppm">ppm</option>
+						</select>
+					</form>
+				</div>
+				<br>
+				Enter the MS2 Accuracy of the Mass Spectrometer:
+				<div id="ms2-settings-entry" style="width:600; margin-left:0;">
+					<form id="ms2-settings-form">
+						<input type="text" id="ms2-accuracy-input" name="ms2-accuracy-input">
+						<select id="ms2-unit-selection">
+							<option value="Da">Da</option>
+							<option value="ppm">ppm</option>
+						</select>
+					</form>
+				</div>
+			</div>
+
+			<br><br>
+
+			<table><tr>
+				<td>Run Quantification</td>
+				<td><input type="checkbox" id="quantification" name="quantification"></td>
+			</tr></table>
+
+			<br><br>
+
+			Use NetMHCpan Binding affinity?
+			<table><tr>
+				<td>As a feature for assignment (best for mono-allelic immunopeptidome data): </td>
+				<td><input type="checkbox" class="pancheckbox" id="panfeature" name="panfeature" onclick="competingCheckboxes(this, 'pancheckbox')"></td>
+			</tr><tr>
+				<td>In reporting after assignment (best for multi-allelic immunopeptidome data): </td>
+				<td><input type="checkbox" class="pancheckbox" id="panvalidation" name="panvalidation" onclick="competingCheckboxes(this, 'pancheckbox')"></td>
+			</tr></table>
+			<br>
+			<div id="netmhcpan-allele-div" style="width:600; margin-left:0; display:none">
+				Specify the allele(s) to be predicted for (eg. HLA-B07:02). For multi-allelic data provide comma separated list.
+				<form id="netmhcpan-allele-form">
+					<input type="text" id="netmhcpan-allele-input" name="netmhcpan-allele-input" style="width:60%;"  class="text-input">
+				</form>
+				<br>
+			</div>
+			<div id="control-flag-div" style="width:600; margin-left:0; display:none">
+				Specify the control flags (Comma-Separated).
+				<form id="control-flag-form">
+					<input type="text" id="control-flag-input" name="control-flag-input" style="width:60%;"  class="text-input">
+				</form>
+			</div>
+			<br>
+			<div id="params-col-2" class="column"  style="margin-left: 0%;">
+				(Optional) Additional inSPIRE configurations.
+				<table id="configs-table" style="width: 60%; border: 2px solid darkgreen; padding: 10px 10px; margin: 12px 12px; ">
+				<br>
+					<tr>
+						<td>Config Key</td>
+						<td>Config Setting</td>
+						<td></td>
+					</tr>
+					<tr>
+						<td><input type="text" class="config-key" /></td>
+						<td><input type="text" class="config-value" /></td>
+						<td><input type="button" class="delete-entry"  value="Delete Entry" onclick="deleteRow(this)"></td>
+					</tr>
+				</table>
+				<button id="add-configs" onclick="addConfigs()">Add Additional Configurations</button>
+			</div>
+
+	
+			<br><br>
+		</div>
+
+		<div id="execution-div" class="container">
+			<div class="vertical-center">
+				<button id="execute-button" onclick="executePipeline('{{ server_address }}', '{{ user }}', '{{ project }}')">
+					Execute Pipeline
+				</button>
+			</div>
+		</div>
+
+		<div id="file-download-text" style="display: none;">
+			<p>Pipeline running. Results will be accessable via:</p>
+			<a id="file-download" href></a>
+			<p>You can also access the results from the main interact page by entering your username
+				and project name and selecting the workflow "Retrieve Results".</p>
+		</div>
+    </div>
+
+    <br>
+
+    <button id="back-button" class="text-button" onclick="revertGUI('{{ server_address }}', '{{ user }}', '{{ project }}', 'parameters')">
+        &xlarr; Go back
+    </button>
+
+
+    <div class="footer">
+        <hr>
+
+        <p>PLACEHOLDER TEXT: ACKNOWLEDGEMENTS, IMPORTANT LINKS</p>
+    </div>
+</body>
+</html>

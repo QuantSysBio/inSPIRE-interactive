@@ -1,0 +1,92 @@
+<!DOCTYPE html>
+<html>
+<head>
+	<link rel='stylesheet' type="text/css" href="{{ url_for('static',filename='styles/style.css') }}">
+	<script src="{{url_for('static', filename='index.js')}}"></script>
+	<title>inSPIRE-Interactive</title>
+</head>
+<body onload="checkFilePattern('{{ server_address }}', '{{ user }}', '{{ project }}', 'search')">	
+	<div class="header">
+		<img src="{{url_for('static', filename='inSPIRE-logo-nobg.png')}}" class="icon-top"/>		
+		<h1>Welcome to inSPIRE-Interactive!</h1>
+		<div id="welcoming-div"></div>
+	</div>
+
+	<hr>
+
+	<div class="center-content">
+		<div id="all-search-div">
+			<h3>Initial Search</h3>
+			<p>Have you already run a search or do you want to run MSFragger as part of inSPIRE?</p>
+			<form id="search-run-div">
+				<select autocomplete="off" onchange="selectSearchType(this.value, '{{ server_address }}', '{{ user }}', '{{ project }}')" id="search-required-selection">
+					<option selected disabled hidden>Select Option</option>
+					<option value="searchDone">I have search results.</option>
+					<option value="searchNeeded">I need to run MSFragger.</option>
+				</select>
+			</form>
+			
+
+			<br>
+
+			<form id="search-engine-div" style="display:none;">
+				<p>Which search engine did you use?</p>
+				<select autocomplete="off"  id="search-engine-selection" onchange="selectSearchEngine(this.value, '{{ server_address }}', '{{ user }}', '{{ project }}')">
+					<option selected disabled hidden>Select Search Engine Used</option>
+					<option value="maxquant">Max Quant</option>
+					<option value="mascot">Mascot</option>
+					<option value="msfragger">MSFragger</option>
+					<option value="peaks">PEAKS DB</option>
+				</select>
+			</form>
+
+			<br><br>
+			<!-- SEARCH DIV -->
+			<div id="search-div" class="row">
+				<div class="row">
+					<div id="search-column-1" style="display:none; margin-left: 0%;">
+						<p>Upload your search results.</p>
+						<br>
+						<input type="file" id="search-file-upload" multiple="true" />
+						<br>
+						<br>
+						<input type="submit" onclick="uploadFiles('{{ server_address }}', '{{ user }}', '{{ project }}', 'search')">
+						<p id="search-waiting" style="display:none;">Files uploading...</p>
+						<p id="search-no-files" style="display:none; color:red;">Please upload a file before proceeding.</p>
+					</div>
+					
+					<div class="vl" id="search-separator" style="display:none;""></div>
+
+					<div id="search-column-2" style="display:none; margin-left: 0%;">
+						Files currently loaded:
+						<ul id="search-file-list"></ul>
+						<br><br>
+						If you have uploaded new files and wish to check the upload click the button below:
+						<br>
+						<input autocomplete="off"  type="submit" value="Refresh File List" onclick="checkFilePattern('{{ server_address }}', '{{ user }}', '{{ project }}', 'search')">
+						<br><br>
+						If you remove the files above:
+						<br>
+						<input autocomplete="off"  type="submit" value="Delete All Files" onclick="clearFilePattern('{{ server_address }}', '{{ user }}', '{{ project }}', 'search')">
+					</div>
+				</div>
+			</div>
+		</div>
+		<br>
+	</div>
+
+    <button id="back-button" class="text-button" onclick="revertGUI('{{ server_address }}', '{{ user }}', '{{ project }}', 'search')">
+        &xlarr; Go back
+    </button>
+
+    <button id="forward-button" class="text-button" onclick="forwardGUI('{{ server_address }}', '{{ user }}', '{{ project }}', 'search')">
+        Proceed &xrarr;
+    </button>
+
+    <div class="footer">
+        <hr>
+
+        <p>PLACEHOLDER TEXT: ACKNOWLEDGEMENTS, IMPORTANT LINKS</p>
+    </div>
+</body>
+</html>

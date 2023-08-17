@@ -168,7 +168,6 @@ function selectWorkflow(value, serverAddress) {
     let user = document.getElementById('user-selection').value;
     let project = document.getElementById('project-selection').value;
 
-
     switch(value){
         case 'deleteProjectData': case 'downloadProjectData': {
             let executeButtonElmt = document.getElementById('execute-button');
@@ -182,22 +181,24 @@ function selectWorkflow(value, serverAddress) {
          } break;
 
         case 'inspire':
-            let message = "User <b>" + user + "</b> is working on <b>" + project + "</b> to run <b>" + value + "</b>.";
+            window.location.href = 'http://' + serverAddress + ':5000/interact-page/usecase/' + user + '/' + project;  
 
-            document.getElementById("opening-div").style.display = "none";
-            document.getElementById("welcoming-div").innerHTML = message;
-            cycleButtonVisibility("back");
-            cycleButtonVisibility("forward");
+            // let message = "User <b>" + user + "</b> is working on <b>" + project + "</b> to run <b>" + value + "</b>.";
 
-            document.getElementById("ms-data-div").style.display = "block";
-            checkFilePattern(serverAddress, 'ms');
-            break;
+            // document.getElementById("opening-div").style.display = "none";
+            // document.getElementById("welcoming-div").innerHTML = message;
+            // cycleButtonVisibility("back");
+            // cycleButtonVisibility("forward");
+
+            // document.getElementById("ms-data-div").style.display = "block";
+            // checkFilePattern(serverAddress, 'ms');
+            // break;
     };
 };
 
 /* ============================================= FUNCTIONAL ============================================= */
 
-async function uploadFiles(serverAddress, mode) {
+async function uploadFiles(serverAddress, user, project, mode) {
     var selectedFiles = (mode === 'proteome-select') ? [
             document.getElementById('host-proteome-file-upload').files[0], 
             document.getElementById('pathogen-proteome-file-upload').files[0]
@@ -216,10 +217,9 @@ async function uploadFiles(serverAddress, mode) {
     
     //Displays the waiting text during the postFiles process, removing it right after.
     waitingTextElem.style.display = 'block';
-    console.log(await postFiles(serverAddress, multiFormData, mode));
+    console.log(await postFiles(serverAddress, user, project, multiFormData, mode));
+    checkFilePattern(serverAddress, user, project, mode);
     waitingTextElem.style.display = "none";
-
-    updateGUI(mode, serverAddress);
 };
 
 function checkPreconditions(mode, files) {
@@ -240,11 +240,9 @@ function checkPreconditions(mode, files) {
  * @param {*} serverAddress 
  * @param {*} file_type 
  */
-async function checkFilePattern(serverAddress, file_type) {
+async function checkFilePattern(serverAddress, user, project, file_type) {
+    console.log(file_type);
     document.getElementById(file_type + "-file-list").innerHTML = "";
-
-    let user = document.getElementById('user-selection').value;
-    let project = document.getElementById('project-selection').value;
 
     var response = await fetch(
         'http://' + serverAddress + ':5000/interact/checkPattern/' + file_type,
@@ -260,7 +258,32 @@ async function checkFilePattern(serverAddress, file_type) {
     });
 
     var filesFound = response['message'];
-    updateListElement(file_type + "-file-list", filesFound)
+    updateListElement(file_type + "-file-list", filesFound);
+
+    if (file_type === 'search') {
+        var response = await fetch(
+            'http://' + serverAddress + ':5000/interact/metadata/' + user + '/' + project + '/' + file_type,
+            {
+                method: 'GET',
+            }
+        ).then( response => {
+            return response.json();
+        });
+        metaDict = response['message'];
+        if (Object.keys(metaDict).length !== 0) {
+            if (metaDict['runFragger'] == 1) {
+                document.getElementById('search-required-selection').value = 'searchNeeded';
+                selectSearchType('searchNeeded', serverAddress, user, project)
+            } else {
+                selectSearchType('searchDone', serverAddress, user, project)
+                document.getElementById('search-required-selection').value = 'searchDone';
+                if ('searchEngine' in metaDict){
+                    document.getElementById('search-engine-selection').value = metaDict['searchEngine'];
+                    selectSearchEngine(metaDict['searchEngine'], serverAddress, user, project)
+                }
+            }
+        }
+    };
 }
 
 /**
@@ -269,11 +292,9 @@ async function checkFilePattern(serverAddress, file_type) {
  * @param {*} serverAddress 
  * @param {*} file_type 
  */
-async function clearFilePattern(serverAddress, file_type) {
+async function clearFilePattern(serverAddress, user, project, file_type) {
     document.getElementById(file_type + "-file-list").innerHTML = "";
 
-    let user = document.getElementById('user-selection').value;
-    let project = document.getElementById('project-selection').value;
 
     var response = await fetch(
         'http://' + serverAddress + ':5000/interact/clearPattern/' + file_type,
@@ -317,7 +338,14 @@ async function updateGUI(currentFrame, serverAddress) {
             blockIds = ["proteome-div"];
             break;
 
-        case 'proteome': case 'proteome-select':
+        case 'proteome':
+            presentFrame = "configs";
+            deletedIds = ["proteome-div"];
+            blockIds = ["parameters-div", "execute-button"];
+            document.getElementById("forward-button").style.display = 'none';
+            break;
+        
+        case 'proteome-select':
             presentFrame = "configs";
             deletedIds = ["proteome-div"];
             blockIds = ["parameters-div", "execute-button"];
@@ -335,74 +363,52 @@ async function updateGUI(currentFrame, serverAddress) {
  * 
  * @param {*} frame frame to be reverted to.
  */
-async function revertGUI(serverAddress, frame = lastFrame) {
+async function revertGUI(serverAddress, user, project, frame) {
     var blockIds = [];
     let deletedIds;
 
-    switch(frame) {
-        case "init" :
-            document.getElementById("opening-div").style.display = "flex";
-            deletedIds = ["welcoming-div", "ms-data-div"]
-            document.getElementById('workflow-selection').selectedIndex = 0;
-            cycleButtonVisibility("back");
-            cycleButtonVisibility("forward");
-            break;
-            
+    switch(frame) {            
         case 'ms':
-            blockIds = ["ms-data-div"];
-            deletedIds = ["search-div"];
-            lastFrame = "init"
+            window.location.href = 'http://' + serverAddress + ':5000/interact-page/usecase';  
             break;
 
         case 'search':
-            blockIds = ["search-div"];
-            deletedIds = ["proteome-div"];
-            lastFrame = "ms"
+            window.location.href = 'http://' + serverAddress + ':5000/interact-page/ms/' + user + '/' + project;  
+            break;
+        
+        case 'usecase':
+            window.location.href = 'http://' + serverAddress + ':5000/interact-page/search/' + user + '/' + project;  
             break;
 
-        case 'proteome': case 'proteome-select':
-            blockIds = ["proteome-div"];
-            deletedIds = ["parameters-div", "execute-button"]; 
-            lastFrame = "search"
-            document.getElementById("forward-button").style.display = 'block';
+        case 'proteome':
+            window.location.href = 'http://' + serverAddress + ':5000/interact-page/usecase/' + user + '/' + project;  
+            break;
+
+        case 'parameters':
+            window.location.href = 'http://' + serverAddress + ':5000/interact-page/proteome/' + user + '/' + project;  
             break;
     };
-    if (frame !== "init"){
-        checkFilePattern(serverAddress, frame);
-    }
+
     setElementDisplay(blockIds);
     setElementDisplay(deletedIds, "none");
 }
 
-async function forwardGUI(serverAddress, frame = lastFrame) {
-    var blockIds = [];
-    let deletedIds;
-
+async function forwardGUI(serverAddress, user, project, frame) {
     switch(frame) {
-        case 'init':
-            blockIds = ["search-div"];
-            deletedIds = ["ms-data-div"];
-            lastFrame = "ms";
-            checkFilePattern(serverAddress, 'search');
+        case 'usecase':
+            window.location.href = 'http://' + serverAddress + ':5000/interact-page/ms/' + user + '/' + project;  
             break;
         case 'ms':
-            blockIds = ["proteome-div"];
-            deletedIds = ["search-div",]; 
-            lastFrame = "search";
-            checkFilePattern(serverAddress, 'proteome');
-            checkFilePattern(serverAddress, 'proteome-select');
+            window.location.href = 'http://' + serverAddress + ':5000/interact-page/search/' + user + '/' + project;  
             break;
         case 'search':
-            blockIds = ["parameters-div", "execute-button"];
-            deletedIds = ["proteome-div",]; 
-            lastFrame = "proteome";
-            document.getElementById("forward-button").style.display = 'none';
+            window.location.href = 'http://' + serverAddress + ':5000/interact-page/proteome/' + user + '/' + project;  
+            break;
+        case 'proteome':
+            window.location.href = 'http://' + serverAddress + ':5000/interact-page/parameters/' + user + '/' + project;  
             break;
     };
 
-
-    setElementDisplay(blockIds);
-    setElementDisplay(deletedIds, "none");
 }
 
 /**
@@ -457,20 +463,35 @@ function updateListElement(listName, array) {
  * 
  * @param {*} value chosen search type.
  */
-function selectSearchType(value, serverAddress) {
-    let blockIds;
-
+function selectSearchType(value, serverAddress, user, project) {
     switch(value){
         case 'searchDone':
-            blockIds = ['search-engine-div', 'search-column-1', 'search-column-2']
+            setElementDisplay(['search-engine-div']);
             break;
         case 'searchNeeded':
-            blockIds = ['proteome-div'];
-            updateGUI('search', serverAddress)
+            var configObject = {
+                'user': user,
+                'project': project,
+                'metadata_type': 'search',
+                'runFragger': 1,
+                'searchEngine': 'msfragger',
+            };
+            postJson(serverAddress, 'metadata', configObject);
+            forwardGUI(serverAddress, user, project, 'search');
             break;
     };
+};
 
-    setElementDisplay(blockIds)
+function selectSearchEngine(value, serverAddress, user, project) {
+    var configObject = {
+        'user': user,
+        'project': project,
+        'metadata_type': 'search',
+        'runFragger': 0,
+        'searchEngine': value,
+    };
+    postJson(serverAddress, 'metadata', configObject);
+    setElementDisplay([ 'search-column-1', 'search-column-2', 'search-separator']);
 };
 
 /**
@@ -478,25 +499,15 @@ function selectSearchType(value, serverAddress) {
  * 
  * @param {*} value chosen inspire type.
  */
-function selectInspireType(value, serverAddress) {
-    let flexIds;
-    let noneIds;
-
-    switch(value){
-        case 'inspireStandard':
-            blockIds = ["sub-proteome-div"];
-            noneIds = ["sub-proteome-select-div"];
-            checkFilePattern(serverAddress, 'proteome');
-            break;
-        case 'inspireSelect':
-            blockIds = ["sub-proteome-select-div"]
-            noneIds = ["sub-proteome-div"];
-            checkFilePattern(serverAddress, 'proteome-select');
-            break;
+function selectInspireType(value, serverAddress, user, project) {
+    var configObject = {
+        'user': user,
+        'project': project,
+        'metadata_type': 'core',
+        'variant': value,
     };
-
-    setElementDisplay(blockIds, "flex");
-    setElementDisplay(noneIds, 'none');
+    postJson(serverAddress, 'metadata', configObject);
+    forwardGUI(serverAddress, user, project, 'usecase');
 };
 
 /**
@@ -537,9 +548,7 @@ function cycleButtonVisibility(buttonType) {
  * @param {*} mode 
  * @returns 
  */
-async function postFiles(serverAddress, formData, mode){
-    let user = document.getElementById('user-selection').value;
-    let project = document.getElementById('project-selection').value;
+async function postFiles(serverAddress, user, project, formData, mode){
     return await fetch(
         'http://' + serverAddress + ':5000/interact/upload/' + user + '/' + project + '/' + mode,
         {
@@ -549,6 +558,23 @@ async function postFiles(serverAddress, formData, mode){
     ).then( response => {
         return response.json();
     });
+}
+
+async function parametersCheck(serverAddress, user, project)
+{
+    var response = await fetch(
+        'http://' + serverAddress + ':5000/interact/metadata/' + user + '/' + project + '/core',
+        {
+            method: 'GET',
+        }
+    ).then( response => {
+        return response.json();
+    });
+    metaDict = response['message'];
+    if (metaDict['variant'] === 'select') {
+        let controlFlagDiv = document.getElementById('control-flag-div');
+        controlFlagDiv.style.display = 'block';
+    }
 }
 
 /**
@@ -585,27 +611,19 @@ async function postJson(serverAddress, endPoint, configObject)
  * 
  * @param {*} serverAddress address of the server hosting inSPIRE-interact.
  */
-async function executePipeline(serverAddress) {
-    let user = document.getElementById('user-selection').value;
-    let project = document.getElementById('project-selection').value;
-    let useMsFragger = document.getElementById('search-required').value;
-    let searchEngine = (
-        useMsFragger != 'searchNeeded'
-    ) ? document.getElementById('search-engine-selection').value : 'msfragger'; 
-    let controlFlags = document.getElementById('control-flag-input').value;
+async function executePipeline(serverAddress, user, project) {
     let ms1Accuracy = document.getElementById('ms1-accuracy-input').value;
     let mzAccuracy = document.getElementById('ms2-accuracy-input').value;
     let mzUnits = document.getElementById('ms2-unit-selection').value;
-
+    let controlFlags = document.getElementById('control-flag-input').value;
 
     var configObject = {
         'user': user,
         'project': project,
-        'searchEngine': searchEngine,
-        'controlFlags': controlFlags,
         'ms1Accuracy': ms1Accuracy,
         'mzAccuracy': mzAccuracy,
         'mzUnits': mzUnits,
+        'controlFlags': controlFlags,
     };
 
 
@@ -635,7 +653,6 @@ async function executePipeline(serverAddress) {
     }
     console.log(additionalConfigs)
 
-    configObject['runFragger'] = (useMsFragger == 'searchNeeded') ? 1 : 0;
     configObject['runQuantification'] = (
         document.getElementById('quantification'
     ).checked) ? 1 : 0;

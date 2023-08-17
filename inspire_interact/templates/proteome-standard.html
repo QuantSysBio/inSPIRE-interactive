@@ -1,0 +1,69 @@
+<!DOCTYPE html>
+<html>
+<head>
+	<link rel='stylesheet' type="text/css" href="{{ url_for('static',filename='styles/style.css') }}">
+	<script src="{{url_for('static', filename='index.js')}}"></script>
+	<title>inSPIRE-Interactive</title>
+</head>
+<body onload="checkFilePattern('{{ server_address }}', '{{ user }}', '{{ project }}', 'proteome')">	
+	<div class="header">
+		<img src="{{url_for('static', filename='inSPIRE-logo-nobg.png')}}" class="icon-top"/>		
+		<h1>Welcome to inSPIRE-Interactive!</h1>
+		<div id="welcoming-div"></div>
+	</div>
+
+	<hr>
+
+	<div class="center-content">
+        <div id="all-proteome-div">
+            <h3>Proteome Fasta File</h3>
+
+            <!-- PROTEOME DIV -->
+            <div id="proteome-div" class="row">
+                <div id="sub-proteome-div" class="row" style="margin-left: 0%;">
+                    <div id="proteome-column-1" style="margin-left: 0%;">
+                        <p>Upload your proteome file.</p>
+                        <br>
+                        <input type="file" id="proteome-file-upload" multiple="true" />
+                        <br>
+                        <br>
+                        <input type="submit" onclick="uploadFiles('{{ server_address }}', '{{ user }}', '{{ project }}', 'proteome')">
+                        <p id="proteome-waiting" style="display:none;">Files uploading...</p>
+                        <p id="proteome-no-files" style="display:none; color:red;">Please upload a file before proceeding.</p>
+                    </div>
+
+                    <div class="vl"></div>
+
+                    <div id="proteome-column-2"style="margin-left: 0%;">
+                        Files currently loaded:
+                        <ul id="proteome-file-list"></ul>
+                        <br><br>
+                        If you have uploaded new files and wish to check the upload click the button below:
+                        <br>
+                        <input autocomplete="off"  type="submit" value="Refresh File List" onclick="checkFilePattern('{{ server_address }}', 'proteome')">
+                        <br><br>
+                        If you remove the files above:
+                        <br>
+                        <input autocomplete="off"  type="submit" value="Delete All Files" onclick="clearFilePattern('{{ server_address }}', 'proteome')">
+                    </div>
+                </div>
+            </div>
+        </div>
+		<br>
+    </div>
+
+    <button id="back-button" class="text-button" onclick="revertGUI('{{ server_address }}', '{{ user }}', '{{ project }}', 'proteome')">
+        &xlarr; Go back
+    </button>
+
+    <button id="forward-button" class="text-button" onclick="forwardGUI('{{ server_address }}', '{{ user }}', '{{ project }}', 'proteome')">
+        Proceed &xrarr;
+    </button>
+
+    <div class="footer">
+        <hr>
+
+        <p>PLACEHOLDER TEXT: ACKNOWLEDGEMENTS, IMPORTANT LINKS</p>
+    </div>
+</body>
+</html>

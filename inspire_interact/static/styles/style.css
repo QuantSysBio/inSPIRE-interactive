@@ -24,6 +24,13 @@ hr {
     padding: 0;
 }
 
+.text-input {
+    padding: 12px 12px;
+    margin: 8px 0;
+    /* box-sizing: border-box; */
+}
+
+
 /* #msDataDiv {
     border: 5px solid blue;
     width: 200px;
@@ -92,6 +99,40 @@ hr {
     margin-left: 5%;
 }
 
+
+.white-black-button{
+    margin-top:80px;
+    margin-bottom:60px;
+    /* margin-left:250px; */
+    color: black;
+    border-color: black;
+    background-color: white;
+    border-style: solid;
+    height: 150px;
+    width: 300px;
+    border-radius: 10px;
+    font-family: 'Times New Roman', Times, serif;
+    cursor: pointer;
+    font-weight: 600;
+    font-size: 40px;
+}
+
+.black-white-button{
+    margin-top:80px;
+    margin-bottom:60px;
+    /* margin-left:250px;	 */
+    color: white;
+    background-color: black;
+    border: none;
+    height: 150px;
+    width: 300px;
+    border-radius: 10px;
+    font-family: 'Times New Roman', Times, serif;
+    cursor: pointer;
+    font-weight: 600;
+    font-size:40px;
+}
+
 .icon-top {
     height: 100%;
     width: 200px;
@@ -119,6 +160,12 @@ hr {
     margin-top: 5%;
     margin-left: 0%;
     height: auto;
+}
+
+.h_iframe {
+    margin-top:80px;
+    margin-bottom:60px;
+    width: 100%; height: 100%; border: none
 }
 
 #opening-div {

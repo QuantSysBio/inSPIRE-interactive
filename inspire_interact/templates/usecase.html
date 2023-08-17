@@ -1,0 +1,49 @@
+<!DOCTYPE html>
+<html>
+<head>
+	<link rel='stylesheet' type="text/css" href="{{ url_for('static',filename='styles/style.css') }}">
+	<script src="{{url_for('static', filename='index.js')}}"></script>
+	<title>inSPIRE-Interactive</title>
+</head>
+<body>	
+	<div class="header">
+		<img src="{{url_for('static', filename='inSPIRE-logo-nobg.png')}}" class="icon-top"/>		
+		<h1>Welcome to inSPIRE-Interactive!</h1>
+		<div id="welcoming-div"></div>
+	</div>
+
+	<hr>
+    <div class="center-content">
+        <div class="row"> 
+            <div id="standard-button-div">
+                <button 
+                id="inSPIRE-Standard-button" class="white-black-button"
+                onclick="selectInspireType('standard', '{{ server_address }}', '{{ user }}', '{{ project }}')"
+                >inSPIRE<br>Standard</button>
+                <p>
+                    Sensitive mass spectrometry identification.
+                </p>            
+            </div>
+            <div id="select-button-div">
+                <button 
+                id="inSPIRE-Select-button" class="black-white-button"
+                onclick="selectInspireType('select', '{{ server_address }}', '{{ user }}', '{{ project }}')"
+                >inSPIRE<br>Select</button>
+                <p>
+                    Specialised pathogen peptide identification.
+                </p>
+            </div>
+            
+        </div>
+    </div>
+	
+    <br><br>
+
+
+    <div class="footer">
+        <hr>
+
+        <p>PLACEHOLDER TEXT: ACKNOWLEDGEMENTS, IMPORTANT LINKS</p>
+    </div>
+</body>
+</html>

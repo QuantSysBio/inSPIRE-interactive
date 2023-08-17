@@ -1,0 +1,70 @@
+<!DOCTYPE html>
+<html>
+<head>
+	<link rel='stylesheet' type="text/css" href="{{ url_for('static',filename='styles/style.css') }}">
+	<script src="{{url_for('static', filename='index.js')}}"></script>
+	<title>inSPIRE-Interactive</title>
+</head>
+<body onload="checkFilePattern('{{ server_address }}', '{{ user }}', '{{ project }}', 'ms')">	
+	<div class="header">
+		<img src="{{url_for('static', filename='inSPIRE-logo-nobg.png')}}" class="icon-top"/>		
+		<h1>Welcome to inSPIRE-Interactive!</h1>
+		<div id="welcoming-div"></div>
+	</div>
+
+	<hr>
+
+	<div class="center-content">
+
+
+		<!-- MASS SPEC DATA DIV -->
+		<div id="ms-data-div" >
+			<h3>MS Data (RAW or mgf)</h3>
+
+			<div class="row">
+				<div style="margin-left: 0%;">
+					<p>Upload new MS data.</p>
+					<br>
+					<input type="file" id="ms-file-upload" multiple="true" />
+					<br>
+					<br>
+					<input autocomplete="off" type="submit" onclick="uploadFiles('{{ server_address }}', '{{ user }}', '{{ project }}', 'ms')">
+					<p id="ms-waiting" style="display:none;">Files uploading...</p>
+					<p id="ms-no-files" style="display:none; color:red;">Please upload a file before proceeding.</p>
+				</div>
+
+				<div class="vl"></div>
+
+				<div style="margin-left: 0%; border-right: auto;">
+					Files currently loaded:
+						<ul id="ms-file-list"></ul>
+					<br><br>
+					If you have uploaded new files and wish to check the upload click the button below:
+					<br>
+					<input autocomplete="off"  type="submit" value="Refresh File List" onclick="checkFilePattern('{{ server_address }}', '{{ user }}', '{{ project }}', 'ms')">
+					<br><br>
+					If you remove the files above:
+					<br>
+					<input autocomplete="off"  type="submit" value="Delete All Files" onclick="clearFilePattern('{{ server_address }}', '{{ user }}', '{{ project }}', 'ms')">
+				</div>
+			</div>
+		</div>
+    </div>
+
+    <br>
+
+    <button id="back-button" class="text-button" onclick="revertGUI('{{ server_address }}', '{{ user }}', '{{ project }}', 'ms')">
+        &xlarr; Go back
+    </button>
+
+    <button id="forward-button" class="text-button" onclick="forwardGUI('{{ server_address }}', '{{ user }}', '{{ project }}', 'ms')">
+        Proceed &xrarr;
+    </button>
+
+    <div class="footer">
+        <hr>
+
+        <p>PLACEHOLDER TEXT: ACKNOWLEDGEMENTS, IMPORTANT LINKS</p>
+    </div>
+</body>
+</html>
