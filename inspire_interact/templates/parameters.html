@@ -7,8 +7,15 @@
 </head>
 <body onload="parametersCheck('{{ server_address }}', '{{ user }}', '{{ project }}')">	
 	<div class="header">
-		<img src="{{url_for('static', filename='inSPIRE-logo-nobg.png')}}" class="icon-top"/>		
+		<img src="{{url_for('static', filename='inSPIRE-logo-nobg.png')}}" class="icon-top" onclick="goHome('{{ server_address }}')"/>		
+		<pre>
+			<h1>    </h1>
+		</pre>
 		<h1>Welcome to inSPIRE-Interactive!</h1>
+		<pre>
+			<h1>    </h1>
+		</pre>
+		<img src="{{url_for('static', filename='help.png')}}" class="icon-help" onclick="location.href = 'https://github.com/QuantSysBio/inSPIRE/issues';"/>		
 		<div id="welcoming-div"></div>
 	</div>
 
@@ -21,7 +28,7 @@
 				Enter the MS1 Accuracy of the Mass Spectrometer:
 				<div id="ms1-settings-entry" style="width:600; margin-left:0;">
 					<form id="ms1-settings-form">
-						<input type="text" id="ms1-accuracy-input" name="mz-accuracy-input">
+						<input type="text" id="ms1-accuracy-input" name="mz-accuracy-input" onkeypress="textSubmit(event, '{{ server_address }}', 'noAction')">
 						<select id="ms1-unit-selection">
 							<option value="ppm">ppm</option>
 						</select>
@@ -31,7 +38,7 @@
 				Enter the MS2 Accuracy of the Mass Spectrometer:
 				<div id="ms2-settings-entry" style="width:600; margin-left:0;">
 					<form id="ms2-settings-form">
-						<input type="text" id="ms2-accuracy-input" name="ms2-accuracy-input">
+						<input type="text" id="ms2-accuracy-input" name="ms2-accuracy-input" onkeypress="textSubmit(event, '{{ server_address }}', 'noAction')">
 						<select id="ms2-unit-selection">
 							<option value="Da">Da</option>
 							<option value="ppm">ppm</option>
@@ -42,10 +49,20 @@
 
 			<br><br>
 
-			<table><tr>
-				<td>Run Quantification</td>
-				<td><input type="checkbox" id="quantification" name="quantification"></td>
-			</tr></table>
+			<table>
+				<tr>
+					<td>
+						Run Quantification (only possible if RAW files have been uploaded).
+					</td>
+					<td>
+						<input type="checkbox" id="quantification" name="quantification">
+					</td>
+				</tr>
+			</table>
+
+			<div id="quant-div" style="width:600; margin-left:0; display:none">
+				<div id="startDraggable"></div>
+			</div>
 
 			<br><br>
 
@@ -61,14 +78,14 @@
 			<div id="netmhcpan-allele-div" style="width:600; margin-left:0; display:none">
 				Specify the allele(s) to be predicted for (eg. HLA-B07:02). For multi-allelic data provide comma separated list.
 				<form id="netmhcpan-allele-form">
-					<input type="text" id="netmhcpan-allele-input" name="netmhcpan-allele-input" style="width:60%;"  class="text-input">
+					<input type="text" id="netmhcpan-allele-input" name="netmhcpan-allele-input" style="width:60%;"  class="text-input" onkeypress="textSubmit(event, '{{ server_address }}', 'noAction')">
 				</form>
 				<br>
 			</div>
 			<div id="control-flag-div" style="width:600; margin-left:0; display:none">
 				Specify the control flags (Comma-Separated).
 				<form id="control-flag-form">
-					<input type="text" id="control-flag-input" name="control-flag-input" style="width:60%;"  class="text-input">
+					<input type="text" id="control-flag-input" name="control-flag-input" style="width:60%;"  class="text-input" onkeypress="textSubmit(event, '{{ server_address }}', 'noAction')">
 				</form>
 			</div>
 			<br>
@@ -82,8 +99,8 @@
 						<td></td>
 					</tr>
 					<tr>
-						<td><input type="text" class="config-key" /></td>
-						<td><input type="text" class="config-value" /></td>
+						<td><input type="text" class="config-key" onkeypress="textSubmit(event, '{{ server_address }}', 'noAction')"/></td>
+						<td><input type="text" class="config-value" onkeypress="textSubmit(event, '{{ server_address }}', 'noAction')"/></td>
 						<td><input type="button" class="delete-entry"  value="Delete Entry" onclick="deleteRow(this)"></td>
 					</tr>
 				</table>

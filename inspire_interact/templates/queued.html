@@ -18,17 +18,11 @@
 		<img src="{{url_for('static', filename='help.png')}}" class="icon-help" onclick="location.href = 'https://github.com/QuantSysBio/inSPIRE/issues';"/>		
 		<div id="welcoming-div"></div>
 	</div>
-	<br>
-	<br>
-	
-    <p>Unfortunately your job appears to have failed.</p>
-	<a href="http://{{ server_address }}:5000/interact/get_results/{{ user }}/{{ project }}/inspireLog"> Click to Download the log of inSPIRE execution.</a>
-	or<br>
-	<a href="http://{{ server_address }}:5000/interact-page/parameters/{{ user }}/{{ project }}">Click to re-execute the pipeline with alternative parameters.</a>
-	<br>
+
+    <p>Your task is in the queue.</p>
 	<center>
-		<h2>Progress Log</h2>
-		{{ progress_html|safe }}
+		<h2>inSPIRE-Interactive Queue</h2>
+		{{ queue_svg }}
 	</center>
 </body>
 </html>

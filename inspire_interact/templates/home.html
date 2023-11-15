@@ -7,8 +7,15 @@
 </head>
 <body>	
 	<div class="header">
-		<img src="{{url_for('static', filename='inSPIRE-logo-nobg.png')}}" class="icon-top"/>		
+		<img src="{{url_for('static', filename='inSPIRE-logo-nobg.png')}}" class="icon-top" onclick="goHome('{{ server_address }}')"/>		
+		<pre>
+			<h1>    </h1>
+		</pre>
 		<h1>Welcome to inSPIRE-Interactive!</h1>
+		<pre>
+			<h1>    </h1>
+		</pre>
+		<img src="{{url_for('static', filename='help.png')}}" class="icon-help" onclick="location.href = 'https://github.com/QuantSysBio/inSPIRE/issues';"/>		
 		<div id="welcoming-div"></div>
 	</div>
 

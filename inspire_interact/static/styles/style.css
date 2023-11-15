@@ -134,9 +134,20 @@ hr {
 }
 
 .icon-top {
+    cursor: pointer;
     height: 100%;
     width: 200px;
-    align-self: flex-start;
+    align-self: center;
+    margin: 0;
+    margin-right: 25px;
+}
+
+.icon-help {
+    cursor: pointer;
+    height: 150px;
+    width: 150px;
+    align-self: center;
+    align-content: right;
     margin: 0;
     margin-right: 25px;
 }

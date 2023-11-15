@@ -7,8 +7,15 @@
 </head>
 <body onload="checkFilePattern('{{ server_address }}', '{{ user }}', '{{ project }}', 'search')">	
 	<div class="header">
-		<img src="{{url_for('static', filename='inSPIRE-logo-nobg.png')}}" class="icon-top"/>		
+		<img src="{{url_for('static', filename='inSPIRE-logo-nobg.png')}}" class="icon-top" onclick="goHome('{{ server_address }}')"/>		
+		<pre>
+			<h1>    </h1>
+		</pre>
 		<h1>Welcome to inSPIRE-Interactive!</h1>
+		<pre>
+			<h1>    </h1>
+		</pre>
+		<img src="{{url_for('static', filename='help.png')}}" class="icon-help" onclick="location.href = 'https://github.com/QuantSysBio/inSPIRE/issues';"/>		
 		<div id="welcoming-div"></div>
 	</div>
 
@@ -52,6 +59,9 @@
 						<br>
 						<input type="submit" onclick="uploadFiles('{{ server_address }}', '{{ user }}', '{{ project }}', 'search')">
 						<p id="search-waiting" style="display:none;">Files uploading...</p>
+						<br>
+                        <progress id="progressBar" value="0" max="100" style="width:300px;display:none"></progress>
+                        <p id="loaded_n_total"></p>
 						<p id="search-no-files" style="display:none; color:red;">Please upload a file before proceeding.</p>
 					</div>
 					

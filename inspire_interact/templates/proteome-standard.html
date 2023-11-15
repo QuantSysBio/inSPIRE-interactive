@@ -7,8 +7,15 @@
 </head>
 <body onload="checkFilePattern('{{ server_address }}', '{{ user }}', '{{ project }}', 'proteome')">	
 	<div class="header">
-		<img src="{{url_for('static', filename='inSPIRE-logo-nobg.png')}}" class="icon-top"/>		
+		<img src="{{url_for('static', filename='inSPIRE-logo-nobg.png')}}" class="icon-top" onclick="goHome('{{ server_address }}')"/>		
+		<pre>
+			<h1>    </h1>
+		</pre>
 		<h1>Welcome to inSPIRE-Interactive!</h1>
+		<pre>
+			<h1>    </h1>
+		</pre>
+		<img src="{{url_for('static', filename='help.png')}}" class="icon-help" onclick="location.href = 'https://github.com/QuantSysBio/inSPIRE/issues';"/>		
 		<div id="welcoming-div"></div>
 	</div>
 
@@ -16,8 +23,11 @@
 
 	<div class="center-content">
         <div id="all-proteome-div">
-            <h3>Proteome Fasta File</h3>
-
+            <h3>Proteome Fasta File (Optional)</h3>
+            <p>
+                Proteome file is only required for inSPIRE if you wish to infer proteins or are running an MSFragger search.<br>
+                If you do not require this, you can click Proceed without uploading.
+            </p>
             <!-- PROTEOME DIV -->
             <div id="proteome-div" class="row">
                 <div id="sub-proteome-div" class="row" style="margin-left: 0%;">
@@ -29,6 +39,9 @@
                         <br>
                         <input type="submit" onclick="uploadFiles('{{ server_address }}', '{{ user }}', '{{ project }}', 'proteome')">
                         <p id="proteome-waiting" style="display:none;">Files uploading...</p>
+                        <br>
+                        <progress id="progressBar" value="0" max="100" style="width:300px;display:none"></progress>
+                        <p id="loaded_n_total"></p>
                         <p id="proteome-no-files" style="display:none; color:red;">Please upload a file before proceeding.</p>
                     </div>
 
@@ -40,11 +53,11 @@
                         <br><br>
                         If you have uploaded new files and wish to check the upload click the button below:
                         <br>
-                        <input autocomplete="off"  type="submit" value="Refresh File List" onclick="checkFilePattern('{{ server_address }}', 'proteome')">
+                        <input autocomplete="off"  type="submit" value="Refresh File List" onclick="checkFilePattern('{{ server_address }}', '{{ user }}', '{{ project }}', 'proteome')">
                         <br><br>
                         If you remove the files above:
                         <br>
-                        <input autocomplete="off"  type="submit" value="Delete All Files" onclick="clearFilePattern('{{ server_address }}', 'proteome')">
+                        <input autocomplete="off"  type="submit" value="Delete All Files" onclick="clearFilePattern('{{ server_address }}', '{{ user }}', '{{ project }}', 'proteome')">
                     </div>
                 </div>
             </div>

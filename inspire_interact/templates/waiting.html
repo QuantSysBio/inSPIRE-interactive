@@ -1,103 +1,37 @@
 <!DOCTYPE html>
 <html>
 <head>
-	<style>
-		h1 {
-			text-align: center;
-		}
-
-        img {
-            display: block;
-            margin-left: auto;
-            margin-right: auto;
-            width: 20%;
-        }
-
-        body {
-            background-color: floralwhite;
-        }
-
-        div {
-            margin-left: 10%;
-            margin-right: auto;
-        }
-
-		/* #msDataDiv {
-			border: 5px solid blue;
-			width: 200px;
-			height: 100px;
-		} */
-
-		.column {
-			float: left;
-			width: 40%;
-		    border-right:#165a19 dotted 2px;
-			padding-left: 3%;
-			padding-right: 3%;
-		}
-
-		.row {
-			width: 80%;
-		}
-
-		.row:after {
-			content: "";
-			display: table;
-			clear: both;
-			width: 80%;
-		}
-
-        /* .center {
-            display: block;
-            margin-left: auto;
-            margin-right: auto;
-            width: 50%;
-        }; */
-
-		#executeButton {
-			display: block;
-			padding: 10px 14px;
-			cursor: pointer;
-			text-align: center;
-			text-decoration: none;
-			outline: none;
-			color: #fff;
-			background-color: #165a19;
-			border: none;
-			border-radius: 10px;
-			/* box-shadow: 0 9px #999; */
-			
-		};
-
-		#executeButton:hover {
-			background-color: #165a19;
-		};
-
-		#executeButton:active {
-			background-color: #165a19;
-			box-shadow: 0 5px #666;
-			transform: translateY(4px);
-		};
-
-		.container {
-			position: relative;
-			border: 3px solid #165a19;
-		}
-
-		.vertical-center {
-			margin: 0;
-			position: relative;
-			top: 50%;
-			/* -ms-transform: translateY(-50%);
-			transform: translateY(-50%); */
-		}
-	</style>
+	<link rel='stylesheet' type="text/css" href="{{ url_for('static',filename='styles/style.css') }}">
 	<script src="{{url_for('static', filename='index.js')}}"></script>
 	<title>inSPIRE-Interactive</title>
 </head>
 <body>
-	<h1>Welcome to inSPIRE-Interactive!</h1>
-	<img src="{{url_for('static', filename='inSPIRE-logo.png')}}"/>
+	<div class="header">
+		<img src="{{url_for('static', filename='inSPIRE-logo-nobg.png')}}" class="icon-top" onclick="goHome('{{ server_address }}')"/>		
+		<pre>
+			<h1>    </h1>
+		</pre>
+		<h1>Welcome to inSPIRE-Interactive!</h1>
+		<pre>
+			<h1>    </h1>
+		</pre>
+		<img src="{{url_for('static', filename='help.png')}}" class="icon-help" onclick="location.href = 'https://github.com/QuantSysBio/inSPIRE/issues';"/>		
+		<div id="welcoming-div"></div>
+	</div>
+
     <p>Your data is still processing, check again later.</p>
+	
+	<center>
+		<h2>Progress Log</h2>
+		{{ progress_html|safe }}
+	</center>
+
+    <p>If you have made a mistake and wish to cancel your job, click below.</p>
+	<div class="vertical-center">
+		<button id="execute-button" onclick="cancelPipeline('{{ server_address }}', '{{ user }}', '{{ project }}')">
+			Cancel Exectuions
+		</button>
+	</div>
+	<div id="cancelled-text"></div>
 </body>
 </html>

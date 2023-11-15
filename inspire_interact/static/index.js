@@ -27,6 +27,23 @@ async function selectUser(serverAddress, selectedUser) {
     showProjectOptions(response["message"]);
 };
 
+async function textSubmit(e, serverAddress, functionActivated) {
+    if (e.keyCode !== 13){
+        return
+    }
+    e.preventDefault();
+
+    switch(functionActivated){
+        case 'createNewUser':
+            createNewUser(serverAddress)
+            break;
+        case 'createNewProject':
+            createNewProject(serverAddress)
+            break;
+    };
+
+}
+
 /**
  * Creates a new inSPIRE-interact user, forcing a GUI update to show the user's projects.
  * 
@@ -169,30 +186,21 @@ function selectWorkflow(value, serverAddress) {
     let project = document.getElementById('project-selection').value;
 
     switch(value){
-        case 'deleteProjectData': case 'downloadProjectData': {
-            let executeButtonElmt = document.getElementById('execute-button');
-
-            executeButtonElmt.innerHTML = (value == 'deleteProjectData') ? 'Delete All Project Data' : 'Download All Project Files';
-            executeButtonElmt.style.display = 'block';
-        } break;
+        case 'deleteProjectData':
+            window.location.href = 'http://' + serverAddress + ':5000/interact-page/delete/' + user + '/' + project;  
+            break;
+        
+        case 'downloadProjectData': 
+            window.location.href = 'http://' + serverAddress + ':5000/interact-page/download/' + user + '/' + project;  
+            break;
             
-        case 'results': {
+        case 'results':
             window.location.href = 'http://' + serverAddress + ':5000/interact/' + user + '/' + project + '/inspire'
-         } break;
+            break;
 
         case 'inspire':
             window.location.href = 'http://' + serverAddress + ':5000/interact-page/usecase/' + user + '/' + project;  
-
-            // let message = "User <b>" + user + "</b> is working on <b>" + project + "</b> to run <b>" + value + "</b>.";
-
-            // document.getElementById("opening-div").style.display = "none";
-            // document.getElementById("welcoming-div").innerHTML = message;
-            // cycleButtonVisibility("back");
-            // cycleButtonVisibility("forward");
-
-            // document.getElementById("ms-data-div").style.display = "block";
-            // checkFilePattern(serverAddress, 'ms');
-            // break;
+            break;
     };
 };
 
@@ -214,12 +222,45 @@ async function uploadFiles(serverAddress, user, project, mode) {
     });
 
     let waitingTextElem = document.getElementById(mode + "-waiting");
-    
-    //Displays the waiting text during the postFiles process, removing it right after.
     waitingTextElem.style.display = 'block';
-    console.log(await postFiles(serverAddress, user, project, multiFormData, mode));
-    checkFilePattern(serverAddress, user, project, mode);
-    waitingTextElem.style.display = "none";
+
+    //create XHR object to send request
+    var ajax = new XMLHttpRequest(
+        
+    );
+
+    // add progress event to find the progress of file upload 
+    ajax.upload.addEventListener("progress", progressHandler);
+
+    // initializes a newly-created request 
+    ajax.open(
+        "POST",
+        'http://' + serverAddress + ':5000/interact/upload/' + user + '/' + project + '/' + mode
+    ); // replace with your file URL
+
+    ajax.onreadystatechange = () => {
+        // Call a function when the state changes.
+        if (ajax.readyState === XMLHttpRequest.DONE && ajax.status === 200) {
+            checkFilePattern(serverAddress, user, project, mode);
+            waitingTextElem.style.display = "none";
+        }
+    };
+    
+    // send request to the server
+    ajax.send(multiFormData);
+};
+
+function progressHandler(ev) {    
+    let totalSize = Math.round((ev.total/1000000000 + Number.EPSILON) * 1000)/1000; // total size of the file in bytes
+    let loadedSize = Math.round((ev.loaded/1000000000 + Number.EPSILON) * 1000)/1000; // loaded size of the file in bytes    
+
+    document.getElementById("loaded_n_total").innerHTML = "Uploaded " + loadedSize + " GB of " + totalSize + " GB.";
+
+    // calculate percentage 
+    var percent = (ev.loaded / ev.total) * 100;
+    document.getElementById("progressBar").style.display="";
+    document.getElementById("progressBar").value = Math.round(percent);
+
 };
 
 function checkPreconditions(mode, files) {
@@ -393,6 +434,10 @@ async function revertGUI(serverAddress, user, project, frame) {
     setElementDisplay(deletedIds, "none");
 }
 
+async function goHome(serverAddress) {
+    window.location.href = 'http://' + serverAddress + ':5000/interact-page/home';
+}
+
 async function forwardGUI(serverAddress, user, project, frame) {
     switch(frame) {
         case 'usecase':
@@ -477,7 +522,6 @@ function selectSearchType(value, serverAddress, user, project) {
                 'searchEngine': 'msfragger',
             };
             postJson(serverAddress, 'metadata', configObject);
-            forwardGUI(serverAddress, user, project, 'search');
             break;
     };
 };
@@ -571,7 +615,7 @@ async function parametersCheck(serverAddress, user, project)
         return response.json();
     });
     metaDict = response['message'];
-    if (metaDict['variant'] === 'select') {
+    if (metaDict['variant'] === 'pathogen') {
         let controlFlagDiv = document.getElementById('control-flag-div');
         controlFlagDiv.style.display = 'block';
     }
@@ -611,6 +655,45 @@ async function postJson(serverAddress, endPoint, configObject)
  * 
  * @param {*} serverAddress address of the server hosting inSPIRE-interact.
  */
+async function cancelPipeline(serverAddress, user, project) {
+    var configObject = {
+        'user': user,
+        'project': project,
+    };
+
+    var response = await postJson(serverAddress, 'cancel', configObject);
+    let cancelElem = document.getElementById("cancelled-text")
+    cancelElem.innerHTML = response['message'];
+};
+
+async function downloadOutputs(serverAddress, user, project) {
+    var configObject = {
+        'user': user,
+        'project': project,
+    };
+    let downloadElem = document.getElementById("download-text");
+    downloadElem.innerHTML = 'There may be some delay before your download begins in order to zip the output folder.';
+    await postJson(serverAddress, 'download', configObject)
+};
+
+
+async function deleteProject(serverAddress, user, project) {
+    var configObject = {
+        'user': user,
+        'project': project,
+    };
+
+    if (confirm("Are you sure you want to delete the project " + project + "?") == true) {
+        await postJson(serverAddress, 'cancel', configObject)
+        var response = await postJson(serverAddress, 'delete', configObject);
+        let deleteElem = document.getElementById("delete-text");
+        deleteElem.innerHTML = response['message'];
+    } else {
+        let deleteElem = document.getElementById("delete-text");
+        deleteElem.innerHTML = 'No deletion.';
+    } 
+};
+
 async function executePipeline(serverAddress, user, project) {
     let ms1Accuracy = document.getElementById('ms1-accuracy-input').value;
     let mzAccuracy = document.getElementById('ms2-accuracy-input').value;
