@@ -686,6 +686,8 @@ def main():
     app.config[INTERACT_HOME_KEY] = os.getcwd()
     if not os.path.exists('projects'):
         os.mkdir('projects')
+    if not os.path.exists('locks'):
+        os.mkdir('locks')
     
     if args.mode == 'local':
         app.config[SERVER_ADDRESS_KEY] = '127.0.0.1'
