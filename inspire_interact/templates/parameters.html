@@ -23,7 +23,8 @@
 
 	<div class="center-content">
 		<div id="parameters-div">
-			<h3>inSPIRE Configuration</h3>
+			<h2>inSPIRE Configuration</h2>
+			<h3>Instrument Settings</h3>
 			<div id="params-col-1" class="column"  style="margin-left: 0%;">
 				Enter the MS1 Accuracy of the Mass Spectrometer:
 				<div id="ms1-settings-entry" style="width:600; margin-left:0;">
@@ -47,7 +48,7 @@
 				</div>
 			</div>
 
-			<br><br>
+			<h3>Additional Features</h3>
 
 			<table>
 				<tr>
@@ -55,7 +56,7 @@
 						Run Quantification (only possible if RAW files have been uploaded).
 					</td>
 					<td>
-						<input type="checkbox" id="quantification" name="quantification">
+						<input type="checkbox" id="quantification-checkbox" name="quantification">
 					</td>
 				</tr>
 			</table>
@@ -82,13 +83,18 @@
 				</form>
 				<br>
 			</div>
-			<div id="control-flag-div" style="width:600; margin-left:0; display:none">
-				Specify the control flags (Comma-Separated).
-				<form id="control-flag-form">
-					<input type="text" id="control-flag-input" name="control-flag-input" style="width:60%;"  class="text-input" onkeypress="textSubmit(event, '{{ server_address }}', 'noAction')">
-				</form>
+
+			<h3>Per File Information</h3>
+			<div id="raw-table-div" style="width:600; margin-left:0;">
+				Specify RAW File information.
+				<br><br>
+				<table id="raw-table" style="width: 60%;">
+				<br>
+					{{ html_table|safe }}
+				</table>
 			</div>
 			<br>
+			<h3>Additional Settings</h3>
 			<div id="params-col-2" class="column"  style="margin-left: 0%;">
 				(Optional) Additional inSPIRE configurations.
 				<table id="configs-table" style="width: 60%; border: 2px solid darkgreen; padding: 10px 10px; margin: 12px 12px; ">
@@ -113,6 +119,10 @@
 
 		<div id="execution-div" class="container">
 			<div class="vertical-center">
+				<button id="parameter-save-button" onclick="saveParameters('{{ server_address }}', '{{ user }}', '{{ project }}')">
+					Save Parameters
+				</button>
+				<br><br>
 				<button id="execute-button" onclick="executePipeline('{{ server_address }}', '{{ user }}', '{{ project }}')">
 					Execute Pipeline
 				</button>

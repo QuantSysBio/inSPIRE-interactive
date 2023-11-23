@@ -12,23 +12,75 @@ from inspire_interact.constants import (
     CPUS_KEY,
     FRAGGER_MEMORY_KEY,
     FRAGGER_PATH_KEY,
+    INTERACT_HOME_KEY,
     MHCPAN_KEY,
+    SERVER_ADDRESS_KEY,
 )
 
-def write_inspire_task(bash_file, project_home, task):
-    user = project_home.split('/')[-2]
-    project_title = project_home.split('/')[-1]
+def generate_raw_file_table(user, project, app, variant):
+    home_key= app.config[INTERACT_HOME_KEY]
+    project_home = f'{home_key}/projects/{user}/{project}'
+    
+    if variant == 'pathogen':
+        html_table = '''
+            <tr align="center" valign="center">
+                <td><b>Raw File</b></td>
+                <td><b>Biological Sample</b></td>
+                <td><b>Infected Sample</b></td>
+            </tr>
+        '''
+    else:
+        html_table = '''
+            <tr align="center" valign="center">
+                <td><b>Raw File</b></td>
+                <td><b>Biological Sample</b></td>
+            </tr>
+        '''
+
+    sample_files = sorted(list(set([
+        file_name[:-4] for file_name in os.listdir(
+            f'{project_home}/ms'
+        ) if (
+            file_name.lower().endswith('.raw') or 
+            file_name.lower().endswith('.mgf')
+        )
+    ])))
+
+    for sample_idx, sample_name in enumerate(sample_files):
+        html_table += f'''
+            <tr align="center" valign="center">
+            <td>{sample_name}</td>
+			<td>
+                <input type="text" class="sample-value" value="{sample_idx+1}"
+                    onkeypress="textSubmit(event, '{app.config[SERVER_ADDRESS_KEY]}', 'noAction')"/>
+            </td>
+        '''
+        if variant == 'pathogen':
+            html_table += f'''
+                <td>
+					<input type="checkbox" class="infection-checkbox" style="align: center" id="{sample_name}_infected" name="{sample_name}_infected">
+				</td>
+            '''
+        html_table += '</tr>'
+
+    return html_table
+
+
+def write_inspire_task(bash_file, project_home, task, interact_home):
     bash_file.write(
         f'inspire --pipeline {task} --config_file {project_home}/config.yml\n'
     )
     bash_file.write(
-        f'python inspire_interact/check_status.py {task} "$?" {project_home}\n'
+        f'interact-queue --project_home {project_home} ' +
+        f' --interact_home {interact_home}' +
+        f' --queue_task update --inspire_task {task} --inspire_status $?\n'
     )
     bash_file.write(
-        'if [ "$?" -ne "0" ]\n'
-        '  then\n'
-        f'    python inspire_interact/remove_from_queue.py  {user} {project_title}\n'
-        '    exit 0\n'
+        'if [ "$?" -ne "0" ]\n' +
+        '  then\n' +
+        f'    interact-queue --project_home {project_home} --interact_home {interact_home} ' +
+        ' --queue_task remove\n' +
+        '    exit 0\n' +
         'fi\n'
     )
 
@@ -40,9 +92,9 @@ def prepare_inspire(config_dict, project_home, app_config):
         'fragger': False,
         'pathogen': False,
     }
-    print('ok')
+
     inspire_settings['quantify'] = bool(config_dict['runQuantification'])
-    print(inspire_settings)
+
     output_config = {
         'experimentTitle': config_dict['project'],
         'scansFormat': 'mgf',
@@ -55,6 +107,7 @@ def prepare_inspire(config_dict, project_home, app_config):
         'fraggerPath': app_config[FRAGGER_PATH_KEY],
         'fraggerMemory': app_config[FRAGGER_MEMORY_KEY],
         'nCores': app_config[CPUS_KEY],
+        'technicalReplicates': config_dict['technicalReplicates'],
     }
 
     if not os.path.exists(
@@ -91,7 +144,7 @@ def prepare_inspire(config_dict, project_home, app_config):
     output_config['scansFolder'] = f'{project_home}/ms'
 
     ms_files = os.listdir(f'{project_home}/ms')
-    print(ms_files)
+
     raw_files = [ms_file for ms_file in ms_files if ms_file.lower().endswith('.raw')]
     mgf_files = [ms_file for ms_file in ms_files if ms_file.lower().endswith('.mgf')]
     if len(raw_files) != len(mgf_files):
@@ -122,7 +175,7 @@ def prepare_inspire(config_dict, project_home, app_config):
         output_config['pathogenProteome'] = f'{project_home}/proteome-select/{path_name}'
         output_config['hostProteome'] = f'{project_home}/proteome-select/{host_name}'
         output_config['controlFlags'] = [
-            elem.strip() for elem in  config_dict["controlFlags"].split(",")
+            elem.strip() for elem in config_dict["controlFlags"].split(",") if elem
         ]
         output_config['inferProteins'] = True
     for config_key, config_value in config_dict['additionalConfigs'].items():
@@ -132,7 +185,6 @@ def prepare_inspire(config_dict, project_home, app_config):
             output_config[config_key] = config_value
 
 
-    print(output_config)
     with open(f'{project_home}/config.yml', 'w', encoding='UTF-8') as yaml_out:
         yaml.dump(output_config, yaml_out)
 
@@ -167,6 +219,8 @@ def get_inspire_increase(project_home, variant):
             ns_df = pd.DataFrame({'q-value': []})
         ns_count = len(ns_df[ns_df['q-value'] < 0.01])
 
+        if ns_count <= 0:
+            return ''
         increase = round(100*(inspire_count - ns_count)/ns_count, 2)
 
         return f'inSPIRE increased overall PSM yield by {increase}% at 1% FDR.'

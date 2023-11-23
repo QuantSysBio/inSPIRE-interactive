@@ -13,7 +13,6 @@ from flask.json import jsonify
 from flask_cors import cross_origin
 from markupsafe import Markup
 import pandas as pd
-import waitress
 import yaml
 
 from inspire_interact.constants import (
@@ -37,7 +36,8 @@ from inspire_interact.utils import (
     get_pids,
     get_quant_count,
     get_tasks, prepare_inspire,
-    write_inspire_task
+    write_inspire_task,
+    generate_raw_file_table,
 )
 
 app = flask.Flask(__name__, template_folder='templates')
@@ -112,6 +112,19 @@ def fetch_page(page, user, project):
 
     if page == 'proteome':
         page += f'-{variant}'
+
+    if page == 'parameters':
+        html_table = generate_raw_file_table(user, project, app, variant)
+        return render_template(
+            f'{page}.html',
+            server_address=app.config[SERVER_ADDRESS_KEY],
+            mode=app.config[MODE_KEY],
+            user=user,
+            project=project,
+            variant=variant,
+            html_table=html_table,
+        )
+
     return render_template(
         f'{page}.html',
         server_address=app.config[SERVER_ADDRESS_KEY],
@@ -351,7 +364,9 @@ def cancel_job():
         )
 
     os.system(
-        f'python inspire_interact/remove_from_queue.py  {user} {project}\n'
+        f'interact-queue --project_home {project_home} ' +
+        f' --interact_home {app.config[INTERACT_HOME_KEY]} ' +
+        ' --queue_task remove\n'
     )
     task_df = pd.read_csv(f'{project_home}/taskStatus.csv')
     task_df['status'] = 'Job Cancelled'
@@ -371,7 +386,6 @@ def run_inspire_core():
     """
     try:
         config_dict = request.json
-        print(config_dict)
         user = config_dict['user']
         project_title = config_dict['project']
         server_address = app.config[SERVER_ADDRESS_KEY]
@@ -408,35 +422,41 @@ def run_inspire_core():
                 f'echo $$ > {project_home}/inspire_pids.txt ;\n'
             )
             bash_file.write(
-                f'python inspire_interact/add_to_queue.py {user} {project_title}\n'
+                f'interact-queue --project_home {project_home} ' +
+                f' --interact_home {app.config[INTERACT_HOME_KEY]} ' +
+                ' --queue_task add\n'
             )
             bash_file.write(
-                f'python inspire_interact/check_queue.py {user} {project_title}\n'
+                f'interact-queue --project_home {project_home} ' +
+                f' --interact_home {app.config[INTERACT_HOME_KEY]} ' +
+                ' --queue_task check\n'
             )
             bash_file.write(
-                f'python inspire_interact/check_status.py start 0 {project_home}\n'
+                f'interact-queue --project_home {project_home} ' +
+                f' --interact_home {app.config[INTERACT_HOME_KEY]} ' +
+                ' --queue_task update --inspire_task start --inspire_status 0\n'
             )
             if inspire_settings['convert']:
-                write_inspire_task(bash_file, project_home, 'convert')
+                write_inspire_task(bash_file, project_home, 'convert', app.config[INTERACT_HOME_KEY])
 
             if inspire_settings['fragger']:
-                write_inspire_task(bash_file, project_home, 'fragger')
+                write_inspire_task(bash_file, project_home, 'fragger', app.config[INTERACT_HOME_KEY])
 
-            write_inspire_task(bash_file, project_home, 'prepare')
-            write_inspire_task(bash_file, project_home, 'predictSpectra')
+            write_inspire_task(bash_file, project_home, 'prepare', app.config[INTERACT_HOME_KEY])
+            write_inspire_task(bash_file, project_home, 'predictSpectra', app.config[INTERACT_HOME_KEY])
             if inspire_settings['binding']:
-                write_inspire_task(bash_file, project_home, 'predictBinding')
-            write_inspire_task(bash_file, project_home, 'featureGeneration')
-            write_inspire_task(bash_file, project_home, 'featureSelection+')
-            write_inspire_task(bash_file, project_home, 'generateReport')
+                write_inspire_task(bash_file, project_home, 'predictBinding', app.config[INTERACT_HOME_KEY])
+            write_inspire_task(bash_file, project_home, 'featureGeneration', app.config[INTERACT_HOME_KEY])
+            write_inspire_task(bash_file, project_home, 'featureSelection+', app.config[INTERACT_HOME_KEY])
+            write_inspire_task(bash_file, project_home, 'generateReport', app.config[INTERACT_HOME_KEY])
 
             if inspire_settings['quantify']:
-                write_inspire_task(bash_file, project_home, 'quantify')
+                write_inspire_task(bash_file, project_home, 'quantify', app.config[INTERACT_HOME_KEY])
                 if inspire_settings['pathogen']:
-                    write_inspire_task(bash_file, project_home, 'quantReport')
+                    write_inspire_task(bash_file, project_home, 'quantReport', app.config[INTERACT_HOME_KEY])
 
             if inspire_settings['pathogen']:
-                write_inspire_task(bash_file, project_home, 'extractCandidates')
+                write_inspire_task(bash_file, project_home, 'extractCandidates', app.config[INTERACT_HOME_KEY])
 
             for intermediate_file in INTERMEDIATE_FILES:
                 bash_file.write(
@@ -444,7 +464,9 @@ def run_inspire_core():
                 )
 
             bash_file.write(
-                f'python inspire_interact/remove_from_queue.py  {user} {project_title}\n'
+                f'interact-queue --project_home {project_home} ' +
+                f' --interact_home {app.config[INTERACT_HOME_KEY]} ' +
+                ' --queue_task remove\n'
             )
 
         os.system(
@@ -512,9 +534,12 @@ def check_results(user, project, workflow):
         
         if os.path.exists(f'{project_home}/inspireOutput/{key_file}'):
             create_status_fig(project_home)
-            with open(f'{project_home}/progress.svg', 'r') as html_file:
-                progress_html = html_file.read()
-
+            if os.path.exists(f'{project_home}/progress.svg'):
+                with open(f'{project_home}/progress.svg', 'r') as html_file:
+                    progress_html = html_file.read()
+            else:
+                progress_html = ''
+        
             if os.path.exists(f'{project_home}/inspireOutput/img/psm_fdr_curve.svg'):
                 with open(f'{project_home}/inspireOutput/img/psm_fdr_curve.svg', 'r') as html_file:
                     psm_fdr_html = html_file.read()
@@ -640,6 +665,8 @@ def get_arguments():
     )
     parser.add_argument(
         '--mode',
+        default='server',
+        required=False,
     )
 
     return parser.parse_args()
@@ -660,11 +687,13 @@ def main():
     if not os.path.exists('projects'):
         os.mkdir('projects')
     
-    if True:
+    if args.mode == 'local':
+        app.config[SERVER_ADDRESS_KEY] = '127.0.0.1'
+    elif args.mode == 'server':
         host_name = socket.gethostname()
         app.config[SERVER_ADDRESS_KEY] = socket.gethostbyname(host_name + ".local")
-    # else:
-    #     app.config[SERVER_ADDRESS_KEY] = '127.0.0.1'
+    else:
+        raise ValueError(f'Unknown mode {args.mode} requested')
 
     app.config[FILESERVER_NAME_KEY] = config_dict.get(FILESERVER_NAME_KEY)
     app.config[MHCPAN_KEY] = config_dict.get(MHCPAN_KEY)
@@ -674,7 +703,6 @@ def main():
     app.config[MODE_KEY] = args.mode
 
     app.run(host='0.0.0.0', debug = False)
-    # waitress.serve(app, host='0.0.0.0', port=5000)
 
 if __name__ == '__main__':
     main()

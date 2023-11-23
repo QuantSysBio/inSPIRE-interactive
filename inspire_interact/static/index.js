@@ -282,7 +282,6 @@ function checkPreconditions(mode, files) {
  * @param {*} file_type 
  */
 async function checkFilePattern(serverAddress, user, project, file_type) {
-    console.log(file_type);
     document.getElementById(file_type + "-file-list").innerHTML = "";
 
     var response = await fetch(
@@ -408,7 +407,11 @@ async function revertGUI(serverAddress, user, project, frame) {
     var blockIds = [];
     let deletedIds;
 
-    switch(frame) {            
+    switch(frame) {
+        case 'usecase':
+            window.location.href = 'http://' + serverAddress + ':5000/interact';  
+            break;
+
         case 'ms':
             window.location.href = 'http://' + serverAddress + ':5000/interact-page/usecase';  
             break;
@@ -416,13 +419,9 @@ async function revertGUI(serverAddress, user, project, frame) {
         case 'search':
             window.location.href = 'http://' + serverAddress + ':5000/interact-page/ms/' + user + '/' + project;  
             break;
-        
-        case 'usecase':
-            window.location.href = 'http://' + serverAddress + ':5000/interact-page/search/' + user + '/' + project;  
-            break;
 
         case 'proteome':
-            window.location.href = 'http://' + serverAddress + ':5000/interact-page/usecase/' + user + '/' + project;  
+            window.location.href = 'http://' + serverAddress + ':5000/interact-page/search/' + user + '/' + project;  
             break;
 
         case 'parameters':
@@ -604,10 +603,22 @@ async function postFiles(serverAddress, user, project, formData, mode){
     });
 }
 
+function controlCheck(col, file_name, item) {
+    if (file_name.includes(item) & item !== '') {
+        col.getElementsByClassName('infection-checkbox')[0].checked = false;
+    }
+};
+
+function replicateCheck(col, file_name, item, index) {
+    if (item.includes(file_name)) {
+        col.getElementsByClassName('sample-value')[0].value = index + 1;
+    }
+};
+
 async function parametersCheck(serverAddress, user, project)
 {
     var response = await fetch(
-        'http://' + serverAddress + ':5000/interact/metadata/' + user + '/' + project + '/core',
+        'http://' + serverAddress + ':5000/interact/metadata/' + user + '/' + project + '/parameters',
         {
             method: 'GET',
         }
@@ -615,9 +626,64 @@ async function parametersCheck(serverAddress, user, project)
         return response.json();
     });
     metaDict = response['message'];
-    if (metaDict['variant'] === 'pathogen') {
-        let controlFlagDiv = document.getElementById('control-flag-div');
-        controlFlagDiv.style.display = 'block';
+
+    if ('ms1Accuracy' in metaDict) {
+        document.getElementById('ms1-accuracy-input').value = metaDict['ms1Accuracy'];
+    }
+    if ('mzAccuracy' in metaDict) {
+        document.getElementById('ms2-accuracy-input').value = metaDict['mzAccuracy'];
+    }
+    if ('mzUnits' in metaDict) {
+        document.getElementById('ms2-unit-selection').value = metaDict['mzUnits'];
+    }
+    if ('runQuantification' in metaDict) {
+        if (metaDict['runQuantification']){
+            document.getElementById('quantification-checkbox').checked = true;
+        }
+    }
+    if ('useBindingAffinity' in metaDict) {
+        if (metaDict['useBindingAffinity'] = 'asFeature') {
+            document.getElementById('panfeature').checked = true;
+            document.getElementById('netmhcpan-allele-div').style.display = 'block';
+        } else if (metaDict['useBindingAffinity'] = 'asValidation') {
+            document.getElementById('panvalidation').checked = true;
+            document.getElementById('netmhcpan-allele-div').style.display = 'block';
+        }
+    }
+    if ('alleles' in metaDict) {
+        document.getElementById('netmhcpan-allele-div').style.display = 'block';
+        document.getElementById('netmhcpan-allele-input').value = metaDict['alleles'];
+    }
+    if ('controlFlags' in metaDict) {
+        var table = document.getElementById("raw-table");
+        var controlFlags = metaDict['controlFlags'].split(",");
+        for (var row_idx = 1, row; row = table.rows[row_idx]; row_idx++) {
+            file_name = row.cells[0].textContent;
+            col = row.cells[2];
+            col.getElementsByClassName('infection-checkbox')[0].checked = true;
+            controlFlags.forEach(function (item, _) {
+                controlCheck(col, file_name, item)
+            });
+        }
+    }
+    if ('technicalReplicates' in metaDict) {
+        var table = document.getElementById("raw-table");
+        for (var row_idx = 1, row; row = table.rows[row_idx]; row_idx++) {
+            file_name = row.cells[0].textContent;
+            col = row.cells[1];
+            metaDict['technicalReplicates'].forEach(function (item, index) {
+                replicateCheck(col, file_name, item, index)
+            });
+        }
+    }
+    if ('additionalConfigs' in metaDict) {
+        for (const configKey in metaDict['additionalConfigs']) {
+            var table = document.getElementById('configs-table');
+            var lastRow = table.rows[ table.rows.length - 1 ];
+            lastRow.cells[0].getElementsByClassName('config-key')[0].value = configKey
+            lastRow.cells[1].getElementsByClassName('config-value')[0].value = metaDict['additionalConfigs'][configKey];
+            addConfigs();
+          };
     }
 }
 
@@ -694,11 +760,39 @@ async function deleteProject(serverAddress, user, project) {
     } 
 };
 
-async function executePipeline(serverAddress, user, project) {
+function constructConfigObject(user, project) {
     let ms1Accuracy = document.getElementById('ms1-accuracy-input').value;
     let mzAccuracy = document.getElementById('ms2-accuracy-input').value;
     let mzUnits = document.getElementById('ms2-unit-selection').value;
-    let controlFlags = document.getElementById('control-flag-input').value;
+
+
+    var table = document.getElementById("raw-table");
+    var file_name = "";
+    var technicalReplicates = Object();
+    var controlFlags = "";
+    for (var row_idx = 1, row; row = table.rows[row_idx]; row_idx++) {
+        for (var col_idx = 0, col; col = row.cells[col_idx]; col_idx++) {
+            if (col_idx === 0){
+                file_name = col.textContent;
+            }
+            if (col_idx === 1){
+                sample_value = col.getElementsByClassName('sample-value')[0].value;
+                if (sample_value in technicalReplicates){
+                    technicalReplicates[sample_value].push(file_name);
+                } else {
+                    technicalReplicates[sample_value] = [file_name];
+                }
+            }
+            if (col_idx === 2){
+                if (col.getElementsByClassName('infection-checkbox')[0].checked) {
+                    continue
+                } else {
+                    controlFlags += file_name;
+                    controlFlags += ",";
+                }
+            }
+        }  
+    }
 
     var configObject = {
         'user': user,
@@ -707,6 +801,7 @@ async function executePipeline(serverAddress, user, project) {
         'mzAccuracy': mzAccuracy,
         'mzUnits': mzUnits,
         'controlFlags': controlFlags,
+        'technicalReplicates': Object.values(technicalReplicates)
     };
 
 
@@ -734,17 +829,34 @@ async function executePipeline(serverAddress, user, project) {
             additionalConfigs[configKey] = configValue;
         }
     }
-    console.log(additionalConfigs)
 
     configObject['runQuantification'] = (
-        document.getElementById('quantification'
+        document.getElementById('quantification-checkbox'
     ).checked) ? 1 : 0;
     configObject['additionalConfigs'] = additionalConfigs;
-    
+    return configObject;
+}
+
+async function executePipeline(serverAddress, user, project) {
+    configObject = constructConfigObject(user, project);
+    configObject['metadata_type'] = 'parameters';
+    await postJson(serverAddress, 'metadata', configObject);
+    delete configObject['metadata_type']; 
+
     var response = await postJson(serverAddress, 'inspire', configObject);
 
     makeDownloadVisible(response['message']);
-}
+
+};
+
+
+async function saveParameters(serverAddress, user, project) {
+    configObject = constructConfigObject(user, project);
+    configObject['metadata_type'] = 'parameters';
+    
+    await postJson(serverAddress, 'metadata', configObject);
+};
+
 
 function deleteRow(r)
 // Function to delete a row from the table.
@@ -789,7 +901,7 @@ function addConfigs() {
             if (i == 2) {
                 newCell.appendChild(newButton);
             } else {
-                newInput.class = CLASSES[i];
+                newInput.classList.add(CLASSES[i]);
                 newCell.appendChild(newInput);
             }
         }
