@@ -1,0 +1,3 @@
+graft inspire_interact/static
+graft inspire_interact/templates
+global-exclude *.pyc
