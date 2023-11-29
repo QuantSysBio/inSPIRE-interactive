@@ -79,8 +79,13 @@ def write_inspire_task(bash_file, project_home, task, interact_home):
         'if [ "$?" -ne "0" ]\n' +
         '  then\n' +
         f'    interact-queue --project_home {project_home} --interact_home {interact_home} ' +
-        ' --queue_task remove\n' +
-        '    exit 0\n' +
+        ' --queue_task remove\n'
+    )
+    if task not in ('predictBinding', 'quantify', 'generateReport'):
+        bash_file.write(
+            '    exit 0\n'
+        )
+    bash_file.write(
         'fi\n'
     )
 
@@ -293,7 +298,6 @@ TASKS = [
     ('featureSelection+', 'Executing rescoring'),
     ('generateReport', 'Creating report'),
     ('quantify', 'Quantifying peptides'),
-    ('quantReport', 'Analysing quantification'),
     ('extractCandidates', 'Finding pathogen peptides'),
 ]
 
@@ -308,7 +312,7 @@ def get_tasks(inspire_settings, project_home):
     if not inspire_settings['pathogen']:
         tasks = [task for task in tasks if task[0] != 'extractCandidates']
     if not inspire_settings['quantify']:
-        tasks = [task for task in tasks if task[0] not in ('quantify', 'quantReport')]
+        tasks = [task for task in tasks if task[0] != 'quantify']
 
     task_ids = [task[0] for task in tasks]
     task_names = [task[1] for task in tasks]

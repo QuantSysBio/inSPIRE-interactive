@@ -727,9 +727,14 @@ async function cancelPipeline(serverAddress, user, project) {
         'project': project,
     };
 
-    var response = await postJson(serverAddress, 'cancel', configObject);
-    let cancelElem = document.getElementById("cancelled-text")
-    cancelElem.innerHTML = response['message'];
+    if (confirm("Are you sure you want to delete the project " + project + "?") == true) {
+        var response = await postJson(serverAddress, 'cancel', configObject);
+        let cancelElem = document.getElementById("cancelled-text")
+        cancelElem.innerHTML = response['message'];
+    } else {
+        let cancelElem = document.getElementById("cancelled-text")
+        cancelElem.innerHTML = 'No cancellation.';
+    }
 };
 
 async function downloadOutputs(serverAddress, user, project) {
