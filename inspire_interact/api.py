@@ -11,6 +11,7 @@ import flask
 from flask import request, Response, render_template, send_file, send_from_directory
 from flask.json import jsonify
 from flask_cors import cross_origin
+from jinja2.exceptions import TemplateNotFound
 from markupsafe import Markup
 import pandas as pd
 import yaml
@@ -36,7 +37,8 @@ from inspire_interact.utils import (
     get_pids,
     get_quant_count,
     get_tasks, prepare_inspire,
-    write_inspire_task
+    write_inspire_task,
+    generate_raw_file_table,
 )
 
 app = flask.Flask(__name__, template_folder='templates')
@@ -66,7 +68,7 @@ def get_user(user):
     """ Function to check for existing user or create a new user folder.
     """
     if os.path.isdir(f'{app.config[INTERACT_HOME_KEY]}/projects/{user}'):
-        projects = os.listdir(f'projects/{user}')
+        projects = sorted(os.listdir(f'projects/{user}'))
         projects = [project for project in projects if not project.endswith('.tar')]
     else:
         os.mkdir(f'projects/{user}')
@@ -80,11 +82,15 @@ def get_user(user):
 def fetch_page_no_arguments(page):
     """ Endpoint serving the spi_serverive Home Page.
     """
-    return render_template(
-        f'{page}.html',
-        server_address=app.config[SERVER_ADDRESS_KEY],
-        mode=app.config[MODE_KEY],
-    )
+    try:
+        return render_template(
+            f'{page}.html',
+            server_address=app.config[SERVER_ADDRESS_KEY],
+            mode=app.config[MODE_KEY],
+        )
+    except TemplateNotFound:
+        return render_template('404.html'), 404
+
 
 @app.route('/interact-page/<page>/<user>/<project>', methods=['GET'])
 @cross_origin()
@@ -92,13 +98,16 @@ def fetch_page(page, user, project):
     """ Endpoint serving the spi_serverive Home Page.
     """
     if not os.path.exists(f'projects/{user}/{project}/core_metadata.yml'):
-        return render_template(
-            f'{page}.html',
-            server_address=app.config[SERVER_ADDRESS_KEY],
-            mode=app.config[MODE_KEY],
-            user=user,
-            project=project,
-        )
+        try:
+            return render_template(
+                f'{page}.html',
+                server_address=app.config[SERVER_ADDRESS_KEY],
+                mode=app.config[MODE_KEY],
+                user=user,
+                project=project,
+            )
+        except TemplateNotFound:
+            return render_template('404.html'), 404
     try:
         with open(f'projects/{user}/{project}/core_metadata.yml', 'r', encoding='UTF-8') as stream:
             core_config = yaml.safe_load(stream)
@@ -111,14 +120,31 @@ def fetch_page(page, user, project):
 
     if page == 'proteome':
         page += f'-{variant}'
-    return render_template(
-        f'{page}.html',
-        server_address=app.config[SERVER_ADDRESS_KEY],
-        mode=app.config[MODE_KEY],
-        user=user,
-        project=project,
-        variant=variant,
-    )
+
+    try:
+        if page == 'parameters':
+            html_table = generate_raw_file_table(user, project, app, variant)
+            return render_template(
+                f'{page}.html',
+                server_address=app.config[SERVER_ADDRESS_KEY],
+                mode=app.config[MODE_KEY],
+                user=user,
+                project=project,
+                variant=variant,
+                html_table=html_table,
+            )
+
+        return render_template(
+            f'{page}.html',
+            server_address=app.config[SERVER_ADDRESS_KEY],
+            mode=app.config[MODE_KEY],
+            user=user,
+            project=project,
+            variant=variant,
+        )
+    except TemplateNotFound:
+        return render_template('404.html'), 404
+
 
 @app.route('/interact/project/<user>/<project>', methods=['GET'])
 @cross_origin()
@@ -128,6 +154,7 @@ def create_project(user, project):
     if not os.path.isdir(f'{app.config[INTERACT_HOME_KEY]}/projects/{user}/{project}'):
         os.mkdir(f'{app.config[INTERACT_HOME_KEY]}/projects/{user}/{project}')
     return jsonify(message='Ok')
+
 
 @app.route('/interact/upload/<user>/<project>/<file_type>', methods=['POST'])
 @cross_origin()
@@ -191,6 +218,7 @@ def clear_file_pattern(file_type):
     os.system(f'rm -rf projects/{user}/{project}/{file_type}/*')
     return jsonify(message=os.listdir(f'projects/{user}/{project}/{file_type}'))
 
+
 @app.route('/interact/metadata', methods=['POST'])
 @cross_origin()
 def upload_metadata():
@@ -203,6 +231,7 @@ def upload_metadata():
     with open(f'projects/{user}/{project}/{metadata_type}_metadata.yml', 'w', encoding='UTF-8') as yaml_out:
         yaml.dump(config_data, yaml_out)
     return jsonify(message='Ok')
+
 
 @app.route('/interact/metadata/<user>/<project>/<metadata_type>', methods=['GET'])
 @cross_origin()
@@ -220,6 +249,7 @@ def get_metadata(user, project, metadata_type):
     ) as stream:
         meta_dict = yaml.safe_load(stream)
     return jsonify(message=meta_dict)
+
 
 @app.route('/interact/checkPattern/<file_type>', methods=['POST'])
 @cross_origin()
@@ -271,7 +301,7 @@ def interact_home():
 def interact_landing_page():
     """ Endpoint serving the inspire_interactive Home Page.
     """
-    usernames = os.listdir(f'{app.config[INTERACT_HOME_KEY]}/projects')
+    usernames = sorted(os.listdir(f'{app.config[INTERACT_HOME_KEY]}/projects'))
     option_list = [
         f'<option value="{username}">{username}</option>' for username in usernames
     ]
@@ -282,6 +312,7 @@ def interact_landing_page():
         user_list=options_html,
         mode=app.config[MODE_KEY],
     )
+
 
 @app.route('/interact/delete', methods=['POST'])
 @cross_origin()
@@ -313,7 +344,6 @@ def download_project(user, project):
     shutil.copyfile(f'{project_home}/config.yml', f'{project_home}/inspireOutput/config.yml')
     shutil.make_archive(f'{project_home}/inspireOutput', 'zip', f'{project_home}/inspireOutput')
     return send_file(f'{project_home}/inspireOutput.zip')
-
 
 
 @app.route('/interact/cancel', methods=['POST'])
@@ -350,7 +380,9 @@ def cancel_job():
         )
 
     os.system(
-        f'python inspire_interact/remove_from_queue.py  {user} {project}\n'
+        f'interact-queue --project_home {project_home} ' +
+        f' --interact_home {app.config[INTERACT_HOME_KEY]} ' +
+        ' --queue_task remove\n'
     )
     task_df = pd.read_csv(f'{project_home}/taskStatus.csv')
     task_df['status'] = 'Job Cancelled'
@@ -370,32 +402,20 @@ def run_inspire_core():
     """
     try:
         config_dict = request.json
-        print(config_dict)
         user = config_dict['user']
         project_title = config_dict['project']
         server_address = app.config[SERVER_ADDRESS_KEY]
         home_key= app.config[INTERACT_HOME_KEY]
         project_home = f'{home_key}/projects/{user}/{project_title}'
-        print(project_home)
-
         if check_pids(project_home, 'inspire') == 'waiting':
             return jsonify(
-                message=(
-                    'Task is already running. Check status at ' +
-                    f'http://{server_address}:5000/interact/{user}/{project_title}/inspire'
-                )
+                message=f'http://{server_address}:5000/interact/{user}/{project_title}/inspire'
             )
-        
         if check_queue(user, project_title):
             return jsonify(
-                message=(
-                    'Task is already queued. Check status at ' +
-                    f'http://{server_address}:5000/interact/{user}/{project_title}/inspire'
-                )
+                message=f'http://{server_address}:5000/interact/{user}/{project_title}/inspire'
             )
-
         inspire_settings = prepare_inspire(config_dict, project_home, app.config)
-        print(inspire_settings)
         get_tasks(inspire_settings, project_home)
 
         with open(
@@ -407,35 +427,39 @@ def run_inspire_core():
                 f'echo $$ > {project_home}/inspire_pids.txt ;\n'
             )
             bash_file.write(
-                f'python inspire_interact/add_to_queue.py {user} {project_title}\n'
+                f'interact-queue --project_home {project_home} ' +
+                f' --interact_home {app.config[INTERACT_HOME_KEY]} ' +
+                ' --queue_task add\n'
             )
             bash_file.write(
-                f'python inspire_interact/check_queue.py {user} {project_title}\n'
+                f'interact-queue --project_home {project_home} ' +
+                f' --interact_home {app.config[INTERACT_HOME_KEY]} ' +
+                ' --queue_task check\n'
             )
             bash_file.write(
-                f'python inspire_interact/check_status.py start 0 {project_home}\n'
+                f'interact-queue --project_home {project_home} ' +
+                f' --interact_home {app.config[INTERACT_HOME_KEY]} ' +
+                ' --queue_task update --inspire_task start --inspire_status 0\n'
             )
             if inspire_settings['convert']:
-                write_inspire_task(bash_file, project_home, 'convert')
+                write_inspire_task(bash_file, project_home, 'convert', app.config[INTERACT_HOME_KEY])
 
             if inspire_settings['fragger']:
-                write_inspire_task(bash_file, project_home, 'fragger')
+                write_inspire_task(bash_file, project_home, 'fragger', app.config[INTERACT_HOME_KEY])
 
-            write_inspire_task(bash_file, project_home, 'prepare')
-            write_inspire_task(bash_file, project_home, 'predictSpectra')
+            write_inspire_task(bash_file, project_home, 'prepare', app.config[INTERACT_HOME_KEY])
+            write_inspire_task(bash_file, project_home, 'predictSpectra', app.config[INTERACT_HOME_KEY])
             if inspire_settings['binding']:
-                write_inspire_task(bash_file, project_home, 'predictBinding')
-            write_inspire_task(bash_file, project_home, 'featureGeneration')
-            write_inspire_task(bash_file, project_home, 'featureSelection+')
-            write_inspire_task(bash_file, project_home, 'generateReport')
+                write_inspire_task(bash_file, project_home, 'predictBinding', app.config[INTERACT_HOME_KEY])
+            write_inspire_task(bash_file, project_home, 'featureGeneration', app.config[INTERACT_HOME_KEY])
+            write_inspire_task(bash_file, project_home, 'featureSelection+', app.config[INTERACT_HOME_KEY])
+            write_inspire_task(bash_file, project_home, 'generateReport', app.config[INTERACT_HOME_KEY])
 
             if inspire_settings['quantify']:
-                write_inspire_task(bash_file, project_home, 'quantify')
-                if inspire_settings['pathogen']:
-                    write_inspire_task(bash_file, project_home, 'quantReport')
+                write_inspire_task(bash_file, project_home, 'quantify', app.config[INTERACT_HOME_KEY])
 
             if inspire_settings['pathogen']:
-                write_inspire_task(bash_file, project_home, 'extractCandidates')
+                write_inspire_task(bash_file, project_home, 'extractCandidates', app.config[INTERACT_HOME_KEY])
 
             for intermediate_file in INTERMEDIATE_FILES:
                 bash_file.write(
@@ -443,8 +467,14 @@ def run_inspire_core():
                 )
 
             bash_file.write(
-                f'python inspire_interact/remove_from_queue.py  {user} {project_title}\n'
+                f'interact-queue --project_home {project_home} ' +
+                f' --interact_home {app.config[INTERACT_HOME_KEY]} ' +
+                ' --queue_task remove\n'
             )
+
+        print(f'{project_home}/inspireOutput/formated_df.csv')
+        if os.path.exists(f'{project_home}/inspireOutput/formated_df.csv'):
+            os.system(f'rm -rf {project_home}/inspireOutput/formated_df.csv')
 
         os.system(
             f'bash {project_home}/inspire_script.sh > {project_home}/inspire_log.txt 2>&1 &',
@@ -454,9 +484,7 @@ def run_inspire_core():
             message=f'http://{server_address}:5000/interact/{user}/{project_title}/inspire'
         )
     except Exception as err:
-        print(err)
         response = jsonify(message=f'inSPIRE-Interact failed with error code: {err}')
-        print(response)
     return response
 
 @app.route('/interact/<user>/<project>/<workflow>', methods=['GET'])
@@ -466,6 +494,9 @@ def check_results(user, project, workflow):
     """
     home_key= app.config[INTERACT_HOME_KEY]
     project_home = f'{home_key}/projects/{user}/{project}'
+    if not os.path.exists(project_home):
+        return render_template('404.html'), 404
+
     status = check_pids(project_home, workflow)
     if (
         os.path.exists(f'{project_home}/proteome-select') or
@@ -511,9 +542,12 @@ def check_results(user, project, workflow):
         
         if os.path.exists(f'{project_home}/inspireOutput/{key_file}'):
             create_status_fig(project_home)
-            with open(f'{project_home}/progress.svg', 'r') as html_file:
-                progress_html = html_file.read()
-
+            if os.path.exists(f'{project_home}/progress.svg'):
+                with open(f'{project_home}/progress.svg', 'r') as html_file:
+                    progress_html = html_file.read()
+            else:
+                progress_html = ''
+        
             if os.path.exists(f'{project_home}/inspireOutput/img/psm_fdr_curve.svg'):
                 with open(f'{project_home}/inspireOutput/img/psm_fdr_curve.svg', 'r') as html_file:
                     psm_fdr_html = html_file.read()
@@ -639,6 +673,8 @@ def get_arguments():
     )
     parser.add_argument(
         '--mode',
+        default='server',
+        required=False,
     )
 
     return parser.parse_args()
@@ -658,12 +694,16 @@ def main():
     app.config[INTERACT_HOME_KEY] = os.getcwd()
     if not os.path.exists('projects'):
         os.mkdir('projects')
+    if not os.path.exists('locks'):
+        os.mkdir('locks')
     
-    if False:
+    if args.mode == 'local':
+        app.config[SERVER_ADDRESS_KEY] = '127.0.0.1'
+    elif args.mode == 'server':
         host_name = socket.gethostname()
         app.config[SERVER_ADDRESS_KEY] = socket.gethostbyname(host_name + ".local")
     else:
-        app.config[SERVER_ADDRESS_KEY] = '127.0.0.1'
+        raise ValueError(f'Unknown mode {args.mode} requested')
 
     app.config[FILESERVER_NAME_KEY] = config_dict.get(FILESERVER_NAME_KEY)
     app.config[MHCPAN_KEY] = config_dict.get(MHCPAN_KEY)
@@ -673,7 +713,6 @@ def main():
     app.config[MODE_KEY] = args.mode
 
     app.run(host='0.0.0.0', debug = False)
-    # waitress.serve(app, host='0.0.0.0', port=5000)
 
 if __name__ == '__main__':
     main()

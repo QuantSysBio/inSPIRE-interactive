@@ -3,4 +3,4 @@ serverAddress: fileserver
 fraggerPath: /data/inSPIRE-Server/MSFragger-3.7/MSFragger-3.7.jar
 netMHCpan: tcsh /data/inSPIRE-Server/netMHCpan-4.1/netMHCpan
 fraggerMemory: 240
-maxInspireCpus: 20
+maxInspireCpus: 40

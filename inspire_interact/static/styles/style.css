@@ -30,7 +30,10 @@ hr {
     /* box-sizing: border-box; 
 } */
 
-
+.sample-value {
+    margin: 8px 0;
+    width: 40px;
+}
 /* #msDataDiv {
     border: 5px solid blue;
     width: 200px;
