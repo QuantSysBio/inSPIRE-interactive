@@ -1,0 +1,55 @@
+<!DOCTYPE html>
+<html>
+<head>
+	<link rel='stylesheet' type="text/css" href="{{ url_for('static',filename='styles/style.css') }}">
+	<script src="{{url_for('static', filename='index.js')}}"></script>
+	<title>inSPIRE-Interactive</title>
+</head>
+<body>	
+	<div class="header">
+		<img src="{{url_for('static', filename='inSPIRE-logo-nobg.png')}}" class="icon-top" onclick="goHome('{{ server_address }}')"/>		
+		<pre>
+			<h1>    </h1>
+		</pre>
+		<h1>Welcome to inSPIRE-Interactive! </h1>
+		<pre>
+			<h1>    </h1>
+		</pre>
+		<img src="{{url_for('static', filename='help.png')}}" class="icon-help" onclick="location.href = 'https://github.com/QuantSysBio/inSPIRE/issues';"/>		
+		<div id="welcoming-div"></div>
+	</div>
+
+    <div class="row">
+        <div class="column" id="walkthrough" style="width:40%; margin-left: auto; margin-right: auto;">
+
+            <h4>
+                Watch the walkthrough here: 
+            </h4>
+            <div class="h_iframe">
+                <iframe frameborder="0" src="https://www.youtube.com/embed/FPEP4waYQEU" allowfullscreen></iframe>
+            </div>
+            <br>
+        </div>
+        <div class="column" style="width:40%; margin-left: auto; margin-right: auto;">
+            <h4>
+                Or get started:
+            </h4>
+            <button class="white-black-button" onclick="location.href='http://{{ server_address }}:5000/interact';"
+            style="margin-left: 25%">
+                Use inSPIRE!
+            </button>
+        </div>
+    </div>
+
+</div>
+
+
+      <!-- bottom division Acknowledegements etc-->
+      <div class="footer">
+		<hr>
+
+		<p>PLACEHOLDER TEXT: ACKNOWLEDGEMENTS, IMPORTANT LINKS</p>
+	</div>
+
+</body>
+</html>

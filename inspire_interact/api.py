@@ -13,7 +13,6 @@ from flask.json import jsonify
 from flask_cors import cross_origin
 from markupsafe import Markup
 import pandas as pd
-import waitress
 import yaml
 
 from inspire_interact.constants import (
@@ -660,11 +659,11 @@ def main():
     if not os.path.exists('projects'):
         os.mkdir('projects')
     
-    if True:
+    if False:
         host_name = socket.gethostname()
         app.config[SERVER_ADDRESS_KEY] = socket.gethostbyname(host_name + ".local")
-    # else:
-    #     app.config[SERVER_ADDRESS_KEY] = '127.0.0.1'
+    else:
+        app.config[SERVER_ADDRESS_KEY] = '127.0.0.1'
 
     app.config[FILESERVER_NAME_KEY] = config_dict.get(FILESERVER_NAME_KEY)
     app.config[MHCPAN_KEY] = config_dict.get(MHCPAN_KEY)

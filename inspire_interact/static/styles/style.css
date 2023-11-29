@@ -1,4 +1,4 @@
-h1 {
+/*h1 {
     text-align: center;
 }
 
@@ -12,7 +12,7 @@ img {
 body {
     min-height: 100vh;
     background-color: floralwhite;
-    /* overflow-x: hidden; */
+    /* overflow-x: hidden; 
 }
 
 div {
@@ -22,13 +22,13 @@ div {
 
 hr {
     padding: 0;
-}
+} */
 
-.text-input {
+/*.text-input {
     padding: 12px 12px;
     margin: 8px 0;
-    /* box-sizing: border-box; */
-}
+    /* box-sizing: border-box; 
+} */
 
 
 /* #msDataDiv {
@@ -89,7 +89,7 @@ hr {
     transform: translateY(-50%); */
 }
 
-.header {
+/*.header {
     display: flex;
     flex-direction: row;
     justify-content: flex-start;
@@ -97,7 +97,7 @@ hr {
     width: 100%;
     height: 10%;
     margin-left: 5%;
-}
+} */
 
 
 .white-black-button{
@@ -188,13 +188,6 @@ hr {
     margin: 0;
 }
 
-.footer {
-    position: static;
-    bottom: 0;
-    width: 100%;
-    height: 5%;
-    margin-left: 0%;
-}
 
 .text-button {
     border: none;
@@ -205,4 +198,268 @@ hr {
 }
 
 .text-button:hover {background: #eee;}
+
+
+
+/* New CSS code starts from here */
+
+body{
+    margin: 0;
+    font-family:Verdana, Geneva, Tahoma,sans-serif;
+    min-width:800px;
+}
+
+
+.header{
+    background-color: #FFFFFF;
+    display: flex;
+    height:120px;
+    top: 0; 
+    left: 0; 
+    right: 0; 
+    flex-direction: row;
+    justify-content: center;
+    align-items:center;
+    position:static;
+    margin-bottom: 40px;
+    padding:20px;
+}
+
+.header-left{
+
+    width: 200px;
+    display:flex;
+    min-width: 120px;
+    justify-content: left;
+    padding-left: 20px;
+
+
+   
+}
+
+.inSPIRE-logo-nobg:hover{
+    cursor: pointer;
+}
+
+.header-right{
+    width:750px;
+    height:120px; 
+    display:flex;
+    justify-content: right;
+    align-items:center;
+    margin-right: 20px;
+}
+
+.home-text{
+    width:84px; 
+    color:black;
+    font-size: larger;
+
+}
+
+.about-us-text{
+    width:110px; 
+    color:black;
+    font-size: larger;
+}
+
+.contact-text{
+    width:110px; 
+    color:black;
+    font-size: larger;
+}
+
+.FAQ-text{
+    width:110px; 
+    color:black;
+    font-size: larger;
+}
+
+
+.button{
+    width:180px;
+    display: inline-flex;
+    height:60px;
+    align-items:center;
+    font-size: large;
+    text-align: right;
+    border-radius: 10px;
+    background-color: aquamarine;
+    border:none;
+    color: black;
+    box-shadow: 0 8px 16px 0 rgba(0,0,0,0.2), 0 6px 20px 0 rgba(0,0,0,0.19);
+    cursor: pointer;
+
+}
+
+
+.button:hover {
+    background-color: rgb(12, 226, 155); /* change to your desired color */
+    color: black; /* change to your desired color */
+}
+
+
+@media only screen and (max-width: 780px) {
+    .button{
+        visibility: hidden;
+    }
+    
+}
+
+.second-section{
+    background-color: white;
+    display:flex;
+    margin-top: 10px;
+    height:680px;
+    flex-direction: row;
+    justify-content: center;
+    align-items:center;
+    margin-bottom: 40px;
+}
+
+.second-section-center-right{
+    height:680px;
+    width:662px;
+    background-color:white;
+    display:flex;
+    justify-content: center;
+    align-items:center;
+
+
+}
+.second-section-center-left{
+    background-color: aquamarine;
+    display:flex;
+    width:742px;
+    height:680px;
+    flex-direction: column;
+    justify-content:top;
+    align-items:center;
+    box-shadow: 0 8px 16px 0 rgba(0,0,0,0.2), 0 6px 20px 0 rgba(0,0,0,0.19);
+}
+
+.welcome-note{
+    font-size: 70px;
+    text-align: center;
+}
+
+.intro-inspire{
+    font-size: larger;
+    margin-left: 10px;
+    margin-right:10px;
+}
+
+.buttons{
+    margin-top: 55px;
+    display:flex;
+    height:60px;
+    flex-direction: row;
+    justify-content:space-evenly;
+    align-items:center;
+}
+
+.button-second-section{
+    width:180px;
+    display: flex;
+    height:60px;
+    align-items:center;
+    font-size: large;
+    text-align: right;
+    border-radius: 10px;
+    background-color:#FFFFFF;
+    color: #050719;
+    cursor: pointer;
+    border:none;
+    box-shadow: 0 8px 16px 0 rgba(0,0,0,0.2), 0 6px 20px 0 rgba(0,0,0,0.19);
+    margin-right: 50px;
+    margin-left: 50px;
+}
+
+.button-second-section:hover {
+    background-color: BLACK; /* change to your desired color */
+    color: #FFFFFF; /* change to your desired color */
+}
+
+.third-section{
+
+    display:flex;
+    height:150px;
+    flex-direction: row;
+    justify-content:space-around;
+    align-items:center;
+}
+
+.third-section-top{
+    display:flex;
+    align-items:center;
+    justify-content:center;
+    width:1404px;
+    font-size: 55px;
+    text-align:center;
+    
+}
+
+.third-section-bottom{
+    display:flex;
+    width:1404px;
+    font-size: larger;
+    margin-left: 10px;
+    margin-right: 10px;
+}
+
+.fourth-section{
+    height:600px; 
+    display:flex;
+    flex-direction: row;
+    justify-content:center;
+    align-items:center;
+    margin-bottom:5px;
+}
+
+.fourth-section-left{
+
+    height:450px; 
+    width:732px;
+    display:flex;
+    flex-direction: row;
+    justify-content:space-around;
+    align-items:center;
+    margin-right:1px;
+    border: none;
+
+}
+
+.fourth-section-right{
+    background-color: aquamarine;;
+    height:450px; 
+    width:672px;
+    display:flex;
+    flex-direction: row;
+    justify-content:space-around;
+    align-items:center;
+    font-size:55px;
+    border:none;
+    text-align:center;
+    margin-left:1px;
+    box-shadow: 0 8px 16px 0 rgba(0,0,0,0.2), 0 6px 20px 0 rgba(0,0,0,0.19);
+
+}
+
+a{
+    text-decoration: none;
+}
+
+.bottom {
+
+    display:flex;
+    flex-direction: row;
+    justify-content:space-around;
+    align-items:center;
+}
+
+.footer{
+
+    display:flex;
+    width:1404;
+}
 
