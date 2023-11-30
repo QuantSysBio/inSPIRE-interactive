@@ -12,33 +12,13 @@
 	<title>inSPIRE-Interactive</title>
 </head>
 <body>	
-	<div class="header">
-		<img src="{{url_for('static', filename='inSPIRE-logo-nobg.png')}}" class="icon-top" onclick="goHome('{{ server_address }}')"/>		
-		<pre>
-			<h1>    </h1>
-		</pre>
-		<h1>Welcome to inSPIRE-Interactive!</h1>
-		<pre>
-			<h1>    </h1>
-		</pre>
-		<img src="{{url_for('static', filename='help.png')}}" class="icon-help" onclick="location.href = 'https://github.com/QuantSysBio/inSPIRE/issues';"/>		
-		<!-- https://github.com/QuantSysBio/inSPIRE/issues -->
-		<div id="welcoming-div"></div>
-	</div>
+	<dev class="page-wrapper">
 
-	<hr>
+		<!-- header -->
+		{{ inspire_header|safe }}
+		<hr>
 
-	<div class="center-content">
-
-		<!-- OPENING DIV 
-			This frame deals with the initial selection of 3 parameters: User, Project and Workflow.
-
-			These choices appear one-by-one, and allow for de-selection. When the user is re-specified, the project selection
-			is deleted and re-created according to the new user's existing projects. Workflow is not reset, but does also allow
-			re-selection.
-		-->
-		<div id="opening-div">
-
+		<div class="upload-div">
 			<!-- USER SELECTION -->
 			<div id="user-select-div" class="opening-sub-div">
 				<h3>User Selection</h3>
@@ -80,7 +60,7 @@
 			</div>
 
 			<div id="opening-Vl-2" class="vl" style="visibility: hidden;"></div>
-			
+				
 			<!-- WORKFLOW SELECTION -->
 			<div id="workflow-select-div" class="opening-sub-div" style="visibility: hidden;">
 				<h3>Workflow Selection</h3>
@@ -96,13 +76,9 @@
 				</form>
 			</div>
 		</div>
-	</div>
 
-	<div class="footer">
-		<hr>
-
-		<p>PLACEHOLDER TEXT: ACKNOWLEDGEMENTS, IMPORTANT LINKS</p>
-	</div>
-
+		{{ inspire_footer|safe }}
+			
+	</dev>
 </body>
 </html>

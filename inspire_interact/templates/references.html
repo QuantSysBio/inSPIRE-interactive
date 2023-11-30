@@ -1,0 +1,42 @@
+<!DOCTYPE html>
+<html>
+<head>
+	<link rel='stylesheet' type="text/css" href="{{ url_for('static',filename='styles/style.css') }}">
+	<script src="{{url_for('static', filename='index.js')}}"></script>
+	<title>inSPIRE-Interactive</title>
+</head>
+<body>
+	{{ inspire_header|safe }}
+
+    <div class="adjusted-text">
+        <h3>References</h3>
+
+        <h4>inSPIRE Specific Papers</h4>
+        <p>
+            Please cite the following article if you are using inSPIRE in your research:
+        </p>
+        
+        <p>
+            Cormican, J. A., Horokhovskyi, Y., Soh, W. T., Mishto, M., and Liepe, J. (2022) inSPIRE: An open-source tool for increased mass spectrometry identification rates using Prosit spectral prediction. Mol Cell Proteomics. \
+            [doi.org/10.1016/j.mcpro.2022.100432](https://doi.org/10.1016/j.mcpro.2022.100432)
+        </p>
+        <p>
+            Another article will soon be describing the development of inSPIRE 2 and inSPIRE-Pathogen.
+        </p>
+
+        <h4>Tools used by inSPIRE</h4>
+        <p>
+            Please also cite the relevant publications of the rescoring tools used, see details on <a href=https://github.com/percolator/percolator>Percolator</a> and  <a href="https://github.com/wfondrie/mokapot">Mokapot</a>.
+        </p>
+
+        <p>
+            Please also cite the relevant publications of the spectral predictors, see details on <a href="https://www.proteomicsdb.org/prosit">Prosit</a>.
+        </p>
+
+        <p>
+            If using inSPIRE-affinity please also cite the relevant publications for <a href="https://services.healthtech.dtu.dk/service.php?NetMHCpan-4.1">NetMHCpan</a> binding affinity predictions..
+        </p>
+    </div>
+
+</body>
+</html>

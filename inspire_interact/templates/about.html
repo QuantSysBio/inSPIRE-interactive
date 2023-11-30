@@ -1,0 +1,27 @@
+<!DOCTYPE html>
+<html>
+<head>
+	<link rel='stylesheet' type="text/css" href="{{ url_for('static',filename='styles/style.css') }}">
+	<script src="{{url_for('static', filename='index.js')}}"></script>
+	<title>inSPIRE-Interactive</title>
+</head>
+<body>
+	{{ inspire_header|safe }}
+    <hr>
+    <div class="adjusted-text">
+
+        <h3>inSPIRE Development & Motivation</h3>
+        <p>
+            inSPIRE was developed at the Quantitative and Systems Biology group at the Max Planck Institute for Multidisciplinary Sciences. We are particulary interested
+            in finding non-canonical peptides.
+        </p>
+
+        <h3>
+            Development Team
+        </h3>
+        <center>
+            <img src="{{url_for('static', filename='aboutus.png')}}" width="35%"/>
+        </center>
+    </div>
+</body>
+</html>

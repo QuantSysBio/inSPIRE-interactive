@@ -6,28 +6,21 @@
 	<title>inSPIRE-Interactive</title>
 </head>
 <body onload="checkFilePattern('{{ server_address }}', '{{ user }}', '{{ project }}', 'proteome')">	
-	<div class="header">
-		<img src="{{url_for('static', filename='inSPIRE-logo-nobg.png')}}" class="icon-top" onclick="goHome('{{ server_address }}')"/>		
-		<pre>
-			<h1>    </h1>
-		</pre>
-		<h1>Welcome to inSPIRE-Interactive!</h1>
-		<pre>
-			<h1>    </h1>
-		</pre>
-		<img src="{{url_for('static', filename='help.png')}}" class="icon-help" onclick="location.href = 'https://github.com/QuantSysBio/inSPIRE/issues';"/>		
-		<div id="welcoming-div"></div>
-	</div>
+	<dev class = "page-wrapper">
+	
+		<!-- header -->
+		{{ inspire_header|safe }}
+		<hr>
+        <h3 class="adjusted-text">Proteome Fasta File (Optional)</h3>
+        <p class="adjusted-text">
+            Proteome file is only required for inSPIRE if you wish to infer proteins or are running an MSFragger search.<br>
+            If you do not require this, you can click Proceed without uploading.
+        </p>
 
-	<hr>
-
-	<div class="center-content">
+	<div class="upload-div">
         <div id="all-proteome-div">
-            <h3>Proteome Fasta File (Optional)</h3>
-            <p>
-                Proteome file is only required for inSPIRE if you wish to infer proteins or are running an MSFragger search.<br>
-                If you do not require this, you can click Proceed without uploading.
-            </p>
+            <h3></h3>
+            
             <!-- PROTEOME DIV -->
             <div id="proteome-div" class="row">
                 <div id="sub-proteome-div" class="row" style="margin-left: 0%;">
@@ -48,16 +41,16 @@
                     <div class="vl"></div>
 
                     <div id="proteome-column-2"style="margin-left: 0%;">
-                        Files currently loaded:
+                        <p>Files currently loaded:</p>
                         <ul id="proteome-file-list"></ul>
-                        <br><br>
-                        If you have uploaded new files and wish to check the upload click the button below:
-                        <br>
-                        <input autocomplete="off"  type="submit" value="Refresh File List" onclick="checkFilePattern('{{ server_address }}', '{{ user }}', '{{ project }}', 'proteome')">
-                        <br><br>
-                        If you remove the files above:
-                        <br>
+                        <p>
+                            If you have uploaded incorrect files and need to delete them, click below:
+                        </p>
                         <input autocomplete="off"  type="submit" value="Delete All Files" onclick="clearFilePattern('{{ server_address }}', '{{ user }}', '{{ project }}', 'proteome')">
+                        <p>
+                            If you updated files manually, refresh the file list here
+                        </p>
+                        <input autocomplete="off"  type="submit" value="Refresh File List" onclick="checkFilePattern('{{ server_address }}', '{{ user }}', '{{ project }}', 'proteome')">
                     </div>
                 </div>
             </div>
@@ -73,10 +66,10 @@
         Proceed &xrarr;
     </button>
 
-    <div class="footer">
-        <hr>
+        <br><br>
 
-        <p>PLACEHOLDER TEXT: ACKNOWLEDGEMENTS, IMPORTANT LINKS</p>
-    </div>
+        {{ inspire_footer|safe }}
+
+    </dev>
 </body>
 </html>
