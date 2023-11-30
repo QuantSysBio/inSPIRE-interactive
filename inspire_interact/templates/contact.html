@@ -1,0 +1,30 @@
+<!DOCTYPE html>
+<html>
+<head>
+	<link rel='stylesheet' type="text/css" href="{{ url_for('static',filename='styles/style.css') }}">
+	<script src="{{url_for('static', filename='index.js')}}"></script>
+	<title>inSPIRE-Interactive</title>
+</head>
+<body>
+	{{ inspire_header|safe }}
+    <hr>
+    <div class="adjusted-text">
+
+        <h3>inSPIRE Help & Support</h3>
+        <p>
+            Our prefered method for standard issues is to open an issue on the
+            <a href="https://github.com/QuantSysBio/inSPIRE/issues">inSPIRE Github</a>
+            page. This is a public forum that allows others to learn if you have made
+            a mistake and allows our developers to track problems on our side.
+        </p>
+        <p>
+            If you are working with sensitive data and are nervous about posting on
+            a public forum or if you are interested in on site support or collaboration
+            you can contact us via email on inspire.team@mpinat.mpg.de
+        </p>
+    </div>
+    <br><br>
+
+    {{ inspire_footer|safe }}
+</body>
+</html>

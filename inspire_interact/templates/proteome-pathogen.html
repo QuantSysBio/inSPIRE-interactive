@@ -6,76 +6,70 @@
 	<title>inSPIRE-Interactive</title>
 </head>
 <body onload="checkFilePattern('{{ server_address }}', '{{ user }}', '{{ project }}', 'proteome-select')">	
-	<div class="header">
-		<img src="{{url_for('static', filename='inSPIRE-logo-nobg.png')}}" class="icon-top" onclick="goHome('{{ server_address }}')"/>		
-		<pre>
-			<h1>    </h1>
-		</pre>
-		<h1>Welcome to inSPIRE-Interactive!</h1>
-		<pre>
-			<h1>    </h1>
-		</pre>
-		<img src="{{url_for('static', filename='help.png')}}" class="icon-help" onclick="location.href = 'https://github.com/QuantSysBio/inSPIRE/issues';"/>		
-		<div id="welcoming-div"></div>
-	</div>
+	<!-- main page-->
+	<dev class = "page-wrapper">
+	
+		<!-- header -->
+		{{ inspire_header|safe }}
+		<hr>
+        <h3 class="adjusted-text">Proteome Fasta Files</h3>
+		<p class="adjusted-text">For inSPIRE to provide pathogen eptiope candidates it requires both host and pathogen FASTA files.</p>
 
-	<hr>
+        <div class="upload-div">
+            <div id="all-proteome-div">
 
-	<div class="center-content">
-        <div id="all-proteome-div">
-            <h3>Proteome Fasta Files</h3>
+                <!-- PROTEOME DIV -->
+                <div id="sub-proteome-select-div" class="row" style="margin-left: 0%;">
+                    <div id="proteome-select-column-1" style="margin-left: 0%;">
+                        <p>Upload the host proteome:</p>
+                        <input type="file" id="host-proteome-file-upload" multiple="false" />
+                        <br>
+                        <p>Upload the pathogen proteome:</p>
+                        <input type="file" id="pathogen-proteome-file-upload" multiple="false" />
+                        <br>
+                        <br>
 
-            <!-- PROTEOME DIV -->
-            <div id="sub-proteome-select-div" class="row" style="margin-left: 0%;">
-                <div id="proteome-select-column-1" style="margin-left: 0%;">
-                    <p>Upload the host proteome file.</p>
-                    <p>Host Proteome:</p>
-                    <input type="file" id="host-proteome-file-upload" multiple="false" />
-                    <br>
-                    <p>Pathogen Proteome:</p>
-                    <input type="file" id="pathogen-proteome-file-upload" multiple="false" />
-                    <br>
-                    <br>
+                        <input type="submit" onclick="uploadFiles('{{ server_address }}', '{{ user }}', '{{ project }}', 'proteome-select')">
+                        <p id="proteome-select-waiting" style="display:none;">Files uploading...</p>
+                        <br>
+                        <progress id="progressBar" value="0" max="100" style="width:300px;display:none"></progress>
+                        <p id="loaded_n_total"></p>
+                        <p id="proteome-select-no-files" style="display:none; color:red;">Please upload both files before proceeding.</p>
+                    </div>
 
-                    <input type="submit" onclick="uploadFiles('{{ server_address }}', '{{ user }}', '{{ project }}', 'proteome-select')">
-                    <p id="proteome-select-waiting" style="display:none;">Files uploading...</p>
-                    <br>
-                    <progress id="progressBar" value="0" max="100" style="width:300px;display:none"></progress>
-                    <p id="loaded_n_total"></p>
-                    <p id="proteome-select-no-files" style="display:none; color:red;">Please upload both files before proceeding.</p>
-                </div>
+                    <div class="vl"></div>
 
-                <div class="vl"></div>
-
-                <div id="proteome-select-column-2" style="margin-left: 0%;">
-                    Files currently loaded:
-                    <ul id="proteome-select-file-list"></ul>
-                    <br><br>
-                    If you have uploaded new files and wish to check the upload click the button below:
-                    <br>
-                    <input autocomplete="off"  type="submit" value="Refresh File List" onclick="checkFilePattern('{{ server_address }}',  '{{ user }}', '{{ project }}','proteome-select')">
-                    <br><br>
-                    If you remove the files above:
-                    <br>
-                    <input autocomplete="off"  type="submit" value="Delete All Files" onclick="clearFilePattern('{{ server_address }}', '{{ user }}', '{{ project }}', 'proteome-select')">
+                    <div id="proteome-select-column-2" style="margin-left: 0%;">
+                        <p>Files currently loaded:</p>
+                        <ul id="proteome-select-file-list"></ul>
+                        <p>
+                            If you have uploaded incorrect files and need to delete them, click below:
+                        </p>
+                        <input autocomplete="off"  type="submit" value="Delete All Files" onclick="clearFilePattern('{{ server_address }}', '{{ user }}', '{{ project }}', 'proteome-select')">
+                        <p>
+                            If you updated files manually, refresh the file list here
+                        </p>
+                        <input autocomplete="off"  type="submit" value="Refresh File List" onclick="checkFilePattern('{{ server_address }}',  '{{ user }}', '{{ project }}','proteome-select')">
+                    </div>
                 </div>
             </div>
+            <br>
         </div>
-		<br>
-    </div>
 
-    <button id="back-button" class="text-button" onclick="revertGUI('{{ server_address }}', '{{ user }}', '{{ project }}', 'proteome')">
-        &xlarr; Go back
-    </button>
+        <br>
+    
+        <button id="back-button" class="text-button" onclick="revertGUI('{{ server_address }}', '{{ user }}', '{{ project }}', 'proteome')">
+            &xlarr; Go back
+        </button>
 
-    <button id="forward-button" class="text-button" onclick="forwardGUI('{{ server_address }}', '{{ user }}', '{{ project }}', 'proteome')">
-        Proceed &xrarr;
-    </button>
+        <button id="forward-button" class="text-button" onclick="forwardGUI('{{ server_address }}', '{{ user }}', '{{ project }}', 'proteome')">
+            Proceed &xrarr;
+        </button>
 
-    <div class="footer">
-        <hr>
+		<br><br>
 
-        <p>PLACEHOLDER TEXT: ACKNOWLEDGEMENTS, IMPORTANT LINKS</p>
-    </div>
+		{{ inspire_footer|safe }}
+
+    </dev>
 </body>
 </html>

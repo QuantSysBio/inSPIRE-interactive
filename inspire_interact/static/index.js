@@ -413,7 +413,7 @@ async function revertGUI(serverAddress, user, project, frame) {
             break;
 
         case 'ms':
-            window.location.href = 'http://' + serverAddress + ':5000/interact-page/usecase';  
+            window.location.href = 'http://' + serverAddress + ':5000/interact-page/usecase/' + user + '/' + project;  
             break;
 
         case 'search':

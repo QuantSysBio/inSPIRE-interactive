@@ -6,32 +6,28 @@
 	<title>inSPIRE-Interactive</title>
 </head>
 <body>
-	<div class="header">
-		<img src="{{url_for('static', filename='inSPIRE-logo-nobg.png')}}" class="icon-top" onclick="goHome('{{ server_address }}')"/>		
-		<pre>
-			<h1>    </h1>
-		</pre>
-		<h1>Welcome to inSPIRE-Interactive!</h1>
-		<pre>
-			<h1>    </h1>
-		</pre>
-		<img src="{{url_for('static', filename='help.png')}}" class="icon-help" onclick="location.href = 'https://github.com/QuantSysBio/inSPIRE/issues';"/>		
-		<div id="welcoming-div"></div>
-	</div>
+	<dev class = "page-wrapper">
+		<!-- header -->
+		{{ inspire_header|safe }}
+		<hr>
+		<p class="adjusted-text">Your data is still processing, check again later.</p>
+		
+		<center>
+			<h2>Progress Log</h2>
+			{{ progress_html|safe }}
+		</center>
+		<div class="adjusted-text">
+			<p>If you have made a mistake and wish to cancel your job, click below.</p>
+			<div class="vertical-center">
+				<button id="execute-button" onclick="cancelPipeline('{{ server_address }}', '{{ user }}', '{{ project }}')">
+					Cancel Exectuions
+				</button>
+			</div>
+			<div id="cancelled-text"></div>
+		</div>
+		<br><br>
 
-    <p>Your data is still processing, check again later.</p>
-	
-	<center>
-		<h2>Progress Log</h2>
-		{{ progress_html|safe }}
-	</center>
-
-    <p>If you have made a mistake and wish to cancel your job, click below.</p>
-	<div class="vertical-center">
-		<button id="execute-button" onclick="cancelPipeline('{{ server_address }}', '{{ user }}', '{{ project }}')">
-			Cancel Exectuions
-		</button>
-	</div>
-	<div id="cancelled-text"></div>
+		{{ inspire_footer|safe }}
+	</dev>
 </body>
 </html>

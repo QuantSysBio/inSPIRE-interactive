@@ -6,26 +6,26 @@
 	<title>inSPIRE-Interactive</title>
 </head>
 <body>
-	<div class="header">
-		<img src="{{url_for('static', filename='inSPIRE-logo-nobg.png')}}" class="icon-top" onclick="goHome('{{ server_address }}')"/>		
-		<pre>
-			<h1>    </h1>
-		</pre>
-		<h1>Welcome to inSPIRE-Interactive!</h1>
-		<pre>
-			<h1>    </h1>
-		</pre>
-		<img src="{{url_for('static', filename='help.png')}}" class="icon-help" onclick="location.href = 'https://github.com/QuantSysBio/inSPIRE/issues';"/>		
-		<div id="welcoming-div"></div>
-	</div>
+	<dev class = "page-wrapper">
+	
+		<!-- header -->
+		{{ inspire_header|safe }}
+		<hr>
+		<div class="adjusted-text">
 
-    <p>If you are sure you wish to delete this project, click below.</p>
+		<p>If you are sure you wish to delete this project, click below.</p>
 
-    <div class="vertical-center">
-		<button id="execute-button" onclick="deleteProject('{{ server_address }}', '{{ user }}', '{{ project }}')">
-			Delete All Project Data
-		</button>
+		<div class="vertical-center">
+			<button id="execute-button" onclick="deleteProject('{{ server_address }}', '{{ user }}', '{{ project }}')">
+				Delete All Project Data
+			</button>
+		</div>
+		<div id="delete-text"></div>
 	</div>
-	<div id="delete-text"></div>
+	<br><br>
+
+	{{ inspire_footer|safe }}
+
+</dev>
 </body>
 </html>

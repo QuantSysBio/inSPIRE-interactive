@@ -6,22 +6,10 @@
 	<title>inSPIRE-Interactive</title>
 </head>
 <body onload="parametersCheck('{{ server_address }}', '{{ user }}', '{{ project }}')">	
-	<div class="header">
-		<img src="{{url_for('static', filename='inSPIRE-logo-nobg.png')}}" class="icon-top" onclick="goHome('{{ server_address }}')"/>		
-		<pre>
-			<h1>    </h1>
-		</pre>
-		<h1>Welcome to inSPIRE-Interactive!</h1>
-		<pre>
-			<h1>    </h1>
-		</pre>
-		<img src="{{url_for('static', filename='help.png')}}" class="icon-help" onclick="location.href = 'https://github.com/QuantSysBio/inSPIRE/issues';"/>		
-		<div id="welcoming-div"></div>
-	</div>
-
+	{{ inspire_header|safe }}
 	<hr>
 
-	<div class="center-content">
+	<div class="adjusted-text">
 		<div id="parameters-div">
 			<h2>inSPIRE Configuration</h2>
 			<h3>Instrument Settings</h3>
@@ -144,10 +132,8 @@
     </button>
 
 
-    <div class="footer">
-        <hr>
+	<br><br>
 
-        <p>PLACEHOLDER TEXT: ACKNOWLEDGEMENTS, IMPORTANT LINKS</p>
-    </div>
+	{{ inspire_footer|safe }}
 </body>
 </html>

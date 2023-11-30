@@ -6,75 +6,65 @@
 	<title>inSPIRE-Interactive</title>
 </head>
 <body onload="checkFilePattern('{{ server_address }}', '{{ user }}', '{{ project }}', 'ms')">	
-	<div class="header">
-		<img src="{{url_for('static', filename='inSPIRE-logo-nobg.png')}}" class="icon-top" onclick="goHome('{{ server_address }}')"/>		
-		<pre>
-			<h1>    </h1>
-		</pre>
-		<h1>Welcome to inSPIRE-Interactive!</h1>
-		<pre>
-			<h1>    </h1>
-		</pre>
-		<img src="{{url_for('static', filename='help.png')}}" class="icon-help" onclick="location.href = 'https://github.com/QuantSysBio/inSPIRE/issues';"/>		
-		<div id="welcoming-div"></div>
-	</div>
+	<!-- main page-->
+	<dev class = "page-wrapper">
+	
+		<!-- header -->
+		{{ inspire_header|safe }}
+		<hr>
+		<h3 class="adjusted-text">MS Data (RAW or mgf)</h3>
+		<p class="adjusted-text">Note that RAW files must be uploaded for quantification to be performed.</p>
 
-	<hr>
+		<div class="upload-div">
+			<!-- MASS SPEC DATA DIV -->
+			<div id="ms-data-div" >
+				<div class="row">
+					<div style="margin-left: 0%;">
+						<p>Upload your MS data</p>
+						<br>
+						<input type="file" id="ms-file-upload" multiple="true" />
+						<br>
+						<br>
+						<input autocomplete="off" type="submit" onclick="uploadFiles('{{ server_address }}', '{{ user }}', '{{ project }}', 'ms')">
+						<p id="ms-waiting" style="display:none;">Files uploading...</p>
+						<br>
+						<progress id="progressBar" value="0" max="100" style="width:300px;display:none"></progress>
+						<p id="loaded_n_total"></p>
+						<p id="ms-no-files" style="display:none; color:red;">Please upload a file before proceeding.</p>
+					</div>
 
-	<div class="center-content">
+					<div class="vl"></div>
 
-
-		<!-- MASS SPEC DATA DIV -->
-		<div id="ms-data-div" >
-			<h3>MS Data (RAW or mgf)</h3>
-
-			<div class="row">
-				<div style="margin-left: 0%;">
-					<p>Upload new MS data.</p>
-					<br>
-					<input type="file" id="ms-file-upload" multiple="true" />
-					<br>
-					<br>
-					<input autocomplete="off" type="submit" onclick="uploadFiles('{{ server_address }}', '{{ user }}', '{{ project }}', 'ms')">
-					<p id="ms-waiting" style="display:none;">Files uploading...</p>
-					<br>
-					<progress id="progressBar" value="0" max="100" style="width:300px;display:none"></progress>
-					<p id="loaded_n_total"></p>
-					<p id="ms-no-files" style="display:none; color:red;">Please upload a file before proceeding.</p>
-				</div>
-
-				<div class="vl"></div>
-
-				<div style="margin-left: 0%; border-right: auto;">
-					Files currently loaded:
-						<ul id="ms-file-list"></ul>
-					<br><br>
-					If you have uploaded new files and wish to check the upload click the button below:
-					<br>
+					<div style="margin-left: 5%; border-right: auto;">
+						<p>Or check the currently uploaded files:</p>
+							<ul id="ms-file-list"></ul>
+						<p>
+							If you have uploaded incorrect files and need	to delete them, click below:
+						</p>
+						<input autocomplete="off"  type="submit" value="Delete All Files" onclick="clearFilePattern('{{ server_address }}', '{{ user }}', '{{ project }}', 'ms')">
+					</p>
+						If you updated files manually, refresh the file list here
+					</p>
 					<input autocomplete="off"  type="submit" value="Refresh File List" onclick="checkFilePattern('{{ server_address }}', '{{ user }}', '{{ project }}', 'ms')">
-					<br><br>
-					If you remove the files above:
-					<br>
-					<input autocomplete="off"  type="submit" value="Delete All Files" onclick="clearFilePattern('{{ server_address }}', '{{ user }}', '{{ project }}', 'ms')">
+					</div>
 				</div>
 			</div>
 		</div>
-    </div>
 
-    <br>
+		<br>
 
-    <button id="back-button" class="text-button" onclick="revertGUI('{{ server_address }}', '{{ user }}', '{{ project }}', 'ms')">
-        &xlarr; Go back
-    </button>
+		<button id="back-button" class="text-button" onclick="revertGUI('{{ server_address }}', '{{ user }}', '{{ project }}', 'ms')">
+			&xlarr; Go back
+		</button>
 
-    <button id="forward-button" class="text-button" onclick="forwardGUI('{{ server_address }}', '{{ user }}', '{{ project }}', 'ms')">
-        Proceed &xrarr;
-    </button>
+		<button id="forward-button" class="text-button" onclick="forwardGUI('{{ server_address }}', '{{ user }}', '{{ project }}', 'ms')">
+			Proceed &xrarr;
+		</button>
 
-    <div class="footer">
-        <hr>
+		<br><br>
 
-        <p>PLACEHOLDER TEXT: ACKNOWLEDGEMENTS, IMPORTANT LINKS</p>
-    </div>
+		{{ inspire_footer|safe }}
+			
+	</dev>
 </body>
 </html>

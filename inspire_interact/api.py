@@ -28,6 +28,10 @@ from inspire_interact.constants import (
     MODE_KEY,
     SERVER_ADDRESS_KEY,
 )
+from inspire_interact.html_snippets import(
+    INSPIRE_HEADER,
+    INSPIRE_FOOTER,
+)
 from inspire_interact.utils import (
     check_pids,
     create_status_fig,
@@ -87,9 +91,23 @@ def fetch_page_no_arguments(page):
             f'{page}.html',
             server_address=app.config[SERVER_ADDRESS_KEY],
             mode=app.config[MODE_KEY],
+            inspire_header=INSPIRE_HEADER.format(
+                server_address=app.config[SERVER_ADDRESS_KEY],
+            ),
+            inspire_footer=INSPIRE_FOOTER.format(
+                server_address=app.config[SERVER_ADDRESS_KEY],
+            ),
         )
     except TemplateNotFound:
-        return render_template('404.html'), 404
+        return render_template(
+            '404.html',
+            inspire_header=INSPIRE_HEADER.format(
+                server_address=app.config[SERVER_ADDRESS_KEY],
+            ),
+            inspire_footer=INSPIRE_FOOTER.format(
+                server_address=app.config[SERVER_ADDRESS_KEY],
+            ),
+        ), 404
 
 
 @app.route('/interact-page/<page>/<user>/<project>', methods=['GET'])
@@ -105,9 +123,23 @@ def fetch_page(page, user, project):
                 mode=app.config[MODE_KEY],
                 user=user,
                 project=project,
+                inspire_header=INSPIRE_HEADER.format(
+                    server_address=app.config[SERVER_ADDRESS_KEY],
+                ),
+                inspire_footer=INSPIRE_FOOTER.format(
+                    server_address=app.config[SERVER_ADDRESS_KEY],
+                ),
             )
         except TemplateNotFound:
-            return render_template('404.html'), 404
+            return render_template(
+                '404.html',
+                inspire_header=INSPIRE_HEADER.format(
+                    server_address=app.config[SERVER_ADDRESS_KEY],
+                ),
+                inspire_footer=INSPIRE_FOOTER.format(
+                    server_address=app.config[SERVER_ADDRESS_KEY],
+                ),
+            ), 404
     try:
         with open(f'projects/{user}/{project}/core_metadata.yml', 'r', encoding='UTF-8') as stream:
             core_config = yaml.safe_load(stream)
@@ -132,6 +164,12 @@ def fetch_page(page, user, project):
                 project=project,
                 variant=variant,
                 html_table=html_table,
+                inspire_header=INSPIRE_HEADER.format(
+                    server_address=app.config[SERVER_ADDRESS_KEY],
+                ),
+                inspire_footer=INSPIRE_FOOTER.format(
+                    server_address=app.config[SERVER_ADDRESS_KEY],
+                ),
             )
 
         return render_template(
@@ -141,9 +179,23 @@ def fetch_page(page, user, project):
             user=user,
             project=project,
             variant=variant,
+            inspire_header=INSPIRE_HEADER.format(
+                server_address=app.config[SERVER_ADDRESS_KEY],
+            ),
+            inspire_footer=INSPIRE_FOOTER.format(
+                server_address=app.config[SERVER_ADDRESS_KEY],
+            ),
         )
     except TemplateNotFound:
-        return render_template('404.html'), 404
+        return render_template(
+            '404.html',
+            inspire_header=INSPIRE_HEADER.format(
+                server_address=app.config[SERVER_ADDRESS_KEY],
+            ),
+            inspire_footer=INSPIRE_FOOTER.format(
+                server_address=app.config[SERVER_ADDRESS_KEY],
+            ),
+        ), 404
 
 
 @app.route('/interact/project/<user>/<project>', methods=['GET'])
@@ -293,6 +345,12 @@ def interact_home():
         'home.html',
         server_address=app.config[SERVER_ADDRESS_KEY],
         mode=app.config[MODE_KEY],
+        inspire_header=INSPIRE_HEADER.format(
+            server_address=app.config[SERVER_ADDRESS_KEY],
+        ),
+        inspire_footer=INSPIRE_FOOTER.format(
+            server_address=app.config[SERVER_ADDRESS_KEY],
+        ),
     )
 
 
@@ -311,6 +369,12 @@ def interact_landing_page():
         server_address=app.config[SERVER_ADDRESS_KEY],
         user_list=options_html,
         mode=app.config[MODE_KEY],
+        inspire_header=INSPIRE_HEADER.format(
+            server_address=app.config[SERVER_ADDRESS_KEY],
+        ),
+        inspire_footer=INSPIRE_FOOTER.format(
+            server_address=app.config[SERVER_ADDRESS_KEY],
+        ),
     )
 
 
@@ -340,8 +404,10 @@ def delete_project():
 def download_project(user, project):
     home_key= app.config[INTERACT_HOME_KEY]
     project_home = f'{home_key}/projects/{user}/{project}'
-
-    shutil.copyfile(f'{project_home}/config.yml', f'{project_home}/inspireOutput/config.yml')
+    if os.path.exists(f'{project_home}/config.yml'):
+        shutil.copyfile(f'{project_home}/config.yml', f'{project_home}/inspireOutput/config.yml')
+    if not os.path.exists(f'{project_home}/inspireOutput'):
+        os.mkdir((f'{project_home}/inspireOutput'))
     shutil.make_archive(f'{project_home}/inspireOutput', 'zip', f'{project_home}/inspireOutput')
     return send_file(f'{project_home}/inspireOutput.zip')
 
@@ -411,7 +477,7 @@ def run_inspire_core():
             return jsonify(
                 message=f'http://{server_address}:5000/interact/{user}/{project_title}/inspire'
             )
-        if check_queue(user, project_title):
+        if check_queue(home_key, user, project_title):
             return jsonify(
                 message=f'http://{server_address}:5000/interact/{user}/{project_title}/inspire'
             )
@@ -495,7 +561,15 @@ def check_results(user, project, workflow):
     home_key= app.config[INTERACT_HOME_KEY]
     project_home = f'{home_key}/projects/{user}/{project}'
     if not os.path.exists(project_home):
-        return render_template('404.html'), 404
+        return render_template(
+            '404.html',
+            inspire_header=INSPIRE_HEADER.format(
+                server_address=app.config[SERVER_ADDRESS_KEY],
+            ),
+            inspire_footer=INSPIRE_FOOTER.format(
+                server_address=app.config[SERVER_ADDRESS_KEY],
+            ),
+        ), 404
 
     status = check_pids(project_home, workflow)
     if (
@@ -523,6 +597,12 @@ def check_results(user, project, workflow):
                 project=project,
                 server_address=app.config[SERVER_ADDRESS_KEY],
                 user=user,
+                inspire_header=INSPIRE_HEADER.format(
+                    server_address=app.config[SERVER_ADDRESS_KEY],
+                ),
+                inspire_footer=INSPIRE_FOOTER.format(
+                    server_address=app.config[SERVER_ADDRESS_KEY],
+                ),
             )
         else:
             with open(f'{project_home}/queue.svg', 'r') as svg_file:
@@ -532,6 +612,12 @@ def check_results(user, project, workflow):
                 'queued.html',
                 server_address=app.config[SERVER_ADDRESS_KEY],
                 queue_svg=queue_svg,
+                inspire_header=INSPIRE_HEADER.format(
+                    server_address=app.config[SERVER_ADDRESS_KEY],
+                ),
+                inspire_footer=INSPIRE_FOOTER.format(
+                    server_address=app.config[SERVER_ADDRESS_KEY],
+                ),
             )
 
     else:
@@ -582,12 +668,21 @@ def check_results(user, project, workflow):
                 progress_html=progress_html,
                 inspire_increase=get_inspire_increase(project_home, 'total'),
                 pathogen_increase=get_inspire_increase(project_home, 'pathogen'),
-                inspire_quantified_count=get_quant_count(project_home)
+                inspire_quantified_count=get_quant_count(project_home),
+                inspire_header=INSPIRE_HEADER.format(
+                    server_address=app.config[SERVER_ADDRESS_KEY],
+                ),
+                inspire_footer=INSPIRE_FOOTER.format(
+                    server_address=app.config[SERVER_ADDRESS_KEY],
+                ),
             )
         else:
             create_status_fig(project_home)
-            with open(f'{project_home}/progress.html', 'r') as html_file:
-                progress_html = html_file.read()
+            if os.path.exists(f'{project_home}/progress.html'):
+                with open(f'{project_home}/progress.html', 'r') as html_file:
+                    progress_html = html_file.read()
+            else:
+                progress_html = ''
             return render_template(
                 'failed.html',
                 server_address=app.config[SERVER_ADDRESS_KEY],
@@ -595,6 +690,12 @@ def check_results(user, project, workflow):
                 project=project,
                 workflow=workflow,
                 progress_html=progress_html,
+                inspire_header=INSPIRE_HEADER.format(
+                    server_address=app.config[SERVER_ADDRESS_KEY],
+                ),
+                inspire_footer=INSPIRE_FOOTER.format(
+                    server_address=app.config[SERVER_ADDRESS_KEY],
+                ),
             )
 
 @app.route('/interact/get_results/<user>/<project>/<workflow>', methods=['GET'])
@@ -698,7 +799,10 @@ def main():
         os.mkdir('locks')
     
     if args.mode == 'local':
-        app.config[SERVER_ADDRESS_KEY] = '127.0.0.1'
+        # app.config[SERVER_ADDRESS_KEY] = '127.0.0.1'
+
+        host_name = socket.gethostname()
+        app.config[SERVER_ADDRESS_KEY] = host_name
     elif args.mode == 'server':
         host_name = socket.gethostname()
         app.config[SERVER_ADDRESS_KEY] = socket.gethostbyname(host_name + ".local")

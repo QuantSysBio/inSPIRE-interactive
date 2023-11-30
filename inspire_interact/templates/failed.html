@@ -6,29 +6,24 @@
 	<title>inSPIRE-Interactive</title>
 </head>
 <body>
-	<div class="header">
-		<img src="{{url_for('static', filename='inSPIRE-logo-nobg.png')}}" class="icon-top" onclick="goHome('{{ server_address }}')"/>		
-		<pre>
-			<h1>    </h1>
-		</pre>
-		<h1>Welcome to inSPIRE-Interactive!</h1>
-		<pre>
-			<h1>    </h1>
-		</pre>
-		<img src="{{url_for('static', filename='help.png')}}" class="icon-help" onclick="location.href = 'https://github.com/QuantSysBio/inSPIRE/issues';"/>		
-		<div id="welcoming-div"></div>
-	</div>
-	<br>
-	<br>
-	
-    <p>Unfortunately your job appears to have failed.</p>
-	<a href="http://{{ server_address }}:5000/interact/get_results/{{ user }}/{{ project }}/inspireLog"> Click to Download the log of inSPIRE execution.</a>
-	or<br>
-	<a href="http://{{ server_address }}:5000/interact-page/parameters/{{ user }}/{{ project }}">Click to re-execute the pipeline with alternative parameters.</a>
-	<br>
-	<center>
-		<h2>Progress Log</h2>
-		{{ progress_html|safe }}
-	</center>
+	<dev class = "page-wrapper">
+		{{ inspire_header|safe }}
+		<hr>
+		<div class="adjusted-text">
+			<p>Unfortunately your job appears to have failed.</p>
+			<a href="http://{{ server_address }}:5000/interact/get_results/{{ user }}/{{ project }}/inspireLog"> Click to Download the log of inSPIRE execution.</a>
+			or<br>
+			<a href="http://{{ server_address }}:5000/interact-page/parameters/{{ user }}/{{ project }}">Click to re-execute the pipeline with alternative parameters.</a>
+			<br>
+		</div>
+		<center>
+			<h2>Progress Log</h2>
+			{{ progress_html|safe }}
+		</center>
+
+		<br><br>
+
+        {{ inspire_footer|safe }}
+	</dev>
 </body>
 </html>

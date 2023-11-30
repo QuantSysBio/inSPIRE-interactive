@@ -12,33 +12,13 @@
 	<title>inSPIRE-Interactive</title>
 </head>
 <body>	
-	<div class="header">
-		<img src="{{url_for('static', filename='inSPIRE-logo-nobg.png')}}" class="icon-top" onclick="goHome('{{ server_address }}')"/>		
-		<pre>
-			<h1>    </h1>
-		</pre>
-		<h1>Welcome to inSPIRE-Interactive!</h1>
-		<pre>
-			<h1>    </h1>
-		</pre>
-		<img src="{{url_for('static', filename='help.png')}}" class="icon-help" onclick="location.href = 'https://github.com/QuantSysBio/inSPIRE/issues';"/>		
-		<!-- https://github.com/QuantSysBio/inSPIRE/issues -->
-		<div id="welcoming-div"></div>
-	</div>
+	<dev class="page-wrapper">
 
-	<hr>
+		<!-- header -->
+		{{ inspire_header|safe }}
+		<hr>
 
-	<div class="center-content">
-
-		<!-- OPENING DIV 
-			This frame deals with the initial selection of 3 parameters: User, Project and Workflow.
-
-			These choices appear one-by-one, and allow for de-selection. When the user is re-specified, the project selection
-			is deleted and re-created according to the new user's existing projects. Workflow is not reset, but does also allow
-			re-selection.
-		-->
-		<div id="opening-div">
-
+		<div class="upload-div" style="align-items: flex-start;">
 			<!-- USER SELECTION -->
 			<div id="user-select-div" class="opening-sub-div">
 				<h3>User Selection</h3>
@@ -63,8 +43,7 @@
 			<!-- PROJECT SELECTION -->
 			<div id="project-select-div" class="opening-sub-div" style="visibility: hidden;">
 				<h3>Project Selection</h3>
-				<p>Which project do you want to work on?.</p>
-				<p>Select existing projects.</p>
+				<p>Select an existing project.</p>
 				<form>
 					<select id="project-selection" autocomplete="off" onchange="selectProject('{{ server_address }}', this.value)">
 						<option class = "default" selected disabled hidden>Select Project</option>
@@ -80,7 +59,7 @@
 			</div>
 
 			<div id="opening-Vl-2" class="vl" style="visibility: hidden;"></div>
-			
+				
 			<!-- WORKFLOW SELECTION -->
 			<div id="workflow-select-div" class="opening-sub-div" style="visibility: hidden;">
 				<h3>Workflow Selection</h3>
@@ -96,13 +75,9 @@
 				</form>
 			</div>
 		</div>
-	</div>
 
-	<div class="footer">
-		<hr>
-
-		<p>PLACEHOLDER TEXT: ACKNOWLEDGEMENTS, IMPORTANT LINKS</p>
-	</div>
-
+		{{ inspire_footer|safe }}
+			
+	</dev>
 </body>
 </html>

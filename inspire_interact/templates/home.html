@@ -6,50 +6,97 @@
 	<title>inSPIRE-Interactive</title>
 </head>
 <body>	
-	<div class="header">
-		<img src="{{url_for('static', filename='inSPIRE-logo-nobg.png')}}" class="icon-top" onclick="goHome('{{ server_address }}')"/>		
-		<pre>
-			<h1>    </h1>
-		</pre>
-		<h1>Welcome to inSPIRE-Interactive!</h1>
-		<pre>
-			<h1>    </h1>
-		</pre>
-		<img src="{{url_for('static', filename='help.png')}}" class="icon-help" onclick="location.href = 'https://github.com/QuantSysBio/inSPIRE/issues';"/>		
-		<div id="welcoming-div"></div>
-	</div>
 
-    <div class="row">
-        <div class="column" id="walkthrough" style="width:40%; margin-left: auto; margin-right: auto;">
+    <!-- main page-->
+	<dev class = "page-wrapper">
+	
+		<!-- header -->
+		{{ inspire_header|safe }}
 
-            <h4>
-                Watch the walkthrough here:
-            </h4>
-            <div class="h_iframe">
-                <iframe frameborder="0" src="https://www.youtube.com/embed/FPEP4waYQEU" allowfullscreen></iframe>
-            </div>
-            <br>
-        </div>
-        <div class="column" style="width:40%; margin-left: auto; margin-right: auto;">
-            <h4>
-                Or get started:
-            </h4>
-            <button class="white-black-button" onclick="location.href='http://{{ server_address }}:5000/interact';"
-            style="margin-left: 25%">
-                Use inSPIRE!
-            </button>
-        </div>
-    </div>
+		<!--second section -->
 
-</div>
+		<dev class = "second-section">
+			<dev class = "second-section-center-left">
+				<dev class = "welcome-note">
+					<p>Welcome to inSPIRE Interactive !</p>
+				</dev>
+				<dev class = "intro-inspire"> <p>
+					inSPIRE-interactive is a simple, 
+					webserver-based solution for you & your
+					lab to reliably identify greater numbers
+					of peptides from mass spec. experiments
+					via inSPIRE and dive deeper into 
+					immunopeptidomics experiments with inSPIRE-Pathogen.
+					</p>
+				</dev>
+				<dev class = "buttons"> 
+					<button type="button" class = "button-second-section"
+						onclick="location.href='http://{{ server_address }}:5000/interact';"> 
+						<p>&nbsp;&nbsp;&nbsp;&nbsp;GET STARTED					
+						</p>
+					</button>
+					<button type="button" class = "button-second-section"
+						onclick="window.location.href='#tutorial-video'"> 
+						<p>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;TUTORIAL					
+						</p>
+					</button>
+				</dev>
+			</dev>
+			<dev class = "second-section-center-right"> 
+				<img src = "{{url_for('static', filename='plot_1.jpeg')}}"
+				class = "plot" 
+				width = "100%" height = "100%">
+			</dev>
+			
+		</dev>
+
+		<!--Third section-->
+
+		<dev class = "third-section">
+			<dev class = "third-section-top">
+				 <p> Why inSPIRE-Interactive? 
+				 </p>
+			</dev>
+		</dev>
+		<dev class = "third-section">
+			<dev class = "third-section-bottom"> 
+				<p>
+					For any mass spectrometry analysis, sensitive
+					and reliable identification is key to maximising 
+					potential insights and discovery. The inSPIRE core 
+					rescoring provides state-of-the-art identification,
+					while inSPIRE-Pathogen allows you to find pathogen
+					peptides in infected immunopeptidome samples.
+					Further integrations can allow custom searches 
+					to be run with MSFragger, binding affinity via 
+					NetMHCpan, and quantification via Skyline to build 
+					out your analysis ecosystem entirely within inSPIRE-interactive.
+				</p>
+			</dev>
+		</dev>
 
 
-      <!-- bottom division Acknowledegements etc-->
-      <div class="footer">
-		<hr>
+		<!-- Fourth section-->
 
-		<p>PLACEHOLDER TEXT: ACKNOWLEDGEMENTS, IMPORTANT LINKS</p>
-	</div>
+		<div class = "fourth-section">
+			<div id = "tutorial-video" class = "fourth-section-left">
+				<iframe  width="100%" height="100%" 
+					src="https://www.youtube.com/embed/Po098TRdOn4/?controls=1" frameBorder="0" allowfullscreen> 
+				</iframe> 
+			</div>
+			<div class = "fourth-section-right">
+				<p>
+					Get inSPIRED with a Tutorial Video. 
+				</p>
+			</div>
+		</div>
+
+
+	
+		<!--footer-->
+
+		{{ inspire_footer|safe }}
+	</dev>
 
 </body>
 </html>

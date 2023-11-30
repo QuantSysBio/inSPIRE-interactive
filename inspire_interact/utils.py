@@ -81,6 +81,7 @@ def write_inspire_task(bash_file, project_home, task, interact_home):
         f'    interact-queue --project_home {project_home} --interact_home {interact_home} ' +
         ' --queue_task remove\n'
     )
+    # Some tasks do not need to block execution:
     if task not in ('predictBinding', 'quantify', 'generateReport'):
         bash_file.write(
             '    exit 0\n'
@@ -246,8 +247,10 @@ def get_inspire_increase(project_home, variant):
 
         return f'inSPIRE increased pathogen peptide yield by {increase}%.'
 
-def check_queue(user, project):
-    queue_df = pd.read_csv('locks/inspireQueue.csv')
+def check_queue(interact_home, user, project):
+    if not os.path.exists(f'{interact_home}/locks/inspireQueue.csv'):
+        return False
+    queue_df = pd.read_csv(f'{interact_home}/locks/inspireQueue.csv')
     filtered_queue = queue_df[
         (queue_df['user'] == user) &
         (queue_df['project'] == project)
@@ -325,6 +328,8 @@ def get_tasks(inspire_settings, project_home):
     task_df.to_csv(f'{project_home}/taskStatus.csv', index=False)
 
 def create_status_fig(project_home):
+    if not os.path.exists(f'{project_home}/taskStatus.csv'):
+        return
     task_df = pd.read_csv(f'{project_home}/taskStatus.csv')
     task_colors = []
     for idx in range(3):
