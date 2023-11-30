@@ -18,7 +18,7 @@
 		{{ inspire_header|safe }}
 		<hr>
 
-		<div class="upload-div">
+		<div class="upload-div" style="align-items: flex-start;">
 			<!-- USER SELECTION -->
 			<div id="user-select-div" class="opening-sub-div">
 				<h3>User Selection</h3>
@@ -43,8 +43,7 @@
 			<!-- PROJECT SELECTION -->
 			<div id="project-select-div" class="opening-sub-div" style="visibility: hidden;">
 				<h3>Project Selection</h3>
-				<p>Which project do you want to work on?.</p>
-				<p>Select existing projects.</p>
+				<p>Select an existing project.</p>
 				<form>
 					<select id="project-selection" autocomplete="off" onchange="selectProject('{{ server_address }}', this.value)">
 						<option class = "default" selected disabled hidden>Select Project</option>
