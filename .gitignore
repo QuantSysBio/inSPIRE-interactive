@@ -129,3 +129,5 @@ dmypy.json
 .pyre/
 projects/
 locks/
+.DS_Store
+inspire_interact/.DS_Store
