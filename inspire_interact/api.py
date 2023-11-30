@@ -668,7 +668,13 @@ def check_results(user, project, workflow):
                 progress_html=progress_html,
                 inspire_increase=get_inspire_increase(project_home, 'total'),
                 pathogen_increase=get_inspire_increase(project_home, 'pathogen'),
-                inspire_quantified_count=get_quant_count(project_home)
+                inspire_quantified_count=get_quant_count(project_home),
+                inspire_header=INSPIRE_HEADER.format(
+                    server_address=app.config[SERVER_ADDRESS_KEY],
+                ),
+                inspire_footer=INSPIRE_FOOTER.format(
+                    server_address=app.config[SERVER_ADDRESS_KEY],
+                ),
             )
         else:
             create_status_fig(project_home)

@@ -81,6 +81,7 @@ def write_inspire_task(bash_file, project_home, task, interact_home):
         f'    interact-queue --project_home {project_home} --interact_home {interact_home} ' +
         ' --queue_task remove\n'
     )
+    # Some tasks do not need to block execution:
     if task not in ('predictBinding', 'quantify', 'generateReport'):
         bash_file.write(
             '    exit 0\n'

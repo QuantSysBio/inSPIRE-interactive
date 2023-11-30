@@ -6,24 +6,14 @@
 	<title>inSPIRE-Interactive</title>
 </head>
 <body>
-	<div class="header">
-		<img src="{{url_for('static', filename='inSPIRE-logo-nobg.png')}}" class="icon-top" onclick="goHome('{{ server_address }}')"/>		
-		<pre>
-			<h1>    </h1>
-		</pre>
-		<h1>inSPIRE results are ready!</h1>
-		<pre>
-			<h1>    </h1>
-		</pre>
-		<img src="{{url_for('static', filename='help.png')}}" class="icon-help" onclick="location.href = 'https://github.com/QuantSysBio/inSPIRE/issues';"/>		
-		<div id="welcoming-div"></div>
-	</div>
-	<br>
-	<br>
-	<table>
+	<dev class = "page-wrapper">
+	<!-- header -->
+	{{ inspire_header|safe }}
+	<hr>
+	<table class="results-table">
 
 		<div class="row">
-			<div style="margin-left: 0%;" class="column">
+			<div style="margin-left: 0%; padding-right:6%" class="column">
 				<h2>inSPIRE Identification Results</h2>
 				<p id="psm-fdr-increase">{{ inspire_increase }}</p>
 
@@ -50,7 +40,7 @@
 		</div>
 
 		<div class="row">
-			<div id="inSpirePerformance" style="visibility: {{ inspire_select_visible }}; margin-left: 0%;"  class="column">
+			<div id="inSpirePerformance" style="visibility: {{ inspire_select_visible }}; margin-left: 0%; ; padding-right:6%"  class="column">
 				<h2>inSPIRE-Pathogen Results</h2>
 				<p id="inspire-pathogen-increase">{{ pathogen_increase }}</p>
 				<a href="http://{{ server_address }}:5000/interact/get_results/{{ user }}/{{ project }}/inspireSelect"> Click to download the inSPIRE-Select epitope candidates</a>
@@ -71,7 +61,12 @@
 				<br>
 				{{ progress_html|safe }}
 			</div>
-		</div>
-	</table>
+		</table>
+	</div>
+	<br><br>
+
+	{{ inspire_footer|safe }}
+
+	</dev>
 </body>
 </html>
