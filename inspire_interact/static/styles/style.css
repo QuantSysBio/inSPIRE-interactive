@@ -19,6 +19,25 @@
 .results-table {
     margin-left: auto;
     margin-right: auto;
+    width: auto;
+
+    justify-content: center;
+    /* align-items: center; */
+}
+
+/* .res-column{
+    display: flex;
+    flex-direction: row;
+    justify-content: flex-start;
+    align-items: flex-start;
+
+}; */
+
+.res-row {
+    display: flex;
+    flex-direction: row;
+    justify-content: flex-start;
+    align-items: flex-start;
 }
 
 .row {

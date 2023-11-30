@@ -12,8 +12,8 @@
 	<hr>
 	<table class="results-table">
 
-		<div class="row">
-			<div style="margin-left: 0%; padding-right:6%" class="column">
+		<div class="res-row">
+			<div style="margin-left: 20%; padding-right:6%" class="res-column">
 				<h2>inSPIRE Identification Results</h2>
 				<p id="psm-fdr-increase">{{ inspire_increase }}</p>
 
@@ -26,7 +26,7 @@
 				<br>
 			</div>
 
-			<div class="column">
+			<div class="res-column">
 				<h2>inSPIRE Quantitative Report</h2>
 				<p id="psm-fdr-increase">{{ inspire_quantified_count }}</p>
 
@@ -39,8 +39,8 @@
 			</div>
 		</div>
 
-		<div class="row">
-			<div id="inSpirePerformance" style="visibility: {{ inspire_select_visible }}; margin-left: 0%; ; padding-right:6%"  class="column">
+		<div class="res-row">
+			<div id="inSpirePerformance" style="visibility: {{ inspire_select_visible }}; margin-left: 20%; ; padding-right:6%"  class="res-column">
 				<h2>inSPIRE-Pathogen Results</h2>
 				<p id="inspire-pathogen-increase">{{ pathogen_increase }}</p>
 				<a href="http://{{ server_address }}:5000/interact/get_results/{{ user }}/{{ project }}/inspireSelect"> Click to download the inSPIRE-Select epitope candidates</a>
@@ -51,7 +51,7 @@
 				{{ ep_bar|safe }}
 			</div>
 
-			<div class="column">
+			<div class="res-column">
 				<h2>inSPIRE Execution Logs</h2>
 				<p>You can see the details of inSPIRE execution</p>
 				<a href="http://{{ server_address }}:5000/interact/get_results/{{ user }}/{{ project }}/inspireLog"> Click to download the log of inSPIRE execution</a>
