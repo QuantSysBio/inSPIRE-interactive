@@ -5,6 +5,7 @@ import os
 import shutil
 import signal
 import socket
+import sys
 import time
 
 import flask
@@ -412,22 +413,12 @@ def download_project(user, project):
     return send_file(f'{project_home}/inspireOutput.zip')
 
 
-@app.route('/interact/cancel', methods=['POST'])
-@cross_origin()
-def cancel_job():
-    config_dict = request.json
-    user = config_dict['user']
-    project = config_dict['project']
-
-    home_key= app.config[INTERACT_HOME_KEY]
+def cancel_job_helper(home_key, user, project):
     project_home = f'{home_key}/projects/{user}/{project}'
-
     pids = get_pids(project_home, 'inspire')
     if pids is None:
-        return jsonify(
-            message=(
-                'No task was running. Please refresh the page.'
-            )
+        return (
+            'No task was running. Please refresh the page.'
         )
 
     task_killed = False
@@ -459,6 +450,18 @@ def cancel_job():
             'Task cancelled. Please refresh the page.'
         )
     )
+
+@app.route('/interact/cancel', methods=['POST'])
+@cross_origin()
+def cancel_job():
+    config_dict = request.json
+    user = config_dict['user']
+    project = config_dict['project']
+
+    home_key= app.config[INTERACT_HOME_KEY]
+
+    cancel_message = cancel_job_helper(home_key, user, project)
+    return jsonify(message=cancel_message)
 
 
 @app.route('/interact/inspire', methods=['POST'])
@@ -738,22 +741,24 @@ def get_results_file(user, project, workflow):
         )
 
     if workflow == 'performance':
-        with open(
-            f'{project_home}/inspireOutput/inspire-report.html',
-            mode='r',
-            encoding='UTF-8',
-        ) as perf_file:
-            contents = perf_file.read()
-        return contents
+        if os.path.exists( f'{project_home}/inspireOutput/inspire-report.html'):
+            with open(
+                f'{project_home}/inspireOutput/inspire-report.html',
+                mode='r',
+                encoding='UTF-8',
+            ) as perf_file:
+                contents = perf_file.read()
+            return contents
     
     if workflow == 'quantReport':
-        with open(
-            f'{project_home}/inspireOutput/quant/inspire-quant-report.html',
-            mode='r',
-            encoding='UTF-8',
-        ) as perf_file:
-            contents = perf_file.read()
-        return contents
+        if os.path.exists(f'{project_home}/inspireOutput/quant/inspire-quant-report.html'):
+            with open(
+                f'{project_home}/inspireOutput/quant/inspire-quant-report.html',
+                mode='r',
+                encoding='UTF-8',
+            ) as perf_file:
+                contents = perf_file.read()
+            return contents
 
     return Response()
 
@@ -780,43 +785,56 @@ def get_arguments():
 
     return parser.parse_args()
 
+def clear_queue(interact_home):
+    if os.path.exists(f'{interact_home}/locks/inspireQueue.csv'):
+        queue_df = pd.read_csv(f'{interact_home}/locks/inspireQueue.csv')
+        for _, df_row in queue_df.iterrows():
+            cancel_job_helper(interact_home, df_row['user'], df_row['project'])
+
 
 def main():
     """ Main function to run inSPIRE-interactive.
     """
-    args = get_arguments()
+    try:
+        args = get_arguments()
 
-    with open(args.config_file, 'r', encoding='UTF-8') as stream:
-        config_dict = yaml.safe_load(stream)
-    for config_key in config_dict:
-        if config_key not in ALL_CONFIG_KEYS:
-            raise ValueError(f'Unrecognised key {config_key} found in config file.')
+        with open(args.config_file, 'r', encoding='UTF-8') as stream:
+            config_dict = yaml.safe_load(stream)
+        for config_key in config_dict:
+            if config_key not in ALL_CONFIG_KEYS:
+                raise ValueError(f'Unrecognised key {config_key} found in config file.')
 
-    app.config[INTERACT_HOME_KEY] = os.getcwd()
-    if not os.path.exists('projects'):
-        os.mkdir('projects')
-    if not os.path.exists('locks'):
-        os.mkdir('locks')
+        app.config[INTERACT_HOME_KEY] = os.getcwd()
+        if not os.path.exists('projects'):
+            os.mkdir('projects')
+        if not os.path.exists('locks'):
+            os.mkdir('locks')
+        
+        if args.mode == 'local':
+            # app.config[SERVER_ADDRESS_KEY] = '127.0.0.1'
+
+            host_name = socket.gethostname()
+            app.config[SERVER_ADDRESS_KEY] = host_name
+        elif args.mode == 'server':
+            host_name = socket.gethostname()
+            app.config[SERVER_ADDRESS_KEY] = socket.gethostbyname(host_name + ".local")
+        else:
+            raise ValueError(f'Unknown mode {args.mode} requested')
+
+        app.config[FILESERVER_NAME_KEY] = config_dict.get(FILESERVER_NAME_KEY)
+        app.config[MHCPAN_KEY] = config_dict.get(MHCPAN_KEY)
+        app.config[FRAGGER_PATH_KEY] = config_dict.get(FRAGGER_PATH_KEY)
+        app.config[FRAGGER_MEMORY_KEY] = config_dict.get(FRAGGER_MEMORY_KEY)
+        app.config[CPUS_KEY] = config_dict.get(CPUS_KEY, 1)
+        app.config[MODE_KEY] = args.mode
+
+        app.run(host='0.0.0.0', debug = False)
+
+    except KeyboardInterrupt:
+        print('Quitting, first clearing queue.')
+        clear_queue(app.config[INTERACT_HOME_KEY])
+        sys.exit()
     
-    if args.mode == 'local':
-        # app.config[SERVER_ADDRESS_KEY] = '127.0.0.1'
-
-        host_name = socket.gethostname()
-        app.config[SERVER_ADDRESS_KEY] = host_name
-    elif args.mode == 'server':
-        host_name = socket.gethostname()
-        app.config[SERVER_ADDRESS_KEY] = socket.gethostbyname(host_name + ".local")
-    else:
-        raise ValueError(f'Unknown mode {args.mode} requested')
-
-    app.config[FILESERVER_NAME_KEY] = config_dict.get(FILESERVER_NAME_KEY)
-    app.config[MHCPAN_KEY] = config_dict.get(MHCPAN_KEY)
-    app.config[FRAGGER_PATH_KEY] = config_dict.get(FRAGGER_PATH_KEY)
-    app.config[FRAGGER_MEMORY_KEY] = config_dict.get(FRAGGER_MEMORY_KEY)
-    app.config[CPUS_KEY] = config_dict.get(CPUS_KEY, 1)
-    app.config[MODE_KEY] = args.mode
-
-    app.run(host='0.0.0.0', debug = False)
 
 if __name__ == '__main__':
     main()

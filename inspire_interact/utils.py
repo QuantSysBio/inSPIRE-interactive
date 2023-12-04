@@ -6,6 +6,7 @@ import os
 
 import pandas as pd
 import plotly.graph_objects as go
+import plotly.io as pio
 import yaml
 
 from inspire_interact.constants import (
@@ -385,6 +386,9 @@ def create_status_fig(project_home):
     )
 
     fig_html = fig.to_html()
+    fig.write_image(
+        f'{project_home}/progress.svg', engine='kaleido'
+    )
     with open(
         f'{project_home}/progress.html',
         mode='w',
