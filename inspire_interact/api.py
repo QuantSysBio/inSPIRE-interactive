@@ -3,7 +3,6 @@
 from argparse import ArgumentParser
 import os
 import shutil
-import signal
 import socket
 import sys
 import time
@@ -13,37 +12,38 @@ from flask import request, Response, render_template, send_file, send_from_direc
 from flask.json import jsonify
 from flask_cors import cross_origin
 from jinja2.exceptions import TemplateNotFound
-from markupsafe import Markup
-import pandas as pd
 import yaml
 
+from inspire_interact.clean_up import (
+    clear_queue,
+    cancel_job_helper,
+)
 from inspire_interact.constants import (
     ALL_CONFIG_KEYS,
     CPUS_KEY,
     FILESERVER_NAME_KEY,
     FRAGGER_MEMORY_KEY,
     FRAGGER_PATH_KEY,
+    KEY_FILES,
     MHCPAN_KEY,
     INTERACT_HOME_KEY,
-    INTERMEDIATE_FILES,
     MODE_KEY,
     SERVER_ADDRESS_KEY,
 )
-from inspire_interact.html_snippets import(
-    INSPIRE_HEADER,
-    INSPIRE_FOOTER,
+from inspire_interact.handle_results import (
+    create_queue_fig,
+    deal_with_failure,
+    deal_with_queue,
+    deal_with_success,
+    deal_with_waiting,
+    fetch_queue_and_task,
+    safe_fetch,
 )
+from inspire_interact.inspire_execute import execute_inspire
 from inspire_interact.utils import (
     check_pids,
-    create_status_fig,
-    check_queue,
-    create_queue_fig,
-    get_inspire_increase,
-    get_pids,
-    get_quant_count,
-    get_tasks, prepare_inspire,
-    write_inspire_task,
     generate_raw_file_table,
+    format_header_and_footer,
 )
 
 app = flask.Flask(__name__, template_folder='templates')
@@ -60,12 +60,14 @@ def favicon():
         mimetype='image/vnd.microsoft.icon',
     )
 
+
 @app.route('/static/<path:path>')
 @cross_origin()
 def send_static(path):
     """ Function to send static files from the static folder.
     """
     return send_from_directory('static', path)
+
 
 @app.route('/interact/user/<user>', methods=['GET'])
 @cross_origin()
@@ -87,27 +89,26 @@ def get_user(user):
 def fetch_page_no_arguments(page):
     """ Endpoint serving the spi_serverive Home Page.
     """
+    additional_args = format_header_and_footer(app.config[SERVER_ADDRESS_KEY])
     try:
+        if page == 'view-queue':
+            create_queue_fig(
+                app.config[SERVER_ADDRESS_KEY],
+                f'{app.config[SERVER_ADDRESS_KEY]}/locks/'
+            )
+            additional_args['queue_svg'] = safe_fetch(
+                f'{app.config[SERVER_ADDRESS_KEY]}/locks/queue.svg'
+            )
         return render_template(
             f'{page}.html',
             server_address=app.config[SERVER_ADDRESS_KEY],
             mode=app.config[MODE_KEY],
-            inspire_header=INSPIRE_HEADER.format(
-                server_address=app.config[SERVER_ADDRESS_KEY],
-            ),
-            inspire_footer=INSPIRE_FOOTER.format(
-                server_address=app.config[SERVER_ADDRESS_KEY],
-            ),
+            **additional_args
         )
     except TemplateNotFound:
         return render_template(
             '404.html',
-            inspire_header=INSPIRE_HEADER.format(
-                server_address=app.config[SERVER_ADDRESS_KEY],
-            ),
-            inspire_footer=INSPIRE_FOOTER.format(
-                server_address=app.config[SERVER_ADDRESS_KEY],
-            ),
+            **additional_args,
         ), 404
 
 
@@ -116,6 +117,8 @@ def fetch_page_no_arguments(page):
 def fetch_page(page, user, project):
     """ Endpoint serving the spi_serverive Home Page.
     """
+    header_and_footer = format_header_and_footer(app.config[SERVER_ADDRESS_KEY])
+
     if not os.path.exists(f'projects/{user}/{project}/core_metadata.yml'):
         try:
             return render_template(
@@ -124,23 +127,11 @@ def fetch_page(page, user, project):
                 mode=app.config[MODE_KEY],
                 user=user,
                 project=project,
-                inspire_header=INSPIRE_HEADER.format(
-                    server_address=app.config[SERVER_ADDRESS_KEY],
-                ),
-                inspire_footer=INSPIRE_FOOTER.format(
-                    server_address=app.config[SERVER_ADDRESS_KEY],
-                ),
+                **header_and_footer,
             )
         except TemplateNotFound:
-            return render_template(
-                '404.html',
-                inspire_header=INSPIRE_HEADER.format(
-                    server_address=app.config[SERVER_ADDRESS_KEY],
-                ),
-                inspire_footer=INSPIRE_FOOTER.format(
-                    server_address=app.config[SERVER_ADDRESS_KEY],
-                ),
-            ), 404
+            return render_template('404.html', **header_and_footer), 404
+
     try:
         with open(f'projects/{user}/{project}/core_metadata.yml', 'r', encoding='UTF-8') as stream:
             core_config = yaml.safe_load(stream)
@@ -153,7 +144,6 @@ def fetch_page(page, user, project):
 
     if page == 'proteome':
         page += f'-{variant}'
-
     try:
         if page == 'parameters':
             html_table = generate_raw_file_table(user, project, app, variant)
@@ -165,12 +155,7 @@ def fetch_page(page, user, project):
                 project=project,
                 variant=variant,
                 html_table=html_table,
-                inspire_header=INSPIRE_HEADER.format(
-                    server_address=app.config[SERVER_ADDRESS_KEY],
-                ),
-                inspire_footer=INSPIRE_FOOTER.format(
-                    server_address=app.config[SERVER_ADDRESS_KEY],
-                ),
+                **header_and_footer,
             )
 
         return render_template(
@@ -180,23 +165,10 @@ def fetch_page(page, user, project):
             user=user,
             project=project,
             variant=variant,
-            inspire_header=INSPIRE_HEADER.format(
-                server_address=app.config[SERVER_ADDRESS_KEY],
-            ),
-            inspire_footer=INSPIRE_FOOTER.format(
-                server_address=app.config[SERVER_ADDRESS_KEY],
-            ),
+            **header_and_footer,
         )
     except TemplateNotFound:
-        return render_template(
-            '404.html',
-            inspire_header=INSPIRE_HEADER.format(
-                server_address=app.config[SERVER_ADDRESS_KEY],
-            ),
-            inspire_footer=INSPIRE_FOOTER.format(
-                server_address=app.config[SERVER_ADDRESS_KEY],
-            ),
-        ), 404
+        return render_template('404.html', **header_and_footer), 404
 
 
 @app.route('/interact/project/<user>/<project>', methods=['GET'])
@@ -233,7 +205,9 @@ def upload_file(user, project, file_type):
         uploaded_files[1].save(
             f'{upload_home}/pathogen_{uploaded_files[1].filename}'
         )
-        with open(f'{upload_home}/proteome_combined.fasta', mode='w', encoding='UTF-8') as total_file:
+        with open(
+            f'{upload_home}/proteome_combined.fasta', mode='w', encoding='UTF-8',
+        ) as total_file:
             for prot_file in (
                 f'{upload_home}/host_{uploaded_files[0].filename}',
                 f'{upload_home}/pathogen_{uploaded_files[1].filename}',
@@ -260,18 +234,6 @@ def upload_file(user, project, file_type):
     return jsonify(message='Ok')
 
 
-@app.route('/interact/clearPattern/<file_type>', methods=['POST'])
-@cross_origin()
-def clear_file_pattern(file_type):
-    """ Function for checking which files match a particular file pattern provided.
-    """
-    config_data = request.json
-    user = config_data['user']
-    project = config_data['project']
-    os.system(f'rm -rf projects/{user}/{project}/{file_type}/*')
-    return jsonify(message=os.listdir(f'projects/{user}/{project}/{file_type}'))
-
-
 @app.route('/interact/metadata', methods=['POST'])
 @cross_origin()
 def upload_metadata():
@@ -281,7 +243,11 @@ def upload_metadata():
     user = config_data.pop('user')
     project = config_data.pop('project')
     metadata_type = config_data.pop('metadata_type')
-    with open(f'projects/{user}/{project}/{metadata_type}_metadata.yml', 'w', encoding='UTF-8') as yaml_out:
+    with open(
+        f'projects/{user}/{project}/{metadata_type}_metadata.yml',
+        'w',
+        encoding='UTF-8'
+    ) as yaml_out:
         yaml.dump(config_data, yaml_out)
     return jsonify(message='Ok')
 
@@ -312,24 +278,23 @@ def check_file_pattern(file_type):
     config_data = request.json
     user = config_data['user']
     project = config_data['project']
-
-    if os.path.exists(
+    file_list_path = (
         f'{app.config[INTERACT_HOME_KEY]}/projects/{user}/{project}/{file_type}_file_list.txt'
-    ):
-        os.remove(f'projects/{user}/{project}/{file_type}_file_list.txt')
+    )
+
+    if os.path.exists(file_list_path):
+        os.remove(file_list_path)
 
     if not os.path.exists(f'projects/{user}/{project}/{file_type}'):
         os.mkdir(f'projects/{user}/{project}/{file_type}')
         return jsonify(message=[])
 
-    fetch_matched_files = (
-        f"ls -l projects/{user}/{project}/{file_type} >> projects/{user}/{project}/{file_type}_file_list.txt"
+    os.system(
+        f'ls -l projects/{user}/{project}/{file_type} >> {file_list_path}'
     )
 
-    os.system(fetch_matched_files)
-
     with open(
-        f'projects/{user}/{project}/{file_type}_file_list.txt', mode='r', encoding='UTF-8'
+        file_list_path, mode='r', encoding='UTF-8'
     ) as list_file:
         file_list = list_file.readlines()
         all_files = [x.split()[-1].split('\n')[0] for x in file_list][1:]
@@ -337,29 +302,24 @@ def check_file_pattern(file_type):
     return jsonify(message=all_files)
 
 
-@app.route('/interact-home', methods=['GET'])
+@app.route('/interact/clearPattern/<file_type>', methods=['POST'])
 @cross_origin()
-def interact_home():
-    """ Endpoint serving the inspire_interactive Home Page.
+def clear_file_pattern(file_type):
+    """ Function for checking which files match a particular file pattern provided.
     """
-    return render_template(
-        'home.html',
-        server_address=app.config[SERVER_ADDRESS_KEY],
-        mode=app.config[MODE_KEY],
-        inspire_header=INSPIRE_HEADER.format(
-            server_address=app.config[SERVER_ADDRESS_KEY],
-        ),
-        inspire_footer=INSPIRE_FOOTER.format(
-            server_address=app.config[SERVER_ADDRESS_KEY],
-        ),
-    )
+    config_data = request.json
+    user = config_data['user']
+    project = config_data['project']
+    os.system(f'rm -rf projects/{user}/{project}/{file_type}/*')
+    return jsonify(message=os.listdir(f'projects/{user}/{project}/{file_type}'))
 
 
 @app.route('/interact', methods=['GET'])
 @cross_origin()
 def interact_landing_page():
-    """ Endpoint serving the inspire_interactive Home Page.
+    """ Endpoint serving the starting page.
     """
+    header_and_footer = format_header_and_footer(app.config[SERVER_ADDRESS_KEY])
     usernames = sorted(os.listdir(f'{app.config[INTERACT_HOME_KEY]}/projects'))
     option_list = [
         f'<option value="{username}">{username}</option>' for username in usernames
@@ -370,29 +330,22 @@ def interact_landing_page():
         server_address=app.config[SERVER_ADDRESS_KEY],
         user_list=options_html,
         mode=app.config[MODE_KEY],
-        inspire_header=INSPIRE_HEADER.format(
-            server_address=app.config[SERVER_ADDRESS_KEY],
-        ),
-        inspire_footer=INSPIRE_FOOTER.format(
-            server_address=app.config[SERVER_ADDRESS_KEY],
-        ),
+        **header_and_footer,
     )
 
 
 @app.route('/interact/delete', methods=['POST'])
 @cross_origin()
 def delete_project():
+    """ Function allow deletion of all project data.
+    """
     config_dict = request.json
     user = config_dict['user']
     project = config_dict['project']
-
     home_key= app.config[INTERACT_HOME_KEY]
     project_home = f'{home_key}/projects/{user}/{project}'
     if os.path.exists(project_home):
         shutil.rmtree(project_home)
-        message=(
-            'Project deleted.'
-        )
     return jsonify(
         message=(
             'Project deleted.'
@@ -403,6 +356,8 @@ def delete_project():
 @app.route('/interact/download/<user>/<project>', methods=['GET'])
 @cross_origin()
 def download_project(user, project):
+    """ Function allow download of all project data.
+    """
     home_key= app.config[INTERACT_HOME_KEY]
     project_home = f'{home_key}/projects/{user}/{project}'
     if os.path.exists(f'{project_home}/config.yml'):
@@ -413,54 +368,17 @@ def download_project(user, project):
     return send_file(f'{project_home}/inspireOutput.zip')
 
 
-def cancel_job_helper(home_key, user, project):
-    project_home = f'{home_key}/projects/{user}/{project}'
-    pids = get_pids(project_home, 'inspire')
-    if pids is None:
-        return (
-            'No task was running. Please refresh the page.'
-        )
-
-    task_killed = False
-    for pid in pids:
-        try:
-            os.kill(int(pid), signal.SIGTERM) #or signal.SIGKILL 
-            task_killed = True
-        except OSError:
-            continue
-
-    if not task_killed:
-        return jsonify(
-            message=(
-                'No task was running. Please refresh the page.'
-            )
-        )
-
-    os.system(
-        f'interact-queue --project_home {project_home} ' +
-        f' --interact_home {app.config[INTERACT_HOME_KEY]} ' +
-        ' --queue_task remove\n'
-    )
-    task_df = pd.read_csv(f'{project_home}/taskStatus.csv')
-    task_df['status'] = 'Job Cancelled'
-    task_df.to_csv(f'{project_home}/taskStatus.csv', index=False)
-
-    return jsonify(
-        message=(
-            'Task cancelled. Please refresh the page.'
-        )
-    )
-
 @app.route('/interact/cancel', methods=['POST'])
 @cross_origin()
 def cancel_job():
+    """ Function to cancel an inSPIRE execution.
+    """
     config_dict = request.json
-    user = config_dict['user']
-    project = config_dict['project']
-
-    home_key= app.config[INTERACT_HOME_KEY]
-
-    cancel_message = cancel_job_helper(home_key, user, project)
+    cancel_message = cancel_job_helper(
+        app.config[INTERACT_HOME_KEY],
+        config_dict['user'],
+        config_dict['project'],
+    )
     return jsonify(message=cancel_message)
 
 
@@ -469,91 +387,25 @@ def cancel_job():
 def run_inspire_core():
     """ Run the inSPIRE core pipeline.
     """
+    config_dict = request.json
+    user = config_dict['user']
+    project = config_dict['project']
+
+    project_home = f'{app.config[INTERACT_HOME_KEY]}/projects/{user}/{project}'
+    response = jsonify(
+        message=f'http://{app.config[SERVER_ADDRESS_KEY]}:5000/interact/{user}/{project}/inspire'
+    )
+
     try:
-        config_dict = request.json
-        user = config_dict['user']
-        project_title = config_dict['project']
-        server_address = app.config[SERVER_ADDRESS_KEY]
-        home_key= app.config[INTERACT_HOME_KEY]
-        project_home = f'{home_key}/projects/{user}/{project_title}'
+        # If task is already running or queued, do nothing:
         if check_pids(project_home, 'inspire') == 'waiting':
-            return jsonify(
-                message=f'http://{server_address}:5000/interact/{user}/{project_title}/inspire'
-            )
-        if check_queue(home_key, user, project_title):
-            return jsonify(
-                message=f'http://{server_address}:5000/interact/{user}/{project_title}/inspire'
-            )
-        inspire_settings = prepare_inspire(config_dict, project_home, app.config)
-        get_tasks(inspire_settings, project_home)
+            return response
 
-        with open(
-            f'projects/{user}/{project_title}/inspire_script.sh',
-            'w',
-            encoding='UTF-8'
-        ) as bash_file:
-            bash_file.write(
-                f'echo $$ > {project_home}/inspire_pids.txt ;\n'
-            )
-            bash_file.write(
-                f'interact-queue --project_home {project_home} ' +
-                f' --interact_home {app.config[INTERACT_HOME_KEY]} ' +
-                ' --queue_task add\n'
-            )
-            bash_file.write(
-                f'interact-queue --project_home {project_home} ' +
-                f' --interact_home {app.config[INTERACT_HOME_KEY]} ' +
-                ' --queue_task check\n'
-            )
-            bash_file.write(
-                f'interact-queue --project_home {project_home} ' +
-                f' --interact_home {app.config[INTERACT_HOME_KEY]} ' +
-                ' --queue_task update --inspire_task start --inspire_status 0\n'
-            )
-            if inspire_settings['convert']:
-                write_inspire_task(bash_file, project_home, 'convert', app.config[INTERACT_HOME_KEY])
+        execute_inspire(app.config, project_home, user, project, config_dict)
 
-            if inspire_settings['fragger']:
-                write_inspire_task(bash_file, project_home, 'fragger', app.config[INTERACT_HOME_KEY])
-
-            write_inspire_task(bash_file, project_home, 'prepare', app.config[INTERACT_HOME_KEY])
-            write_inspire_task(bash_file, project_home, 'predictSpectra', app.config[INTERACT_HOME_KEY])
-            if inspire_settings['binding']:
-                write_inspire_task(bash_file, project_home, 'predictBinding', app.config[INTERACT_HOME_KEY])
-            write_inspire_task(bash_file, project_home, 'featureGeneration', app.config[INTERACT_HOME_KEY])
-            write_inspire_task(bash_file, project_home, 'featureSelection+', app.config[INTERACT_HOME_KEY])
-            write_inspire_task(bash_file, project_home, 'generateReport', app.config[INTERACT_HOME_KEY])
-
-            if inspire_settings['quantify']:
-                write_inspire_task(bash_file, project_home, 'quantify', app.config[INTERACT_HOME_KEY])
-
-            if inspire_settings['pathogen']:
-                write_inspire_task(bash_file, project_home, 'extractCandidates', app.config[INTERACT_HOME_KEY])
-
-            for intermediate_file in INTERMEDIATE_FILES:
-                bash_file.write(
-                    f'rm -rf projects/{user}/{project_title}/inspireOutput/{intermediate_file}\n'
-                )
-
-            bash_file.write(
-                f'interact-queue --project_home {project_home} ' +
-                f' --interact_home {app.config[INTERACT_HOME_KEY]} ' +
-                ' --queue_task remove\n'
-            )
-
-        print(f'{project_home}/inspireOutput/formated_df.csv')
-        if os.path.exists(f'{project_home}/inspireOutput/formated_df.csv'):
-            os.system(f'rm -rf {project_home}/inspireOutput/formated_df.csv')
-
-        os.system(
-            f'bash {project_home}/inspire_script.sh > {project_home}/inspire_log.txt 2>&1 &',
-        )
-
-        response = jsonify(
-            message=f'http://{server_address}:5000/interact/{user}/{project_title}/inspire'
-        )
     except Exception as err:
-        response = jsonify(message=f'inSPIRE-Interact failed with error code: {err}')
+        return jsonify(message=f'inSPIRE-Interact failed with error code: {err}')
+
     return response
 
 @app.route('/interact/<user>/<project>/<workflow>', methods=['GET'])
@@ -561,145 +413,75 @@ def run_inspire_core():
 def check_results(user, project, workflow):
     """ Check results.
     """
-    home_key= app.config[INTERACT_HOME_KEY]
-    project_home = f'{home_key}/projects/{user}/{project}'
+    project_home = f'{app.config[INTERACT_HOME_KEY]}/projects/{user}/{project}'
+    server_address = app.config[SERVER_ADDRESS_KEY]
+    header_and_footer = format_header_and_footer(app.config[SERVER_ADDRESS_KEY])
+
     if not os.path.exists(project_home):
-        return render_template(
-            '404.html',
-            inspire_header=INSPIRE_HEADER.format(
-                server_address=app.config[SERVER_ADDRESS_KEY],
-            ),
-            inspire_footer=INSPIRE_FOOTER.format(
-                server_address=app.config[SERVER_ADDRESS_KEY],
-            ),
-        ), 404
+        return render_template('404.html', **header_and_footer), 404
 
     status = check_pids(project_home, workflow)
+
+    # Task incomplete - either running or queueing (or total failure)
+    if status == 'waiting':
+        queue_df, task_id = fetch_queue_and_task(project_home, app.config[INTERACT_HOME_KEY])
+
+        if not len(queue_df):
+            return deal_with_failure(
+                project_home,
+                server_address,
+                user,
+                project,
+                workflow,
+                header_and_footer
+            )
+
+        if int(queue_df['taskID'].iloc[0]) == task_id:
+            return deal_with_waiting(
+                project_home,
+                server_address,
+                user,
+                project,
+                header_and_footer,
+            )
+
+        return deal_with_queue(
+            app.config[INTERACT_HOME_KEY],
+            project_home,
+            server_address,
+            header_and_footer,
+        )
+
+    # Task complete : either in success or failure.
     if (
         os.path.exists(f'{project_home}/proteome-select') or
         os.path.exists(f'{project_home}/proteomeSelect_file_list.txt')
     ):
         inspire_select_visible = 'visible'
+        key_file = 'epitope/potentialEpitopeCandidates.xlsx'
     else:
         inspire_select_visible = 'hidden'
+        key_file = 'inspire-report.html'
 
-    if status == 'waiting':
-        create_queue_fig(project_home)
-        create_status_fig(project_home)
+    if os.path.exists(f'{project_home}/inspireOutput/{key_file}'):
+        return deal_with_success(
+            project_home,
+            server_address,
+            user,
+            project,
+            workflow,
+            inspire_select_visible,
+            header_and_footer,
+        )
+    return deal_with_failure(
+        project_home,
+        server_address,
+        user,
+        project,
+        workflow,
+        header_and_footer,
+    )
 
-        with open(f'{project_home}/inspire_pids.txt', 'r') as pid_file:
-            task_id = int(pid_file.readline().strip())
-
-        queue_df = pd.read_csv('locks/inspireQueue.csv')
-        if int(queue_df['taskID'].iloc[0]) == task_id:
-            with open(f'{project_home}/progress.html', 'r') as html_file:
-                progress_html = html_file.read()
-            return render_template(
-                'waiting.html',
-                progress_html=progress_html,
-                project=project,
-                server_address=app.config[SERVER_ADDRESS_KEY],
-                user=user,
-                inspire_header=INSPIRE_HEADER.format(
-                    server_address=app.config[SERVER_ADDRESS_KEY],
-                ),
-                inspire_footer=INSPIRE_FOOTER.format(
-                    server_address=app.config[SERVER_ADDRESS_KEY],
-                ),
-            )
-        else:
-            with open(f'{project_home}/queue.svg', 'r') as svg_file:
-                queue_svg = Markup(svg_file.read())
-
-            return render_template(
-                'queued.html',
-                server_address=app.config[SERVER_ADDRESS_KEY],
-                queue_svg=queue_svg,
-                inspire_header=INSPIRE_HEADER.format(
-                    server_address=app.config[SERVER_ADDRESS_KEY],
-                ),
-                inspire_footer=INSPIRE_FOOTER.format(
-                    server_address=app.config[SERVER_ADDRESS_KEY],
-                ),
-            )
-
-    else:
-        if inspire_select_visible == 'visible':
-            key_file = 'epitope/potentialEpitopeCandidates.xlsx'
-        else:
-            key_file = 'inspire-report.html'
-        
-        if os.path.exists(f'{project_home}/inspireOutput/{key_file}'):
-            create_status_fig(project_home)
-            if os.path.exists(f'{project_home}/progress.svg'):
-                with open(f'{project_home}/progress.svg', 'r') as html_file:
-                    progress_html = html_file.read()
-            else:
-                progress_html = ''
-        
-            if os.path.exists(f'{project_home}/inspireOutput/img/psm_fdr_curve.svg'):
-                with open(f'{project_home}/inspireOutput/img/psm_fdr_curve.svg', 'r') as html_file:
-                    psm_fdr_html = html_file.read()
-            else:
-                psm_fdr_html = ''
-
-            if os.path.exists(f'{project_home}/inspireOutput/img/epitope_bar_plot.svg'):
-                with open(f'{project_home}/inspireOutput/img/epitope_bar_plot.svg', 'r') as svg_file:
-                    ep_bar = svg_file.read()
-            else:
-                ep_bar = ''
-
-            if os.path.exists(f'{project_home}/inspireOutput/img/peptide_volcano.svg'):
-                with open(f'{project_home}/inspireOutput/img/peptide_volcano.svg', 'r') as html_file:
-                    quant_html = html_file.read()
-            elif os.path.exists(f'{project_home}/inspireOutput/img/norm_correlation.svg'):
-                with open(f'{project_home}/inspireOutput/img/norm_correlation.svg', 'r') as html_file:
-                    quant_html = html_file.read()
-            else:
-                quant_html = ''
-
-            return render_template(
-                'ready.html',
-                server_address=app.config[SERVER_ADDRESS_KEY],
-                user=user,
-                project=project,
-                workflow=workflow,
-                inspire_select_visible=inspire_select_visible,
-                psm_fdr_html=psm_fdr_html,
-                ep_bar=ep_bar,
-                quant_html=quant_html,
-                progress_html=progress_html,
-                inspire_increase=get_inspire_increase(project_home, 'total'),
-                pathogen_increase=get_inspire_increase(project_home, 'pathogen'),
-                inspire_quantified_count=get_quant_count(project_home),
-                inspire_header=INSPIRE_HEADER.format(
-                    server_address=app.config[SERVER_ADDRESS_KEY],
-                ),
-                inspire_footer=INSPIRE_FOOTER.format(
-                    server_address=app.config[SERVER_ADDRESS_KEY],
-                ),
-            )
-        else:
-            create_status_fig(project_home)
-            if os.path.exists(f'{project_home}/progress.html'):
-                with open(f'{project_home}/progress.html', 'r') as html_file:
-                    progress_html = html_file.read()
-            else:
-                progress_html = ''
-            return render_template(
-                'failed.html',
-                server_address=app.config[SERVER_ADDRESS_KEY],
-                user=user,
-                project=project,
-                workflow=workflow,
-                progress_html=progress_html,
-                inspire_header=INSPIRE_HEADER.format(
-                    server_address=app.config[SERVER_ADDRESS_KEY],
-                ),
-                inspire_footer=INSPIRE_FOOTER.format(
-                    server_address=app.config[SERVER_ADDRESS_KEY],
-                ),
-            )
 
 @app.route('/interact/get_results/<user>/<project>/<workflow>', methods=['GET'])
 @cross_origin()
@@ -709,55 +491,35 @@ def get_results_file(user, project, workflow):
     home_key= app.config[INTERACT_HOME_KEY]
     server_address = app.config[SERVER_ADDRESS_KEY]
     project_home = f'{home_key}/projects/{user}/{project}'
-    if workflow == 'inspire':
-        return send_file(f'{project_home}/inspireOutput/finalPsmAssignments.csv')
 
-    if workflow == 'inspireSelect':
-        return send_file(f'{project_home}/inspireOutput/epitope/potentialEpitopeCandidates.xlsx')
-
-    if workflow == 'inspireLog':
-        return send_file(f'{project_home}/inspire_log.txt')
-    
+    # The quantification results require a zip archive
     if workflow == 'quantification':
-        shutil.make_archive(f'{project_home}/inspireOutput/quant', 'zip', f'{project_home}/inspireOutput/quant')
-        return send_file(f'{project_home}/inspireOutput/quant.zip')
-
-    if workflow == 'epitopeReport':
-        with open(
-            f'{project_home}/inspireOutput/epitope/inspire-epitope-report.html',
-            mode='r',
-            encoding='UTF-8',
-        ) as perf_file:
-            contents = perf_file.read()
-            contents = contents.replace(
-                f'{project_home}/inspireOutput/epitope/spectralPlots.pdf',
-                f'http://{server_address}:5000/interact/get_results/{user}/{project}/epitopePlots'
-            )
-        return contents
-    
-    if workflow == 'epitopePlots':
-        return send_file(
-            f'{project_home}/inspireOutput/epitope/spectralPlots.pdf'
+        shutil.make_archive(
+            f'{project_home}/inspireOutput/quant',
+            'zip',
+            f'{project_home}/inspireOutput/quant',
         )
 
-    if workflow == 'performance':
-        if os.path.exists( f'{project_home}/inspireOutput/inspire-report.html'):
-            with open(
-                f'{project_home}/inspireOutput/inspire-report.html',
-                mode='r',
-                encoding='UTF-8',
-            ) as perf_file:
-                contents = perf_file.read()
-            return contents
-    
-    if workflow == 'quantReport':
-        if os.path.exists(f'{project_home}/inspireOutput/quant/inspire-quant-report.html'):
-            with open(
-                f'{project_home}/inspireOutput/quant/inspire-quant-report.html',
-                mode='r',
-                encoding='UTF-8',
-            ) as perf_file:
-                contents = perf_file.read()
+    # The following results require the relevant results file to be sent:
+    if workflow in (
+        'epitopePlots',
+        'inspire',
+        'inspireLog',
+        'inspirePathogen',
+        'quantification'
+    ):
+        if os.path.exists(f'{project_home}/{KEY_FILES[workflow]}'):
+            return send_file(f'{project_home}/{KEY_FILES[workflow]}')
+
+    # The following send html reports
+    if workflow in ('epitopeReport', 'performance', 'quantReport'):
+        if (contents := safe_fetch(f'{project_home}/{KEY_FILES[workflow]}')):
+            if workflow == 'epitopeReport':
+                contents = contents.replace(
+                    f'{project_home}/inspireOutput/epitope/spectralPlots.pdf',
+                    f'http://{server_address}:5000/interact/get_results/{user}/{project}/epitopePlots',
+                )
+
             return contents
 
     return Response()
@@ -785,12 +547,6 @@ def get_arguments():
 
     return parser.parse_args()
 
-def clear_queue(interact_home):
-    if os.path.exists(f'{interact_home}/locks/inspireQueue.csv'):
-        queue_df = pd.read_csv(f'{interact_home}/locks/inspireQueue.csv')
-        for _, df_row in queue_df.iterrows():
-            cancel_job_helper(interact_home, df_row['user'], df_row['project'])
-
 
 def main():
     """ Main function to run inSPIRE-interactive.
@@ -809,10 +565,8 @@ def main():
             os.mkdir('projects')
         if not os.path.exists('locks'):
             os.mkdir('locks')
-        
-        if args.mode == 'local':
-            # app.config[SERVER_ADDRESS_KEY] = '127.0.0.1'
 
+        if args.mode == 'local':
             host_name = socket.gethostname()
             app.config[SERVER_ADDRESS_KEY] = host_name
         elif args.mode == 'server':
@@ -834,7 +588,7 @@ def main():
         print('Quitting, first clearing queue.')
         clear_queue(app.config[INTERACT_HOME_KEY])
         sys.exit()
-    
+
 
 if __name__ == '__main__':
     main()

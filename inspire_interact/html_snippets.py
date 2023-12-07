@@ -18,6 +18,11 @@ INSPIRE_HEADER = """
             </a>
         </dev>
 
+        <dev class = "view-queue">
+            <a href=http://{server_address}:5000/interact-page/view-queue> <p class = "view-queue-text"> View Queue </p>
+            </a>
+        </dev>
+
         <dev class = "about-us">
             <a href=http://{server_address}:5000/interact-page/about> <p class = "about-us-text"> About Us </p>
             </a>
@@ -32,7 +37,6 @@ INSPIRE_HEADER = """
             <a href=http://{server_address}:5000/interact-page/faq> <p class = "FAQ-text"> FAQ </p>
             </a>
         </dev>
-        
 
         <dev class = "header-right">
             <button type="button" class = "button"

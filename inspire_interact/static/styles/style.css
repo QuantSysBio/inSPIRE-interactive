@@ -239,9 +239,24 @@ body{
     padding-left: 20px;
     padding-top: 20px;
     vertical-align: bottom;
+}
+
+.ref-col-1 {
+    float: left;
+    width: 60%;
+}
 
 
-   
+.ref-col-2 {
+    float: left;
+    width: 30%;
+}
+
+/* Clear floats after the columns */
+.ref-row:after {
+    content: "";
+    display: table;
+    clear: both;
 }
 
 .inSPIRE-logo-nobg:hover{
@@ -261,7 +276,12 @@ body{
     width:84px; 
     color:black;
     font-size: larger;
+}
 
+.view-queue-text{
+    width:110px; 
+    color:black;
+    font-size: larger;
 }
 
 .about-us-text{

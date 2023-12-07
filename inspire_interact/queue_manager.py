@@ -2,10 +2,12 @@
 """
 from argparse import ArgumentParser
 import os
+import sys
 from time import sleep
 
 import pandas as pd
 
+from inspire_interact.constants import QUEUE_PATH
 
 def get_arguments():
     """ Function to collect command line arguments.
@@ -44,10 +46,12 @@ def get_arguments():
 
 
 def add_to_queue(project_home, interact_home):
-    with open(f'{project_home}/inspire_pids.txt', 'r') as pid_file:
+    """ Function to add an inSPIRE job to the inSPIRE-Interactive queue.
+    """
+    with open(f'{project_home}/inspire_pids.txt', 'r', encoding='UTF-8') as pid_file:
         task_id = int(pid_file.readline().strip())
-    if os.path.exists(f'{interact_home}/locks/inspireQueue.csv'):
-        queue_df = pd.read_csv(f'{interact_home}/locks/inspireQueue.csv')
+    if os.path.exists(QUEUE_PATH.format(home_key=interact_home)):
+        queue_df = pd.read_csv(QUEUE_PATH.format(home_key=interact_home))
     else:
         queue_df = pd.DataFrame({
             'user': [],
@@ -65,23 +69,31 @@ def add_to_queue(project_home, interact_home):
         'status': 'waiting',
     })
     queue_df = pd.concat([queue_df, append_df])
-    queue_df.to_csv(f'{interact_home}/locks/inspireQueue.csv', index=False)
+    queue_df.to_csv(QUEUE_PATH.format(home_key=interact_home), index=False)
 
 def remove_from_queue(project_home, interact_home):
-    with open(f'{project_home}/inspire_pids.txt', 'r') as pid_file:
+    """ Function to remove an inSPIRE job from the inSPIRE interactive queue.
+    """
+    with open(f'{project_home}/inspire_pids.txt', 'r', encoding='UTF-8') as pid_file:
         task_id = int(pid_file.readline().strip())
 
-    queue_df = pd.read_csv(f'{interact_home}/locks/inspireQueue.csv')
+    queue_df = pd.read_csv(QUEUE_PATH.format(home_key=interact_home))
     drop_index = queue_df[queue_df['taskID'] == task_id].index[0]
     queue_df = queue_df.drop(drop_index, axis=0)
-    queue_df.to_csv(f'{interact_home}/locks/inspireQueue.csv', index=False)
+    queue_df.to_csv(QUEUE_PATH.format(home_key=interact_home), index=False)
 
 def update_status(project_home, interact_home, inspire_task, inspire_status):
+    """ Function to update the status of a task in the taskStatus file.
+    """
     task_df = pd.read_csv(f'{project_home}/taskStatus.csv')
-    queue_df = pd.read_csv(f'{interact_home}/locks/inspireQueue.csv')
+    queue_df = pd.read_csv(QUEUE_PATH.format(home_key=interact_home))
     if inspire_task == 'start':
         task_df['status'].iloc[0] = 'Running'
-        queue_df.iloc[0, queue_df.columns.get_loc('status')] = task_df.iloc[0, task_df.columns.get_loc('taskName')]
+        queue_df.iloc[
+            0, queue_df.columns.get_loc('status')
+        ] = task_df.iloc[
+            0, task_df.columns.get_loc('taskName')
+        ]
     else:
         index = task_df.index[task_df['taskId'] == inspire_task].tolist()[0]
         if inspire_status == '0':
@@ -97,25 +109,29 @@ def update_status(project_home, interact_home, inspire_task, inspire_status):
                 task_df['status'].iloc[following_idx] = 'Skipped'
 
     task_df.to_csv(f'{project_home}/taskStatus.csv', index=False)
-    queue_df.to_csv(f'{interact_home}/locks/inspireQueue.csv', index=False)
+    queue_df.to_csv(QUEUE_PATH.format(home_key=interact_home), index=False)
 
     if inspire_task == 'start' or inspire_status == '0':
-        exit(0)
+        sys.exit(0)
     else:
-        exit(1)
+        sys.exit(1)
 
 
 def check_queue(project_home, interact_home):
-    with open(f'{project_home}/inspire_pids.txt', 'r') as pid_file:
+    """ Function to check if the job is first in the queue.
+    """
+    with open(f'{project_home}/inspire_pids.txt', 'r', encoding='UTF-8') as pid_file:
         task_id = int(pid_file.readline().strip())
 
     while True:
-        queue_df = pd.read_csv(f'{interact_home}/locks/inspireQueue.csv')
+        queue_df = pd.read_csv(QUEUE_PATH.format(home_key=interact_home))
         if int(queue_df['taskID'].iloc[0]) == task_id:
             break
         sleep(60)
 
 def main():
+    """ Main function for all inSPIRE-interactive queue management tasks.
+    """
     args = get_arguments()
     if args.queue_task == 'add':
         add_to_queue(args.project_home, args.interact_home)
@@ -124,8 +140,13 @@ def main():
     if args.queue_task == 'check':
         check_queue(args.project_home, args.interact_home)
     if args.queue_task == 'update':
-        update_status(args.project_home, args.interact_home, args.inspire_task, args.inspire_status)
+        update_status(
+            args.project_home,
+            args.interact_home,
+            args.inspire_task,
+            args.inspire_status,
+        )
 
 
-if __name__ == '__main__':    
+if __name__ == '__main__':
     main()
