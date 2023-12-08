@@ -12,11 +12,23 @@
 		{{ inspire_header|safe }}
 		<hr>
 
-		<p class="adjusted-text">Your task is in the queue.</p>
+		<p class="adjusted-text">Below are all jobs in the inSPIRE-interactive queue.</p>
 		<center>
 			<h2>inSPIRE-Interactive Queue</h2>
 			{{ queue_svg|safe }}
 		</center>
+
+		<p class="adjusted-text">
+            You can cancel any job by entering the Job ID in the box below and clicking cancel:
+			<form id="cancel-job-form" class="adjusted-text">
+				<input type="text" id="cancel-job-input" name="cancel-job-input" style="width:200px;"  class="text-input" onkeypress="textSubmit(event, '{{ server_address }}', 'noAction')">
+			</form>
+            <br>
+			<button id="cancel-job-button" class="adjusted-text" onclick="cancelJobById('{{ server_address }}')">
+				Cancel Selected Job
+			</button>
+            <div id="cancel-text" class="adjusted-text"></div>
+		</p>
 
 		<br><br>
 

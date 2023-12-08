@@ -61,7 +61,7 @@ def create_queue_fig(interact_home, project_home):
                     'values': [
                         'User',
                         'Project',
-                        'Task ID',
+                        'Job ID',
                         'Task Status',
                     ],
                     'line_color': 'black',

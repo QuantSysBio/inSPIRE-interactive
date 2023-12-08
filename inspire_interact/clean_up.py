@@ -6,8 +6,22 @@ import signal
 import pandas as pd
 
 from inspire_interact.constants import QUEUE_PATH
+from inspire_interact.queue_manager import remove_from_queue
 from inspire_interact.utils import get_pids
 
+
+def get_user_and_project(home_key, job_id):
+    """ Function to get the user and project name from a job ID.
+    """
+    queue_df = pd.read_csv(
+        QUEUE_PATH.format(home_key=home_key)
+    )
+    queue_df = queue_df[
+        queue_df['taskID'] == job_id
+    ]
+    if len(queue_df):
+        return queue_df['user'].iloc[0], queue_df['project'].iloc[0]
+    return None, None
 
 def clear_queue(interact_home):
     """ Function to cancel all running jobs and clear the queue.
@@ -23,6 +37,10 @@ def cancel_job_helper(home_key, user, project):
     """
     project_home = f'{home_key}/projects/{user}/{project}'
     pids = get_pids(project_home, 'inspire')
+
+
+    remove_from_queue(project_home, home_key)
+
     if pids is None:
         return 'No task was running. Please refresh the page.'
 
@@ -37,11 +55,6 @@ def cancel_job_helper(home_key, user, project):
     if not task_killed:
         return 'No task was running. Please refresh the page.'
 
-    os.system(
-        f'interact-queue --project_home {project_home} ' +
-        f' --interact_home {home_key} ' +
-        ' --queue_task remove\n'
-    )
     task_df = pd.read_csv(f'{project_home}/taskStatus.csv')
     task_df['status'] = 'Job Cancelled'
     task_df.to_csv(f'{project_home}/taskStatus.csv', index=False)

@@ -642,10 +642,10 @@ async function parametersCheck(serverAddress, user, project)
         }
     }
     if ('useBindingAffinity' in metaDict) {
-        if (metaDict['useBindingAffinity'] = 'asFeature') {
+        if (metaDict['useBindingAffinity'] === 'asFeature') {
             document.getElementById('panfeature').checked = true;
             document.getElementById('netmhcpan-allele-div').style.display = 'block';
-        } else if (metaDict['useBindingAffinity'] = 'asValidation') {
+        } else if (metaDict['useBindingAffinity'] === 'asValidation') {
             document.getElementById('panvalidation').checked = true;
             document.getElementById('netmhcpan-allele-div').style.display = 'block';
         }
@@ -733,6 +733,20 @@ async function cancelPipeline(serverAddress, user, project) {
         cancelElem.innerHTML = response['message'];
     } else {
         let cancelElem = document.getElementById("cancelled-text")
+        cancelElem.innerHTML = 'No cancellation.';
+    }
+};
+
+async function cancelJobById(serverAddress) {
+    var configObject = {
+        'jobID': document.getElementById('cancel-job-input').value,
+    };
+    if (confirm("Are you sure you want to cancel execution for job ID " + configObject['jobID'] + "?") == true) {
+        var response = await postJson(serverAddress, 'cancel', configObject);
+        let cancelElem = document.getElementById("cancel-text")
+        cancelElem.innerHTML = response['message'];
+    } else {
+        let cancelElem = document.getElementById("cancel-text")
         cancelElem.innerHTML = 'No cancellation.';
     }
 };

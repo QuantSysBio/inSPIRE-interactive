@@ -12,11 +12,13 @@ from flask import request, Response, render_template, send_file, send_from_direc
 from flask.json import jsonify
 from flask_cors import cross_origin
 from jinja2.exceptions import TemplateNotFound
+import pandas as pd
 import yaml
 
 from inspire_interact.clean_up import (
     clear_queue,
     cancel_job_helper,
+    get_user_and_project,
 )
 from inspire_interact.constants import (
     ALL_CONFIG_KEYS,
@@ -93,11 +95,11 @@ def fetch_page_no_arguments(page):
     try:
         if page == 'view-queue':
             create_queue_fig(
-                app.config[SERVER_ADDRESS_KEY],
-                f'{app.config[SERVER_ADDRESS_KEY]}/locks/'
+                app.config[INTERACT_HOME_KEY],
+                f'{app.config[INTERACT_HOME_KEY]}/locks/'
             )
             additional_args['queue_svg'] = safe_fetch(
-                f'{app.config[SERVER_ADDRESS_KEY]}/locks/queue.svg'
+                f'{app.config[INTERACT_HOME_KEY]}/locks/queue.svg'
             )
         return render_template(
             f'{page}.html',
@@ -278,26 +280,13 @@ def check_file_pattern(file_type):
     config_data = request.json
     user = config_data['user']
     project = config_data['project']
-    file_list_path = (
-        f'{app.config[INTERACT_HOME_KEY]}/projects/{user}/{project}/{file_type}_file_list.txt'
-    )
+    project_home = f'{app.config[INTERACT_HOME_KEY]}/projects/{user}/{project}'
 
-    if os.path.exists(file_list_path):
-        os.remove(file_list_path)
-
-    if not os.path.exists(f'projects/{user}/{project}/{file_type}'):
-        os.mkdir(f'projects/{user}/{project}/{file_type}')
+    if not os.path.exists(f'{project_home}/{file_type}'):
+        os.mkdir(f'{project_home}/{file_type}')
         return jsonify(message=[])
 
-    os.system(
-        f'ls -l projects/{user}/{project}/{file_type} >> {file_list_path}'
-    )
-
-    with open(
-        file_list_path, mode='r', encoding='UTF-8'
-    ) as list_file:
-        file_list = list_file.readlines()
-        all_files = [x.split()[-1].split('\n')[0] for x in file_list][1:]
+    all_files = os.listdir(f'{project_home}/{file_type}')
 
     return jsonify(message=all_files)
 
@@ -310,7 +299,12 @@ def clear_file_pattern(file_type):
     config_data = request.json
     user = config_data['user']
     project = config_data['project']
-    os.system(f'rm -rf projects/{user}/{project}/{file_type}/*')
+    shutil.rmtree(
+        f'{app.config[INTERACT_HOME_KEY]}/projects/{user}/{project}/{file_type}'
+    )
+    os.mkdir(
+        f'{app.config[INTERACT_HOME_KEY]}/projects/{user}/{project}/{file_type}'
+    )
     return jsonify(message=os.listdir(f'projects/{user}/{project}/{file_type}'))
 
 
@@ -374,11 +368,19 @@ def cancel_job():
     """ Function to cancel an inSPIRE execution.
     """
     config_dict = request.json
-    cancel_message = cancel_job_helper(
-        app.config[INTERACT_HOME_KEY],
-        config_dict['user'],
-        config_dict['project'],
-    )
+    if 'jobID' in config_dict:
+        try:
+            job_id = int(config_dict['jobID'])
+        except ValueError:
+            return jsonify(message='Invalid Job ID')
+        user, project = get_user_and_project(app.config[INTERACT_HOME_KEY], job_id)
+        if user is None:
+            return jsonify(message='No job found')
+    else:
+        user, project = config_dict['user'], config_dict['project']
+    
+    cancel_message = cancel_job_helper(app.config[INTERACT_HOME_KEY], user, project)
+
     return jsonify(message=cancel_message)
 
 
@@ -551,43 +553,48 @@ def get_arguments():
 def main():
     """ Main function to run inSPIRE-interactive.
     """
-    try:
-        args = get_arguments()
+    args = get_arguments()
 
-        with open(args.config_file, 'r', encoding='UTF-8') as stream:
-            config_dict = yaml.safe_load(stream)
-        for config_key in config_dict:
-            if config_key not in ALL_CONFIG_KEYS:
-                raise ValueError(f'Unrecognised key {config_key} found in config file.')
+    with open(args.config_file, 'r', encoding='UTF-8') as stream:
+        config_dict = yaml.safe_load(stream)
+    for config_key in config_dict:
+        if config_key not in ALL_CONFIG_KEYS:
+            raise ValueError(f'Unrecognised key {config_key} found in config file.')
 
-        app.config[INTERACT_HOME_KEY] = os.getcwd()
-        if not os.path.exists('projects'):
-            os.mkdir('projects')
-        if not os.path.exists('locks'):
-            os.mkdir('locks')
+    app.config[INTERACT_HOME_KEY] = os.getcwd()
+    if not os.path.exists('projects'):
+        os.mkdir('projects')
+    if not os.path.exists('locks'):
+        os.mkdir('locks')
+    if not os.path.exists('locks/inspireQueue.csv'):
+        empty_queue_df = pd.DataFrame({
+            'user': [],
+            'project': [],
+            'taskID': [],
+            'status': [],
+        })
+        empty_queue_df.to_csv('locks/inspireQueue.csv', index=False)
 
-        if args.mode == 'local':
-            host_name = socket.gethostname()
-            app.config[SERVER_ADDRESS_KEY] = host_name
-        elif args.mode == 'server':
-            host_name = socket.gethostname()
-            app.config[SERVER_ADDRESS_KEY] = socket.gethostbyname(host_name + ".local")
-        else:
-            raise ValueError(f'Unknown mode {args.mode} requested')
+    if args.mode == 'local':
+        host_name = socket.gethostname()
+        app.config[SERVER_ADDRESS_KEY] = host_name
+    elif args.mode == 'server':
+        host_name = socket.gethostname()
+        app.config[SERVER_ADDRESS_KEY] = socket.gethostbyname(host_name + ".local")
+    else:
+        raise ValueError(f'Unknown mode {args.mode} requested')
 
-        app.config[FILESERVER_NAME_KEY] = config_dict.get(FILESERVER_NAME_KEY)
-        app.config[MHCPAN_KEY] = config_dict.get(MHCPAN_KEY)
-        app.config[FRAGGER_PATH_KEY] = config_dict.get(FRAGGER_PATH_KEY)
-        app.config[FRAGGER_MEMORY_KEY] = config_dict.get(FRAGGER_MEMORY_KEY)
-        app.config[CPUS_KEY] = config_dict.get(CPUS_KEY, 1)
-        app.config[MODE_KEY] = args.mode
+    app.config[FILESERVER_NAME_KEY] = config_dict.get(FILESERVER_NAME_KEY)
+    app.config[MHCPAN_KEY] = config_dict.get(MHCPAN_KEY)
+    app.config[FRAGGER_PATH_KEY] = config_dict.get(FRAGGER_PATH_KEY)
+    app.config[FRAGGER_MEMORY_KEY] = config_dict.get(FRAGGER_MEMORY_KEY)
+    app.config[CPUS_KEY] = config_dict.get(CPUS_KEY, 1)
+    app.config[MODE_KEY] = args.mode
 
-        app.run(host='0.0.0.0', debug = False)
+    app.run(host='0.0.0.0', debug = False)
 
-    except KeyboardInterrupt:
-        print('Quitting, first clearing queue.')
-        clear_queue(app.config[INTERACT_HOME_KEY])
-        sys.exit()
+    print('Quitting, first clearing queue.')
+    clear_queue(app.config[INTERACT_HOME_KEY])
 
 
 if __name__ == '__main__':

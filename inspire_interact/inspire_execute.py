@@ -31,7 +31,7 @@ def execute_inspire(app_config, project_home, user, project, config_dict):
 
     # In case of rerunning, we should be careful not to reuse this file.
     if os.path.exists(f'{project_home}/inspireOutput/formated_df.csv'):
-        os.system(f'rm -rf {project_home}/inspireOutput/formated_df.csv')
+        os.remove(f'{project_home}/inspireOutput/formated_df.csv')
 
     os.system(
         f'bash {project_home}/inspire_script.sh > {project_home}/inspire_log.txt 2>&1 &',
