@@ -58,9 +58,22 @@ where the config file is a yaml file specifying configuration of your inSPIRE-In
 
 In order to use raw files on Linux or Mac O.S. you will require the use of mono ([mono project](https://www.mono-project.com/download/stable/)) which is required by the ThermoRawFileParser. (The ThermoRawFileParser itself is open source and downloaded by inSPIRE.)
 
-In order to use NetMHCpan for binding affinity prediction you should download the software from the [DTU site](https://services.healthtech.dtu.dk/services/NetMHCpan-4.1/) (you must agree to the license agreement).
+In order to use NetMHCpan for binding affinity prediction you should download the software from the [DTU site](https://services.healthtech.dtu.dk/services/NetMHCpan-4.1/) (you must agree to the license agreement). On linux and maxos systems we typically use
 
 In order to use MSFragger within inSPIRE-Interactive you should download from [MSFragger](https://github.com/Nesvilab/MSFragger/wiki/Preparing-MSFragger#Downloading-MSFragger) (you must agree to the license agreements).
 
 In order to use Skyline within inSPIRE-Interactive you will need to download docker and insure can be run within inSPIRE. See instructions from [docker documentation](https://docs.docker.com/desktop/). (Skyline itself is open source).
+
+
+### Writing the config file.
+
+The following configurations should be set for inSPIRE-interactive:
+
+| Key   | Description   |
+|-------|---------------|
+| maxInspireCpus | The number of CPUs from your computer that you wish to dedicate to inSPIRE execution.  |
+| fraggerPath    | The file path to the .jar file of MSFragger (e.g. for version 3.7 the end of this path should be: MSFragger-3.7/MSFragger-3.7.jar) |
+| fraggerMemory  | The ammount of memory (GB) that is available for MSFragger execution. |
+| netMHCpan      | The command that can be used to run NetMHCpan (e.g. on Linux we use [tcsh](https://www.cyberciti.biz/faq/howto-install-csh-shell-on-linux/) to execute NetMHCpan and so our config key is ```tcsh /data/inSPIRE-Server/netMHCpan-4.1/netMHCpan```). |
+
 
