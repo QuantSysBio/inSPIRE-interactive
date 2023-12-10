@@ -2,6 +2,7 @@
 """
 import ast
 import os
+import sys
 
 import yaml
 
@@ -12,61 +13,42 @@ from inspire_interact.constants import (
     INTERACT_HOME_KEY,
     MHCPAN_KEY,
 )
-from inspire_interact.utils import write_task_status, subset_tasks
+from inspire_interact.utils import write_task_status, read_meta, subset_tasks
+from inspire_interact.inspire_script import INSPIRE_SCRIPT
 
-def execute_inspire(app_config, project_home, user, project, config_dict):
+
+
+def execute_inspire(app_config, project_home, config_dict):
     """ Function to execute inSPIRE, writes config file, a bash file with all
         required tasks, and then executes the bash file in the background.
     """
     inspire_settings = prepare_inspire(config_dict, project_home, app_config)
     write_task_status(inspire_settings, project_home)
 
-    write_inspire_script(
-        app_config[INTERACT_HOME_KEY],
-        project_home,
-        user,
-        project,
-        inspire_settings,
-    )
-
     # In case of rerunning, we should be careful not to reuse this file.
     if os.path.exists(f'{project_home}/inspireOutput/formated_df.csv'):
         os.remove(f'{project_home}/inspireOutput/formated_df.csv')
 
+    task_list = subset_tasks(inspire_settings)
+    inspire_script = INSPIRE_SCRIPT.format(
+        home_key=app_config[INTERACT_HOME_KEY],
+        project_home=project_home,
+        task_list=','.join(task_list)
+    )
+    script_path = f'{project_home}/inspire_script.py'
+    with open(script_path, mode='w', encoding='UTF-8') as script_file:
+        script_file.writelines(inspire_script)
+
     os.system(
-        f'bash {project_home}/inspire_script.sh > {project_home}/inspire_log.txt 2>&1 &',
+        f'{sys.executable} {script_path} > {project_home}/inspire_log.txt 2>&1 &'
     )
 
 
-def write_inspire_task(bash_file, project_home, task, interact_home):
-    """ Function to write a task to be executed by inSPIRE - both the command
-        and clean up in the case of failure.
-    """
-    bash_file.write(
-        f'inspire --pipeline {task} --config_file {project_home}/config.yml\n'
-    )
-    bash_file.write(
-        f'interact-queue --project_home {project_home} ' +
-        f' --interact_home {interact_home}' +
-        f' --queue_task update --inspire_task {task} --inspire_status $?\n'
-    )
-
-    # Some tasks do not need to block execution:
-    if task not in ('predictBinding', 'quantify', 'generateReport'):
-        bash_file.write(
-            'if [ "$?" -ne "0" ]\n' +
-            '  then\n' +
-            f'    interact-queue --project_home {project_home} --interact_home {interact_home} ' +
-            ' --queue_task remove\n' +
-            '    exit 0\n' +
-            'fi\n'
-        )
 
 def prepare_inspire(config_dict, project_home, app_config):
     """ Function to prepare the inSPIRE run.
     """
     inspire_settings = {
-        'convert': False,
         'fragger': False,
         'pathogen': False,
     }
@@ -88,17 +70,10 @@ def prepare_inspire(config_dict, project_home, app_config):
         'technicalReplicates': config_dict['technicalReplicates'],
     }
 
-    if not os.path.exists(
-        f'{project_home}/search_metadata.yml'
-    ):
-        return {}
+    meta_dict = read_meta(project_home, 'search')
+    if not meta_dict:
+        raise ValueError('No Search Engine information was provided, check this screen.')
 
-    with open(
-        f'{project_home}/search_metadata.yml',
-        'r',
-        encoding='UTF-8',
-    ) as stream:
-        meta_dict = yaml.safe_load(stream)
     output_config['searchEngine'] = meta_dict.get('searchEngine', 'msfragger')
     inspire_settings['fragger'] = bool(meta_dict.get('runFragger', 1))
 
@@ -120,13 +95,6 @@ def prepare_inspire(config_dict, project_home, app_config):
         ]
 
     output_config['scansFolder'] = f'{project_home}/ms'
-
-    ms_files = os.listdir(f'{project_home}/ms')
-
-    raw_files = [ms_file for ms_file in ms_files if ms_file.lower().endswith('.raw')]
-    mgf_files = [ms_file for ms_file in ms_files if ms_file.lower().endswith('.mgf')]
-    if len(raw_files) != len(mgf_files):
-        inspire_settings['convert'] = True
 
     if output_config['searchEngine'] in ('mascot', 'msfragger'):
         output_config['rescoreMethod'] = 'percolatorSeparate'
@@ -166,34 +134,3 @@ def prepare_inspire(config_dict, project_home, app_config):
         yaml.dump(output_config, yaml_out)
 
     return inspire_settings
-
-def write_inspire_script(home_key, project_home, user, project, inspire_settings):
-    """ Function to write bash file with inSPIRE execution.
-    """
-    with open(
-        f'projects/{user}/{project}/inspire_script.sh',
-        'w',
-        encoding='UTF-8'
-    ) as bash_file:
-        bash_file.write(
-            f'echo $$ > {project_home}/inspire_pids.txt ;\n'
-        )
-        for additional_settings in (
-            'add',
-            'check',
-            'update --inspire_task start --inspire_status 0'
-        ):
-            bash_file.write(
-                f'interact-queue --project_home {project_home} --interact_home {home_key} ' +
-                f' --queue_task {additional_settings}\n'
-            )
-
-        tasks = subset_tasks(inspire_settings)
-        for task in tasks:
-            write_inspire_task(bash_file, project_home, task, home_key)
-
-        bash_file.write(
-            f'interact-queue --project_home {project_home} ' +
-            f' --interact_home {home_key} ' +
-            ' --queue_task remove\n'
-        )

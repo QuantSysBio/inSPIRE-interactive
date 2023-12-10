@@ -4,7 +4,6 @@ from argparse import ArgumentParser
 import os
 import shutil
 import socket
-import sys
 import time
 
 import flask
@@ -46,6 +45,7 @@ from inspire_interact.utils import (
     check_pids,
     generate_raw_file_table,
     format_header_and_footer,
+    read_meta,
 )
 
 app = flask.Flask(__name__, template_folder='templates')
@@ -120,8 +120,8 @@ def fetch_page(page, user, project):
     """ Endpoint serving the spi_serverive Home Page.
     """
     header_and_footer = format_header_and_footer(app.config[SERVER_ADDRESS_KEY])
-
-    if not os.path.exists(f'projects/{user}/{project}/core_metadata.yml'):
+    project_home = f'{app.config[INTERACT_HOME_KEY]}/projects/{user}/{project}'
+    if not os.path.exists(f'{project_home}/core_metadata.yml'):
         try:
             return render_template(
                 f'{page}.html',
@@ -135,14 +135,12 @@ def fetch_page(page, user, project):
             return render_template('404.html', **header_and_footer), 404
 
     try:
-        with open(f'projects/{user}/{project}/core_metadata.yml', 'r', encoding='UTF-8') as stream:
-            core_config = yaml.safe_load(stream)
-            variant = core_config['variant']
+        core_config = read_meta(project_home, 'core')
+        variant = core_config['variant']
     except:
         time.sleep(3)
-        with open(f'projects/{user}/{project}/core_metadata.yml', 'r', encoding='UTF-8') as stream:
-            core_config = yaml.safe_load(stream)
-            variant = core_config['variant']
+        core_config = read_meta(project_home, 'core')
+        variant = core_config['variant']
 
     if page == 'proteome':
         page += f'-{variant}'
@@ -259,16 +257,8 @@ def upload_metadata():
 def get_metadata(user, project, metadata_type):
     """ Function for checking which files match a particular file pattern provided.
     """
-    if not os.path.exists(
-        f'projects/{user}/{project}/{metadata_type}_metadata.yml'
-    ):
-        return jsonify(message={})
-    with open(
-        f'projects/{user}/{project}/{metadata_type}_metadata.yml',
-        'r',
-        encoding='UTF-8',
-    ) as stream:
-        meta_dict = yaml.safe_load(stream)
+    project_home = f'{app.config[INTERACT_HOME_KEY]}/projects/{user}/{project}'
+    meta_dict = read_meta(project_home, metadata_type)
     return jsonify(message=meta_dict)
 
 
@@ -378,7 +368,7 @@ def cancel_job():
             return jsonify(message='No job found')
     else:
         user, project = config_dict['user'], config_dict['project']
-    
+
     cancel_message = cancel_job_helper(app.config[INTERACT_HOME_KEY], user, project)
 
     return jsonify(message=cancel_message)
@@ -403,7 +393,7 @@ def run_inspire_core():
         if check_pids(project_home, 'inspire') == 'waiting':
             return response
 
-        execute_inspire(app.config, project_home, user, project, config_dict)
+        execute_inspire(app.config, project_home, config_dict)
 
     except Exception as err:
         return jsonify(message=f'inSPIRE-Interact failed with error code: {err}')
@@ -428,7 +418,7 @@ def check_results(user, project, workflow):
     if status == 'waiting':
         queue_df, task_id = fetch_queue_and_task(project_home, app.config[INTERACT_HOME_KEY])
 
-        if not len(queue_df):
+        if not queue_df.shape[0]:
             return deal_with_failure(
                 project_home,
                 server_address,
@@ -455,10 +445,10 @@ def check_results(user, project, workflow):
         )
 
     # Task complete : either in success or failure.
-    if (
-        os.path.exists(f'{project_home}/proteome-select') or
-        os.path.exists(f'{project_home}/proteomeSelect_file_list.txt')
-    ):
+    with open(f'projects/{user}/{project}/core_metadata.yml', 'r', encoding='UTF-8') as stream:
+        core_config = yaml.safe_load(stream)
+        variant = core_config['variant']
+    if variant == 'pathogen':
         inspire_select_visible = 'visible'
         key_file = 'epitope/potentialEpitopeCandidates.xlsx'
     else:

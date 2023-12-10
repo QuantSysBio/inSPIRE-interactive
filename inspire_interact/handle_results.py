@@ -8,6 +8,7 @@ import pandas as pd
 import plotly.graph_objects as go
 
 from inspire_interact.constants import QUEUE_PATH
+from inspire_interact.utils import safe_job_id_fetch
 
 EPITOPE_CANDIDATE_ROUTE = 'inspireOutput/epitope/potentialEpitopeCandidates.csv'
 NS_PERC_PSMS_PATH = 'inspireOutput/non_spectral.percolator.psms.txt'
@@ -16,27 +17,23 @@ PERC_PSMS_PATH = 'inspireOutput/final.percolator.psms.txt'
 PERC_SEP_PSMS_PATH = 'inspireOutput/final.percolatorSeparate.psms.txt'
 QUANT_FILE_PATH = 'inspireOutput/quant/quantified_per_file.csv'
 
-def fetch_queue_and_task(project_home, home_key):
-    """
-    """
-    if not os.path.exists(f'{project_home}/inspire_pids.txt'):
-        time.sleep(2)
 
-    if os.path.exists(f'{project_home}/inspire_pids.txt'):
-        with open(f'{project_home}/inspire_pids.txt', 'r') as pid_file:
-            task_id = int(pid_file.readline().strip())
-    else:
-        task_id = 0
+
+def fetch_queue_and_task(project_home, home_key):
+    """ Function to fetch interact queue and the job ID of an
+        inSPIRE execution.
+    """
+    job_id = safe_job_id_fetch(project_home)
 
     queue_df = pd.read_csv(
         QUEUE_PATH.format(home_key=home_key)
     )
-    if not len(queue_df):
+    if not queue_df.shape[0]:
         time.sleep(2)
         queue_df = pd.read_csv(
             QUEUE_PATH.format(home_key=home_key)
         )
-    return queue_df, task_id
+    return queue_df, job_id
 
 
 def create_queue_fig(interact_home, project_home):
@@ -256,19 +253,25 @@ def get_inspire_increase(project_home, variant):
     """ Function to calculate the percentage increase in peptides/PSMs by inSPIRE.
     """
     if variant == 'total':
-        if os.path.exists(f'{project_home}/{PERC_PSMS_PATH}'):
-            inspire_df = pd.read_csv(f'{project_home}/{PERC_PSMS_PATH}', sep='\t')
-        elif os.path.exists(f'{project_home}/{PERC_SEP_PSMS_PATH}'):
-            inspire_df = pd.read_csv(f'{project_home}/{PERC_SEP_PSMS_PATH}', sep='\t')
-        else:
+        try:
+            if os.path.exists(f'{project_home}/{PERC_PSMS_PATH}'):
+                inspire_df = pd.read_csv(f'{project_home}/{PERC_PSMS_PATH}', sep='\t')
+            elif os.path.exists(f'{project_home}/{PERC_SEP_PSMS_PATH}'):
+                inspire_df = pd.read_csv(f'{project_home}/{PERC_SEP_PSMS_PATH}', sep='\t')
+            else:
+                inspire_df = pd.DataFrame({'q-value': []})
+        except pd.errors.EmptyDataError:
             inspire_df = pd.DataFrame({'q-value': []})
         inspire_count = len(inspire_df[inspire_df['q-value'] < 0.01])
 
-        if os.path.exists(f'{project_home}/{NS_PERC_PSMS_PATH}'):
-            ns_df = pd.read_csv(f'{project_home}/{NS_PERC_PSMS_PATH}', sep='\t')
-        elif os.path.exists(f'{project_home}/{NS_PERC_SEP_PSMS_PATH}'):
-            ns_df = pd.read_csv(f'{project_home}/{NS_PERC_SEP_PSMS_PATH}', sep='\t')
-        else:
+        try:
+            if os.path.exists(f'{project_home}/{NS_PERC_PSMS_PATH}'):
+                ns_df = pd.read_csv(f'{project_home}/{NS_PERC_PSMS_PATH}', sep='\t')
+            elif os.path.exists(f'{project_home}/{NS_PERC_SEP_PSMS_PATH}'):
+                ns_df = pd.read_csv(f'{project_home}/{NS_PERC_SEP_PSMS_PATH}', sep='\t')
+            else:
+                ns_df = pd.DataFrame({'q-value': []})
+        except pd.errors.EmptyDataError:
             ns_df = pd.DataFrame({'q-value': []})
         ns_count = len(ns_df[ns_df['q-value'] < 0.01])
 

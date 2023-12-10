@@ -2,8 +2,10 @@
 """
 from copy import deepcopy
 import os
+import time
 
 import pandas as pd
+import yaml
 
 from inspire_interact.constants import (
     INTERACT_HOME_KEY,
@@ -68,6 +70,17 @@ def generate_raw_file_table(user, project, app, variant):
     return html_table
 
 
+def safe_job_id_fetch(project_home):
+    """ Fetch the job ID of an inSPIRE job if it exists.
+    """
+    if not os.path.exists(f'{project_home}/inspire_pids.txt'):
+        time.sleep(2)
+
+    if os.path.exists(f'{project_home}/inspire_pids.txt'):
+        with open(f'{project_home}/inspire_pids.txt', 'r', encoding='UTF-8') as pid_file:
+            return int(pid_file.readline().strip())
+    return 0
+
 def get_pids(project_home, workflow):
     """ Function to get the pids
     """
@@ -78,6 +91,19 @@ def get_pids(project_home, workflow):
         lines = file.readlines()
         pids = [line.rstrip() for line in lines]
     return pids
+
+
+def read_meta(project_home, meta_type):
+    """ Function for reading metadata from a project home.
+    """
+    if os.path.exists(f'{project_home}/{meta_type}_metadata.yml'):
+        with open(
+            f'{project_home}/{meta_type}_metadata.yml',
+            'r',
+            encoding='UTF-8',
+        ) as stream:
+            return yaml.safe_load(stream)
+    return {}
 
 
 def check_pids(project_home, workflow):
@@ -104,8 +130,6 @@ def subset_tasks(inspire_settings):
         the ones relevant for a given job.
     """
     tasks = deepcopy(TASKS_NAMES)
-    if not inspire_settings['convert']:
-        tasks = [task for task in tasks if task != 'convert']
     if not inspire_settings['fragger']:
         tasks = [task for task in tasks if task != 'fragger']
     if not inspire_settings['binding']:

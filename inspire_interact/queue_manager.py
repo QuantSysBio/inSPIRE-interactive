@@ -2,7 +2,6 @@
 """
 from argparse import ArgumentParser
 import os
-import sys
 from time import sleep
 
 import pandas as pd
@@ -78,9 +77,10 @@ def remove_from_queue(project_home, interact_home):
         task_id = int(pid_file.readline().strip())
 
     queue_df = pd.read_csv(QUEUE_PATH.format(home_key=interact_home))
-    drop_index = queue_df[queue_df['taskID'] == task_id].index[0]
-    queue_df = queue_df.drop(drop_index, axis=0)
-    queue_df.to_csv(QUEUE_PATH.format(home_key=interact_home), index=False)
+    if queue_df[queue_df['taskID'] == task_id].shape[0]:
+        drop_index = queue_df[queue_df['taskID'] == task_id].index[0]
+        queue_df = queue_df.drop(drop_index, axis=0)
+        queue_df.to_csv(QUEUE_PATH.format(home_key=interact_home), index=False)
 
 def update_status(project_home, interact_home, inspire_task, inspire_status):
     """ Function to update the status of a task in the taskStatus file.
@@ -110,11 +110,6 @@ def update_status(project_home, interact_home, inspire_task, inspire_status):
 
     task_df.to_csv(f'{project_home}/taskStatus.csv', index=False)
     queue_df.to_csv(QUEUE_PATH.format(home_key=interact_home), index=False)
-
-    if inspire_task == 'start' or inspire_status == '0':
-        sys.exit(0)
-    else:
-        sys.exit(1)
 
 
 def check_queue(project_home, interact_home):
