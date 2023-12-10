@@ -56,11 +56,11 @@ where the config file is a yaml file specifying configuration of your inSPIRE-In
 
 ### Additional Features
 
-In order to use raw files on Linux or Mac O.S. you will require the use of mono ([https://www.mono-project.com/download/stable/]) which is required by the ThermoRawFileParser. (The ThermoRawFileParser itself is open source and downloaded by inSPIRE.)
+In order to use raw files on Linux or Mac O.S. you will require the use of mono ([mono project](https://www.mono-project.com/download/stable/)) which is required by the ThermoRawFileParser. (The ThermoRawFileParser itself is open source and downloaded by inSPIRE.)
 
-In order to use NetMHCpan for binding affinity prediction you should download the software from [https://services.healthtech.dtu.dk/services/NetMHCpan-4.1/] (you must agree to the license agreement).
+In order to use NetMHCpan for binding affinity prediction you should download the software from the [DTU site](https://services.healthtech.dtu.dk/services/NetMHCpan-4.1/) (you must agree to the license agreement).
 
-In order to use MSFragger within inSPIRE-Interactive you should download from [https://github.com/Nesvilab/MSFragger/wiki/Preparing-MSFragger#Downloading-MSFragger] (you must agree to the license agreements).
+In order to use MSFragger within inSPIRE-Interactive you should download from [MSFragger](https://github.com/Nesvilab/MSFragger/wiki/Preparing-MSFragger#Downloading-MSFragger) (you must agree to the license agreements).
 
-In order to use Skyline within inSPIRE-Interactive you will need to download docker and insure can be run within inSPIRE. See instructions from [https://docs.docker.com/desktop/]. (Skyline itself is open source).
+In order to use Skyline within inSPIRE-Interactive you will need to download docker and insure can be run within inSPIRE. See instructions from [docker documentation](https://docs.docker.com/desktop/). (Skyline itself is open source).
 
