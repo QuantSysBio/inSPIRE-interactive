@@ -54,7 +54,7 @@ inspire-interact --config_file path-to-config-file --mode mode-of-execution
 where the config file is a yaml file specifying configuration of your inSPIRE-Interactive server and the mode is either "server" if you are setting up inSPIRE-Interactive for use throughout your lab, or "local" if you are only using inSPIRE-Interactive on your own machine.
 
 
-### Additional Features
+## Additional Features
 
 In order to use raw files on Linux or Mac O.S. you will require the use of mono ([mono project](https://www.mono-project.com/download/stable/)) which is required by the ThermoRawFileParser. (The ThermoRawFileParser itself is open source and downloaded by inSPIRE.)
 
@@ -65,7 +65,7 @@ In order to use MSFragger within inSPIRE-Interactive you should download from [M
 In order to use Skyline within inSPIRE-Interactive you will need to download docker and insure can be run within inSPIRE. See instructions from [docker documentation](https://docs.docker.com/desktop/). (Skyline itself is open source).
 
 
-### Writing the config file.
+## Writing the config file.
 
 The following configurations should be set for inSPIRE-interactive:
 
