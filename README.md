@@ -9,11 +9,11 @@ Easy GUI/webserver access for the inSPIRE platform.
 
 ### Before Downloading
 
-If you are working on Mac with an M1 chip you will require Miniforge. For all other users, any version of conda will suffice.
-
+We recommend working with inSPIRE through conda.
 
 ### Setting up your environment:
 
+For basic inSPIRE-Interactive use.
 
 1) To start with create a new conda environment with python version 3.9:
 
@@ -52,3 +52,15 @@ inspire-interact --config_file path-to-config-file --mode mode-of-execution
 ```
 
 where the config file is a yaml file specifying configuration of your inSPIRE-Interactive server and the mode is either "server" if you are setting up inSPIRE-Interactive for use throughout your lab, or "local" if you are only using inSPIRE-Interactive on your own machine.
+
+
+### Additional Features
+
+In order to use raw files on Linux or Mac O.S. you will require the use of mono ([https://www.mono-project.com/download/stable/]) which is required by the ThermoRawFileParser. (The ThermoRawFileParser itself is open source and downloaded by inSPIRE.)
+
+In order to use NetMHCpan for binding affinity prediction you should download the software from [https://services.healthtech.dtu.dk/services/NetMHCpan-4.1/] (you must agree to the license agreement).
+
+In order to use MSFragger within inSPIRE-Interactive you should download from [https://github.com/Nesvilab/MSFragger/wiki/Preparing-MSFragger#Downloading-MSFragger] (you must agree to the license agreements).
+
+In order to use Skyline within inSPIRE-Interactive you will need to download docker and insure can be run within inSPIRE. See instructions from [https://docs.docker.com/desktop/]. (Skyline itself is open source).
+
