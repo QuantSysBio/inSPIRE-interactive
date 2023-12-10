@@ -65,7 +65,7 @@ In order to use MSFragger within inSPIRE-Interactive you should download from [M
 In order to use Skyline within inSPIRE-Interactive you will need to download docker and insure can be run within inSPIRE. See instructions from [docker documentation](https://docs.docker.com/desktop/). (Skyline itself is open source).
 
 
-## Writing the config file.
+## Writing the Config File.
 
 The following configurations should be set for inSPIRE-interactive:
 
