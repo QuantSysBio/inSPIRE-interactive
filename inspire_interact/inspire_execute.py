@@ -2,6 +2,7 @@
 """
 import ast
 import os
+import subprocess
 import sys
 
 import yaml
@@ -39,8 +40,8 @@ def execute_inspire(app_config, project_home, config_dict):
     with open(script_path, mode='w', encoding='UTF-8') as script_file:
         script_file.writelines(inspire_script)
 
-    os.system(
-        f'{sys.executable} {script_path} > {project_home}/inspire_log.txt 2>&1 &'
+    os.popen(
+        f'{sys.executable} {script_path} > {project_home}/inspire_log.txt 2>&1'
     )
 
 

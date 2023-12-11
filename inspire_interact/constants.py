@@ -1,6 +1,5 @@
 """ Constants for the inspire_interact package.
 """
-FILESERVER_NAME_KEY = 'fileserverName'
 INTERACT_HOME_KEY = 'interactHome'
 SERVER_ADDRESS_KEY = 'serverAddress'
 FRAGGER_PATH_KEY = 'fraggerPath'
@@ -13,7 +12,6 @@ QUEUE_PATH = '{home_key}/locks/inspireQueue.csv'
 
 ALL_CONFIG_KEYS = [
     CPUS_KEY,
-    FILESERVER_NAME_KEY,
     FRAGGER_PATH_KEY,
     FRAGGER_MEMORY_KEY,
     INTERACT_HOME_KEY,

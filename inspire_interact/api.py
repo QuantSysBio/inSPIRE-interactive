@@ -22,7 +22,6 @@ from inspire_interact.clean_up import (
 from inspire_interact.constants import (
     ALL_CONFIG_KEYS,
     CPUS_KEY,
-    FILESERVER_NAME_KEY,
     FRAGGER_MEMORY_KEY,
     FRAGGER_PATH_KEY,
     KEY_FILES,
@@ -358,18 +357,12 @@ def cancel_job():
     """ Function to cancel an inSPIRE execution.
     """
     config_dict = request.json
-    if 'jobID' in config_dict:
-        try:
-            job_id = int(config_dict['jobID'])
-        except ValueError:
-            return jsonify(message='Invalid Job ID')
-        user, project = get_user_and_project(app.config[INTERACT_HOME_KEY], job_id)
-        if user is None:
-            return jsonify(message='No job found')
-    else:
-        user, project = config_dict['user'], config_dict['project']
 
-    cancel_message = cancel_job_helper(app.config[INTERACT_HOME_KEY], user, project)
+    user = config_dict.get('user')
+    project = config_dict.get('project')
+    job_id = config_dict.get('jobID')
+
+    cancel_message = cancel_job_helper(app.config[INTERACT_HOME_KEY], user, project, job_id)
 
     return jsonify(message=cancel_message)
 
@@ -412,11 +405,18 @@ def check_results(user, project, workflow):
     if not os.path.exists(project_home):
         return render_template('404.html', **header_and_footer), 404
 
+    time.sleep(0.5)
     status = check_pids(project_home, workflow)
 
     # Task incomplete - either running or queueing (or total failure)
     if status == 'waiting':
         queue_df, task_id = fetch_queue_and_task(project_home, app.config[INTERACT_HOME_KEY])
+
+        if not queue_df.shape[0]:
+            time.sleep(2)
+            queue_df, task_id = fetch_queue_and_task(
+                project_home, app.config[INTERACT_HOME_KEY],
+            )
 
         if not queue_df.shape[0]:
             return deal_with_failure(
@@ -574,7 +574,6 @@ def main():
     else:
         raise ValueError(f'Unknown mode {args.mode} requested')
 
-    app.config[FILESERVER_NAME_KEY] = config_dict.get(FILESERVER_NAME_KEY)
     app.config[MHCPAN_KEY] = config_dict.get(MHCPAN_KEY)
     app.config[FRAGGER_PATH_KEY] = config_dict.get(FRAGGER_PATH_KEY)
     app.config[FRAGGER_MEMORY_KEY] = config_dict.get(FRAGGER_MEMORY_KEY)

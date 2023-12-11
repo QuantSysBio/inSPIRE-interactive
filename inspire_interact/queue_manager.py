@@ -70,15 +70,12 @@ def add_to_queue(project_home, interact_home):
     queue_df = pd.concat([queue_df, append_df])
     queue_df.to_csv(QUEUE_PATH.format(home_key=interact_home), index=False)
 
-def remove_from_queue(project_home, interact_home):
+def remove_from_queue(interact_home, job_id):
     """ Function to remove an inSPIRE job from the inSPIRE interactive queue.
     """
-    with open(f'{project_home}/inspire_pids.txt', 'r', encoding='UTF-8') as pid_file:
-        task_id = int(pid_file.readline().strip())
-
     queue_df = pd.read_csv(QUEUE_PATH.format(home_key=interact_home))
-    if queue_df[queue_df['taskID'] == task_id].shape[0]:
-        drop_index = queue_df[queue_df['taskID'] == task_id].index[0]
+    if queue_df[queue_df['taskID'] == job_id].shape[0]:
+        drop_index = queue_df[queue_df['taskID'] == job_id].index[0]
         queue_df = queue_df.drop(drop_index, axis=0)
         queue_df.to_csv(QUEUE_PATH.format(home_key=interact_home), index=False)
 
@@ -123,25 +120,3 @@ def check_queue(project_home, interact_home):
         if int(queue_df['taskID'].iloc[0]) == task_id:
             break
         sleep(60)
-
-def main():
-    """ Main function for all inSPIRE-interactive queue management tasks.
-    """
-    args = get_arguments()
-    if args.queue_task == 'add':
-        add_to_queue(args.project_home, args.interact_home)
-    if args.queue_task == 'remove':
-        remove_from_queue(args.project_home, args.interact_home)
-    if args.queue_task == 'check':
-        check_queue(args.project_home, args.interact_home)
-    if args.queue_task == 'update':
-        update_status(
-            args.project_home,
-            args.interact_home,
-            args.inspire_task,
-            args.inspire_status,
-        )
-
-
-if __name__ == '__main__':
-    main()

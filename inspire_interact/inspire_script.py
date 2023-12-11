@@ -14,7 +14,7 @@ from inspire_interact.queue_manager import (
     update_status,
 )
 
-def run_function(home_key, project_home, task_list):
+def execute_taks(home_key, project_home, task_list, proc_id):
     ''' Function which runs in the background, running inSPIRE tasks and
     interacting with inSPIRE-interactive queue.
     '''
@@ -45,14 +45,15 @@ def run_function(home_key, project_home, task_list):
         )
         if status != '0':
             if task not in ('predictBinding', 'quantify', 'generateReport'):
-                remove_from_queue(project_home, home_key)
+                remove_from_queue(home_key, proc_id)
                 sys.exit(0)
+    remove_from_queue(home_key, proc_id)
 
 if __name__ == '__main__':
     proc_id = os.getpid()
     with open(f'{project_home}/inspire_pids.txt', 'w', encoding='UTF-8') as pid_file:
         pid_file.writelines(str(proc_id)+'\\n')
-    run_function('{home_key}', '{project_home}', '{task_list}')
+    execute_taks('{home_key}', '{project_home}', '{task_list}', proc_id)
     sys.exit(0)
 
 """

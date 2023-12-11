@@ -2,7 +2,7 @@ from setuptools import setup
 
 setup(
     name='inspire-interact',
-    version=0.1,
+    version='1.0rc01',
     description='Interactive GUI for inSPIRE Platform.',
     author='John Cormican, Sahil Khan, Juliane Liepe, Manuel S. Pereira',
     author_email='juliane.liepe@mpinat.mpg.de',
@@ -18,19 +18,17 @@ setup(
     entry_points={
         'console_scripts': [
             'inspire-interact=inspire_interact.api:main',
-            'interact-queue=inspire_interact.queue_manager:main',
         ]
     },
     python_requires='>=3.11',
     install_requires=[
-        #'inspirems>=2.0',
+        # 'inspirems==2.0rc01',
         'Werkzeug==2.3.4',
         'blinker==1.6.2',
         'click==8.1.3',
         'flask==2.3.2',
         'flask_cors==3.0.10',
         'itsdangerous==2.1.2',
-        'waitress==2.1.2'
     ],
     project_urls={
         'Homepage': 'https://github.com/QuantSysBio/inSPIRE',
