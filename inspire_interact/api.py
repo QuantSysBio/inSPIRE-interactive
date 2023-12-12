@@ -28,6 +28,7 @@ from inspire_interact.constants import (
     MHCPAN_KEY,
     INTERACT_HOME_KEY,
     MODE_KEY,
+    QUEUE_PATH,
     SERVER_ADDRESS_KEY,
 )
 from inspire_interact.handle_results import (
@@ -556,14 +557,18 @@ def main():
         os.mkdir('projects')
     if not os.path.exists('locks'):
         os.mkdir('locks')
-    if not os.path.exists('locks/inspireQueue.csv'):
+    if not os.path.exists(QUEUE_PATH.format(
+        home_key=app.config[INTERACT_HOME_KEY])
+    ):
         empty_queue_df = pd.DataFrame({
             'user': [],
             'project': [],
             'taskID': [],
             'status': [],
         })
-        empty_queue_df.to_csv('locks/inspireQueue.csv', index=False)
+        empty_queue_df.to_csv(QUEUE_PATH.format(
+            home_key=app.config[INTERACT_HOME_KEY]), index=False
+        )
 
     if args.mode == 'local':
         host_name = socket.gethostname()

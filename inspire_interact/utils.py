@@ -5,6 +5,7 @@ import os
 import time
 
 import pandas as pd
+import psutil
 import yaml
 
 from inspire_interact.constants import (
@@ -85,7 +86,9 @@ def get_pids(project_home, workflow):
     """ Function to get the pids
     """
     if not os.path.exists(f'{project_home}/{workflow}_pids.txt'):
-        return None
+        time.sleep(3)
+        if not os.path.exists(f'{project_home}/{workflow}_pids.txt'):
+            return None
 
     with open(f'{project_home}/{workflow}_pids.txt', 'r', encoding='UTF-8') as file:
         lines = file.readlines()
@@ -112,15 +115,8 @@ def check_pids(project_home, workflow):
     pids = get_pids(project_home, workflow)
     if pids is None:
         return 'clear'
-
-    for pid in pids:
-        if pid:
-            try:
-                os.kill(int(pid), 0)
-            except OSError:
-                continue
-            else:
-                return 'waiting'
+    if psutil.pid_exists(int(pids[0])):
+        return 'waiting'
 
     return 'done'
 

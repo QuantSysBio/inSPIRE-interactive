@@ -2,9 +2,10 @@
 """
 import ast
 import os
-import subprocess
 import sys
+import time
 
+import psutil
 import yaml
 
 from inspire_interact.constants import (
@@ -14,7 +15,9 @@ from inspire_interact.constants import (
     INTERACT_HOME_KEY,
     MHCPAN_KEY,
 )
-from inspire_interact.utils import write_task_status, read_meta, subset_tasks
+from inspire_interact.utils import (
+    check_pids, write_task_status, read_meta, subset_tasks,
+)
 from inspire_interact.inspire_script import INSPIRE_SCRIPT
 
 
@@ -43,7 +46,11 @@ def execute_inspire(app_config, project_home, config_dict):
     os.popen(
         f'{sys.executable} {script_path} > {project_home}/inspire_log.txt 2>&1'
     )
-
+    for idx in range(5):
+        if check_pids(project_home, 'inspire') == 'waiting':
+            break
+        
+        time.sleep(idx+1)
 
 
 def prepare_inspire(config_dict, project_home, app_config):

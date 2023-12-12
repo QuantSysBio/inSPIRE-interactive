@@ -25,6 +25,9 @@ def fetch_queue_and_task(project_home, home_key):
     """
     job_id = safe_job_id_fetch(project_home)
 
+    if not job_id:
+        time.sleep(3)
+        job_id = safe_job_id_fetch(project_home)
     queue_df = pd.read_csv(
         QUEUE_PATH.format(home_key=home_key)
     )

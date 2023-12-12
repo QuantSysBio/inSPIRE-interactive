@@ -44,8 +44,10 @@ def cancel_job_helper(home_key, user, project, job_id):
     else:
         pids = [int(job_id)]
 
+    if pids is None:
+        return 'No task was running. Please refresh the page.'
 
-    remove_from_queue(home_key, pids[0])
+    remove_from_queue(home_key, int(pids[0]))
 
     task_killed = False
     for pid in pids:
