@@ -14,6 +14,7 @@ from inspire_interact.constants import (
     FRAGGER_PATH_KEY,
     INTERACT_HOME_KEY,
     MHCPAN_KEY,
+    SKYLINE_RUNNER_KEY,
 )
 from inspire_interact.utils import (
     check_pids, write_task_status, read_meta, subset_tasks,
@@ -75,6 +76,7 @@ def prepare_inspire(config_dict, project_home, app_config):
         'fraggerPath': app_config[FRAGGER_PATH_KEY],
         'fraggerMemory': app_config[FRAGGER_MEMORY_KEY],
         'nCores': app_config[CPUS_KEY],
+        'skylineRunner': app_config[SKYLINE_RUNNER_KEY],
         'technicalReplicates': config_dict['technicalReplicates'],
     }
 

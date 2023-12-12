@@ -30,6 +30,7 @@ from inspire_interact.constants import (
     MODE_KEY,
     QUEUE_PATH,
     SERVER_ADDRESS_KEY,
+    SKYLINE_RUNNER_KEY,
 )
 from inspire_interact.handle_results import (
     create_queue_fig,
@@ -583,6 +584,7 @@ def main():
     app.config[FRAGGER_PATH_KEY] = config_dict.get(FRAGGER_PATH_KEY)
     app.config[FRAGGER_MEMORY_KEY] = config_dict.get(FRAGGER_MEMORY_KEY)
     app.config[CPUS_KEY] = config_dict.get(CPUS_KEY, 1)
+    app.config[SKYLINE_RUNNER_KEY] = config_dict.get(SKYLINE_RUNNER_KEY)
     app.config[MODE_KEY] = args.mode
 
     app.run(host='0.0.0.0', debug = False)
