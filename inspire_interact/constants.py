@@ -8,6 +8,7 @@ CPUS_KEY = 'maxInspireCpus'
 MHCPAN_KEY = 'netMHCpan'
 MODE_KEY = 'mode'
 SKYLINE_RUNNER_KEY = 'skylineRunner'
+RESCORE_COMMAND_KEY = 'rescoreCommand'
 
 QUEUE_PATH = '{home_key}/locks/inspireQueue.csv'
 
@@ -17,6 +18,7 @@ ALL_CONFIG_KEYS = [
     FRAGGER_MEMORY_KEY,
     INTERACT_HOME_KEY,
     MHCPAN_KEY,
+    RESCORE_COMMAND_KEY,
     SERVER_ADDRESS_KEY,
     SKYLINE_RUNNER_KEY,
 ]

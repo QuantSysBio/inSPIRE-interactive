@@ -14,6 +14,7 @@ from inspire_interact.constants import (
     FRAGGER_PATH_KEY,
     INTERACT_HOME_KEY,
     MHCPAN_KEY,
+    RESCORE_COMMAND_KEY,
     SKYLINE_RUNNER_KEY,
 )
 from inspire_interact.utils import (
@@ -77,6 +78,7 @@ def prepare_inspire(config_dict, project_home, app_config):
         'fraggerMemory': app_config[FRAGGER_MEMORY_KEY],
         'nCores': app_config[CPUS_KEY],
         'skylineRunner': app_config[SKYLINE_RUNNER_KEY],
+        RESCORE_COMMAND_KEY: app_config[RESCORE_COMMAND_KEY],
         'technicalReplicates': config_dict['technicalReplicates'],
     }
 

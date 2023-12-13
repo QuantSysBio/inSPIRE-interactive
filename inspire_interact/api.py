@@ -17,7 +17,6 @@ import yaml
 from inspire_interact.clean_up import (
     clear_queue,
     cancel_job_helper,
-    get_user_and_project,
 )
 from inspire_interact.constants import (
     ALL_CONFIG_KEYS,
@@ -29,6 +28,7 @@ from inspire_interact.constants import (
     INTERACT_HOME_KEY,
     MODE_KEY,
     QUEUE_PATH,
+    RESCORE_COMMAND_KEY,
     SERVER_ADDRESS_KEY,
     SKYLINE_RUNNER_KEY,
 )
@@ -554,6 +554,9 @@ def main():
             raise ValueError(f'Unrecognised key {config_key} found in config file.')
 
     app.config[INTERACT_HOME_KEY] = os.getcwd()
+    app.config[INTERACT_HOME_KEY] = app.config[INTERACT_HOME_KEY].replace(
+        '\\', '/'
+    )
     if not os.path.exists('projects'):
         os.mkdir('projects')
     if not os.path.exists('locks'):
@@ -585,6 +588,12 @@ def main():
     app.config[FRAGGER_MEMORY_KEY] = config_dict.get(FRAGGER_MEMORY_KEY)
     app.config[CPUS_KEY] = config_dict.get(CPUS_KEY, 1)
     app.config[SKYLINE_RUNNER_KEY] = config_dict.get(SKYLINE_RUNNER_KEY)
+    app.config[RESCORE_COMMAND_KEY] = config_dict.get(RESCORE_COMMAND_KEY)
+    if app.config[SKYLINE_RUNNER_KEY] is not None:
+         app.config[SKYLINE_RUNNER_KEY] = app.config[SKYLINE_RUNNER_KEY].replace(
+            '\\', '/'
+        )
+
     app.config[MODE_KEY] = args.mode
 
     app.run(host='0.0.0.0', debug = False)
