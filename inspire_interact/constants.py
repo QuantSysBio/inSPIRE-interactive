@@ -7,6 +7,7 @@ FRAGGER_MEMORY_KEY = 'fraggerMemory'
 CPUS_KEY = 'maxInspireCpus'
 MHCPAN_KEY = 'netMHCpan'
 MODE_KEY = 'mode'
+SKYLINE_RUNNER_KEY = 'skylineRunner'
 
 QUEUE_PATH = '{home_key}/locks/inspireQueue.csv'
 
@@ -17,6 +18,7 @@ ALL_CONFIG_KEYS = [
     INTERACT_HOME_KEY,
     MHCPAN_KEY,
     SERVER_ADDRESS_KEY,
+    SKYLINE_RUNNER_KEY,
 ]
 
 INTERMEDIATE_FILES = [
