@@ -19,7 +19,7 @@
 		
 			<p>Have you already run a search or do you want to run MSFragger as part of inSPIRE?</p>
 			<form id="search-run-div" >
-				<select autocomplete="off" style = "width:200px; height: 30px; font-size: large; border:3px solid  rgb(5, 208, 141);  " onchange="selectSearchType(this.value, '{{ server_address }}', '{{ user }}', '{{ project }}')" id="search-required-selection">
+				<select autocomplete="off" style = "width:300px; height: 30px; font-size: large; border:2px solid  rgb(5, 208, 141);  " onchange="selectSearchType(this.value, '{{ server_address }}', '{{ user }}', '{{ project }}')" id="search-required-selection">
 					<option selected disabled hidden>Select Option</option>
 					<option value="searchDone">I have search results.</option>
 					<option value="searchNeeded">I need to run MSFragger.</option>
@@ -28,7 +28,7 @@
 
 			<form id="search-engine-div" style="display:none;">
 				<p>Which search engine did you use?</p>
-				<select autocomplete="off"  id="search-engine-selection" style = "width:200px; height: 30px; font-size: large; border:3px solid  rgb(5, 208, 141);" onchange="selectSearchEngine(this.value, '{{ server_address }}', '{{ user }}', '{{ project }}')">
+				<select autocomplete="off"  id="search-engine-selection" style = "width:300px; height: 30px; font-size: large; border:2px solid  rgb(5, 208, 141);" onchange="selectSearchEngine(this.value, '{{ server_address }}', '{{ user }}', '{{ project }}')">
 					<option selected disabled hidden>Select Search Engine Used</option>
 					<option value="maxquant">Max Quant</option>
 					<option value="mascot">Mascot</option>
@@ -77,11 +77,8 @@
 			</div>
 			<br>
 		</div>
-		<br>
-		<br>
-		<br>
-		<br>
-		<br>
+		<br>	<br>	<br>
+
 		<div style = " display:flex; justify-content:center; align-items:center; font-size: larger; ">
 			<div style = "width:200px; margin-left: 60px;">
 				<button id="back-button" class="ms-data-extra-button"  onclick="revertGUI('{{ server_address }}', '{{ user }}', '{{ project }}', 'search')">
@@ -94,8 +91,7 @@
 				</button>
 			</div>
 		</div>
-		<div style = "height: 300px" > </div>
-		<br><br>
+		<div style = "height: 100px" > </div>
 
 		{{ inspire_footer|safe }}
 	</dev>

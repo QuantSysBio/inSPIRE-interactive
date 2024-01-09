@@ -22,7 +22,7 @@
 				Enter the MS1 Accuracy of the Mass Spectrometer:
 				<div id="ms1-settings-entry"  style="margin-left:0;">
 					<form id="ms1-settings-form">
-						<input type="text" id="ms1-accuracy-input" style = "width:96%; border:3px solid  rgb(5, 208, 141); "  name="mz-accuracy-input" onkeypress="textSubmit(event, '{{ server_address }}', 'noAction')">
+						<input type="text" id="ms1-accuracy-input" style = "width:96%; border:2px solid  rgb(5, 208, 141); "  name="mz-accuracy-input" onkeypress="textSubmit(event, '{{ server_address }}', 'noAction')">
 						<select id="ms1-unit-selection" class="ms-data-extra" style = "font-size: medium;" >
 							<option value="ppm">ppm</option>
 						</select>
@@ -32,7 +32,7 @@
 				Enter the MS2 Accuracy of the Mass Spectrometer:
 				<div id="ms2-settings-entry"  style="margin-left:0;">
 					<form id="ms2-settings-form">
-						<input type="text" id="ms2-accuracy-input"  style = "width:96%; border:3px solid  rgb(5, 208, 141); "   name="ms2-accuracy-input" onkeypress="textSubmit(event, '{{ server_address }}', 'noAction')">
+						<input type="text" id="ms2-accuracy-input"  style = "width:96%; border:2px solid  rgb(5, 208, 141); "   name="ms2-accuracy-input" onkeypress="textSubmit(event, '{{ server_address }}', 'noAction')">
 						<select id="ms2-unit-selection" class="ms-data-extra" style = "font-size: medium;" >
 							<option value="Da">Da</option>
 							<option value="ppm">ppm</option>
@@ -40,12 +40,12 @@
 					</form>
 				</div>
 			</div>
-			<p style = "font-size: larger;"><b>Additional Features</b></p>
+			<p style = "font-size: larger;"><b>Quantification</b></p>
 	
 			<table>
 				<tr>
 					<td>
-						Run Quantification (only possible if RAW files have been uploaded).
+						Run Quantification? (only possible if RAW files have been uploaded).
 					</td>
 					<td>
 						<input type="checkbox" id="quantification-checkbox" name="quantification">
@@ -54,16 +54,10 @@
 			</table>
 		
 		</div>
-		<div class = "parameter-second-section-right"> 
-			
-	
-		<!--	<div id="quant-div" style="width:600; margin-left:0; display:none">
-				<div id="startDraggable"></div>
-			</div>
-	
-			<br><br>-->
-	
-			<p style = "font-size: larger;"><b>Use NetMHCpan Binding affinity?</b></p>
+		<div class = "parameter-second-section-right">
+			<p style = "font-size: larger;">
+				<b>Use NetMHCpan Binding affinity?</b>
+			</p>
 			<table><tr>
 				<td>As a feature for assignment (best for mono-allelic immunopeptidome data): </td>
 				<td><input type="checkbox" class="pancheckbox" id="panfeature" name="panfeature" onclick="competingCheckboxes(this, 'pancheckbox')"></td>
@@ -75,7 +69,7 @@
 			<div id="netmhcpan-allele-div" style="width:600; margin-left:0; display:none">
 				<p> Specify the allele(s) to be predicted for (eg. HLA-B07:02). For multi-allelic data provide comma separated list. </p>
 				<form id="netmhcpan-allele-form" >
-					<input type="text" id="netmhcpan-allele-input" name="netmhcpan-allele-input" style="width:90%; height:50px;  border:3px solid  rgb(5, 208, 141);"  class="text-input" onkeypress="textSubmit(event, '{{ server_address }}', 'noAction')">
+					<input type="text" id="netmhcpan-allele-input" name="netmhcpan-allele-input" style="width:90%; height:50px;  border:2px solid  rgb(5, 208, 141);"  class="text-input" onkeypress="textSubmit(event, '{{ server_address }}', 'noAction')">
 				</form>
 				<br>
 			</div>
@@ -97,7 +91,7 @@
 	
 			<div style=" width:1404px; text-align: left; margin-left:1%; ">
 					<p style = "font-size: larger;">
-						<b>Files Information.</b>
+						<b>File Specific Information</b>
 					</p>
 					<br>
 						Specify RAW File information.
@@ -129,14 +123,10 @@
 				<br>
 				(Optional) Additional inSPIRE configurations.
 			</div>
-		
 
-	
-	
-			
 			<div style=" width:1304px;  text-align: left; margin-right:25px; ">
 				<br><br>
-				<table id="configs-table" style="width: 100%;  border:3px solid  rgb(5, 208, 141); padding: 10px 10px; margin: 12px 12px; ">
+				<table id="configs-table" style="width: 100%;  border:2px solid  rgb(5, 208, 141); padding: 10px 10px; margin: 12px 12px; ">
 					<br>
 						<tr>
 							<td>Config Key</td>
@@ -144,8 +134,8 @@
 							<td></td>
 						</tr>
 						<tr>
-							<td><input type="text" style = "border:3px solid  rgb(5, 208, 141);" class="config-key" onkeypress="textSubmit(event, '{{ server_address }}', 'noAction')"/></td>
-							<td><input type="text" class="config-value" style = "border:3px solid  rgb(5, 208, 141);" onkeypress="textSubmit(event, '{{ server_address }}', 'noAction')"/></td>
+							<td><input type="text" class="config-key" onkeypress="textSubmit(event, '{{ server_address }}', 'noAction')"/></td>
+							<td><input type="text" class="config-value" onkeypress="textSubmit(event, '{{ server_address }}', 'noAction')"/></td>
 							<td><input type="button"  class = "ms-data-extra" value="Delete Entry" onclick="deleteRow(this)"></td>
 						</tr>
 				</table>
@@ -156,7 +146,7 @@
 
 	</div>
 	
-	
+	<br><br><br>
 	<!-- save and execution button -->
 
 	<div id="execution-div" class="container" style=" height:200px;">
@@ -171,7 +161,7 @@
 		</div>
 	</div>
 	
-	<div id="file-download-text" style="display: none;">
+	<div id="file-download-text" class='adjusted-text' style="display: none; font-size: larger;">
 		<p>Pipeline running. Results will be accessable via:</p>
 		<a id="file-download" href></a>
 		<p>You can also access the results from the main interact page by entering your username

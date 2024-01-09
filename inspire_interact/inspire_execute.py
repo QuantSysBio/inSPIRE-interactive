@@ -5,7 +5,7 @@ import os
 import sys
 import time
 
-import psutil
+from inspire.config import ALL_CONFIG_KEYS
 import yaml
 
 from inspire_interact.constants import (
@@ -121,6 +121,8 @@ def prepare_inspire(config_dict, project_home, app_config):
             output_config['inferProteins'] = True
     else:
         proteome_files = os.listdir(f'{project_home}/proteome-select')
+        if len(proteome_files) < 2:
+            raise ValueError('For inSPIRE-Pathogen, proteome files must be uploaded.')
         inspire_settings['pathogen'] = True
         output_config['proteome'] = f'{project_home}/proteome-select/proteome_combined.fasta'
         path_name = [
@@ -135,7 +137,10 @@ def prepare_inspire(config_dict, project_home, app_config):
             elem.strip() for elem in config_dict["controlFlags"].split(",") if elem
         ]
         output_config['inferProteins'] = True
+
     for config_key, config_value in config_dict['additionalConfigs'].items():
+        if config_key not in ALL_CONFIG_KEYS:
+            raise ValueError(f'Error {config_key} is not a valid inSPIRE config.')
         try:
             output_config[config_key] = ast.literal_eval(config_value)
         except:

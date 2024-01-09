@@ -97,7 +97,7 @@ function showProjectOptions(options) {
         projectSelection.appendChild(optionElem);
     });
 
-    setElementVisibility(["project-select-div", "opening-Vl-1"])
+    setElementVisibility(["project-select-div"])
 };
 
 /**
@@ -172,7 +172,7 @@ async function selectProject(serverAddress, selectedProject) {
  * Updates GUI to display available workflow options.
  */
 function showWorkflowOptions() {
-    setElementVisibility(["workflow-select-div", "opening-Vl-2"]);
+    setElementVisibility(["workflow-select-div"]);
 };
 
 
@@ -513,6 +513,7 @@ function selectSearchType(value, serverAddress, user, project) {
             setElementDisplay(['search-engine-div']);
             break;
         case 'searchNeeded':
+            setElementDisplay(['search-engine-div'], displayType='none');
             var configObject = {
                 'user': user,
                 'project': project,
@@ -563,6 +564,7 @@ function makeDownloadVisible(message) {
 
     if (message.startsWith('inSPIRE-Interact failed')) {
         fileDownloadTextElem.innerHTML = message;
+        fileDownloadTextElem.style = 'color: red;'
     } else {   
         let a = document.getElementById('file-download');
         a.href = message;
@@ -904,8 +906,9 @@ function competingCheckboxes(checkbox, checkboxClass)
 function addConfigs() {
         let newRow = document.getElementById('configs-table').getElementsByTagName('tbody')[0].insertRow();
 
-        let newButton = document.createElement("button");
-        newButton.innerHTML = "Delete Entry";
+        let newButton = document.createElement("input");
+        newButton.type = "button";
+        newButton.value = "Delete Entry";
         newButton.onclick = function() { 
             deleteRow(this);
         };
@@ -918,6 +921,8 @@ function addConfigs() {
             newInput.type = "text";
 
             if (i == 2) {
+                // ms-data-extra
+                newButton.classList.add('ms-data-extra');
                 newCell.appendChild(newButton);
             } else {
                 newInput.classList.add(CLASSES[i]);

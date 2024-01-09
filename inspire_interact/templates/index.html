@@ -27,12 +27,12 @@
 			<!-- USER SELECTION -->
 
 			<div id="user-select-div" class="opening-sub-div-left">
-				<div style = "background-color: aquamarine; width:200px; text-align: center; border:3px solid  rgb(5, 208, 141)">
-					<h3>User Selection</h3>
+				<div style = "background-color: aquamarine; width:200px; text-align: center; border:2px solid  rgb(5, 208, 141)">
+					<h3 style="align-items: center;">User Selection</h3>
 				</div>
 				<p>Select a previous user.</p>
 				<form>
-					<select id="user-selection" style = "border:3px solid  rgb(5, 208, 141); width:150px; height:40px; font-size: medium;" autocomplete="off" onchange="selectUser('{{ server_address }}', this.value)">
+					<select id="user-selection" style = "border:2px solid  rgb(5, 208, 141); width:150px; height:40px; font-size: medium;" autocomplete="off" onchange="selectUser('{{ server_address }}', this.value)">
 						<option selected disabled hidden>Select User</option>
 						{{user_list |safe}}
 					</select>
@@ -40,10 +40,10 @@
 				<br>
 				<form>
 					<label>Or add a new user:</label><br>
-					<input   style = "border:3px solid  rgb(5, 208, 141); width:150px;" autocomplete="off"  type="text" id="new-user-input" name="new-user-input" onkeypress="textSubmit(event, '{{ server_address }}', 'createNewUser')">
+					<input   style = "border:2px solid  rgb(5, 208, 141); width:250px;" autocomplete="off"  type="text" id="new-user-input" name="new-user-input" onkeypress="textSubmit(event, '{{ server_address }}', 'createNewUser')">
 				</form >
 				<br>
-				<button class="job-button" onclick="createNewUser('{{ server_address }}')"><p>Create New User</p></button>
+				<button id="create-user-button" class="job-button" onclick="createNewUser('{{ server_address }}')"><p>Create New User</p></button>
 			</div>
 		
 	
@@ -52,22 +52,22 @@
 			<!-- PROJECT SELECTION -->
 
 			<div id="project-select-div" class="opening-sub-div-mid">
-				<div style = "background-color: aquamarine; width:230px; text-align: center; border:3px solid  rgb(5, 208, 141)">
+				<div style = "background-color: aquamarine; width:230px; text-align: center; border:2px solid  rgb(5, 208, 141)">
 					<h3> Project Selection</h3>
 				</div>
 				<p>Select an existing project.</p>
 				<form>
-					<select id="project-selection" style = "border:3px solid  rgb(5, 208, 141); width:150px; height:40px; font-size: medium;" autocomplete="off" onchange="selectProject('{{ server_address }}', this.value)">
+					<select id="project-selection" style = "border:2px solid  rgb(5, 208, 141); width:150px; height:40px; font-size: medium;" autocomplete="off" onchange="selectProject('{{ server_address }}', this.value)">
 						<option class = "default" selected disabled hidden>Select Project</option>
 					</select>
 				</form>
 				<br>
 				<form>
 					<label>Or enter your new project title:</label><br>
-					<input  style = "border:3px solid  rgb(5, 208, 141);" autocomplete="off" type="text" id="new-project-input" name="new-project-input" onkeypress="textSubmit(event, '{{ server_address }}', 'createNewProject')">
+					<input  style = "border:2px solid  rgb(5, 208, 141); width:250px;" autocomplete="off" type="text" id="new-project-input" name="new-project-input" onkeypress="textSubmit(event, '{{ server_address }}', 'createNewProject')">
 				</form>
 				<br>
-				<button class="job-button" onclick="createNewProject('{{ server_address }}')" >Create New Project</button>
+				<button id="create-project-button" class="job-button" onclick="createNewProject('{{ server_address }}')" >Create New Project</button>
 			</div>
 		
 	
@@ -77,12 +77,12 @@
 			<!-- WORKFLOW SELECTION -->
 
 			<div id="workflow-select-div" class="opening-sub-div-right">
-				<div style = "background-color:aquamarine; width:250px; text-align: center; border:3px solid  rgb(5, 208, 141)">
+				<div style = "background-color:aquamarine; width:250px; text-align: center; border:2px solid  rgb(5, 208, 141)">
 					<h3>Workflow Selection</h3>
 				</div>
 				<p>What do you want to do?</p>
 				<form>
-					<select id="workflow-selection"  style = "border:3px solid  rgb(5, 208, 141); width:150px; height:40px; font-size: medium;" autocomplete="off" onchange="selectWorkflow(this.value, '{{ server_address }}')">
+					<select id="workflow-selection"  style = "border:2px solid  rgb(5, 208, 141); width:150px; height:40px; font-size: medium;" autocomplete="off" onchange="selectWorkflow(this.value, '{{ server_address }}')">
 						<option selected disabled hidden>Select Workflow</option>
 						<option value="inspire">Run inSPIRE</option>
 						<option value="results">Retrieve Results</option>
