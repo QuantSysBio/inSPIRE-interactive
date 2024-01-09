@@ -10,12 +10,16 @@
 	<dev class = "page-wrapper">
 		<!-- header -->
 		{{ inspire_header|safe }}
-		<hr>
-		<div class="adjusted-text">
-			<h3>Initial Search</h3>
+		<div class = "download-div">
+			<div style=" width:1404px; text-align: center; background: linear-gradient(to right, aquamarine 40%, #FFFFFF 58%); ">
+			   <p>Initial Search</p>
+		   </div>
+	   </div>
+		<div class="adjusted-text" style =  "text-align: center; font-size: larger; margin-top: 100px;">
+		
 			<p>Have you already run a search or do you want to run MSFragger as part of inSPIRE?</p>
-			<form id="search-run-div">
-				<select autocomplete="off" onchange="selectSearchType(this.value, '{{ server_address }}', '{{ user }}', '{{ project }}')" id="search-required-selection">
+			<form id="search-run-div" >
+				<select autocomplete="off" style = "width:200px; height: 30px; font-size: large; border:3px solid  rgb(5, 208, 141);  " onchange="selectSearchType(this.value, '{{ server_address }}', '{{ user }}', '{{ project }}')" id="search-required-selection">
 					<option selected disabled hidden>Select Option</option>
 					<option value="searchDone">I have search results.</option>
 					<option value="searchNeeded">I need to run MSFragger.</option>
@@ -24,7 +28,7 @@
 
 			<form id="search-engine-div" style="display:none;">
 				<p>Which search engine did you use?</p>
-				<select autocomplete="off"  id="search-engine-selection" onchange="selectSearchEngine(this.value, '{{ server_address }}', '{{ user }}', '{{ project }}')">
+				<select autocomplete="off"  id="search-engine-selection" style = "width:200px; height: 30px; font-size: large; border:3px solid  rgb(5, 208, 141);" onchange="selectSearchEngine(this.value, '{{ server_address }}', '{{ user }}', '{{ project }}')">
 					<option selected disabled hidden>Select Search Engine Used</option>
 					<option value="maxquant">Max Quant</option>
 					<option value="mascot">Mascot</option>
@@ -33,19 +37,20 @@
 				</select>
 			</form>
 		</div>
-
-		<div class="upload-div">
+		<br>	<br>	<br>
+		<div class="upload-div" style = "align-items: center;">
 			<div id="all-search-div">
+
 				<!-- SEARCH DIV -->
 				<div id="search-div" class="row">
 					<div class="row">
 						<div id="search-column-1" style="display:none; margin-left: 0%;">
 							<p>Upload your search results.</p>
 							<br>
-							<input type="file" id="search-file-upload" multiple="true" />
+							<input type="file" id="search-file-upload" class="ms-data-extra" style = "width:100%; font-size: large;"  multiple="true" />
 							<br>
 							<br>
-							<input type="submit" onclick="uploadFiles('{{ server_address }}', '{{ user }}', '{{ project }}', 'search')">
+							<input type="submit" class="ms-data-extra" style = "width:160px ; font-size: large;" onclick="uploadFiles('{{ server_address }}', '{{ user }}', '{{ project }}', 'search')">
 							<p id="search-waiting" style="display:none;">Files uploading...</p>
 							<br>
 							<progress id="progressBar" value="0" max="100" style="width:300px;display:none"></progress>
@@ -53,7 +58,7 @@
 							<p id="search-no-files" style="display:none; color:red;">Please upload a file before proceeding.</p>
 						</div>
 						
-						<div class="vl" id="search-separator" style="display:none;""></div>
+						<div class="vl" id="search-separator" style="display:none; margin-right:40px"></div>
 
 						<div id="search-column-2" style="display:none; margin-left: 0%;">
 							<p>Or check the currently uploaded files:</p>
@@ -61,28 +66,35 @@
 							<p>
 								If you have uploaded incorrect files and need	to delete them, click below:
 							</p>
-							<input autocomplete="off"  type="submit" value="Delete All Files" onclick="clearFilePattern('{{ server_address }}', '{{ user }}', '{{ project }}', 'search')">
+							<input autocomplete="off"  type="submit" value="Delete All Files" class="ms-data-extra" style = "width:180px ; font-size: large;" onclick="clearFilePattern('{{ server_address }}', '{{ user }}', '{{ project }}', 'search')">
 							<p>
 								If you updated files manually, refresh the file list here
 							</p>
-							<input autocomplete="off"  type="submit" value="Refresh File List" onclick="checkFilePattern('{{ server_address }}', '{{ user }}', '{{ project }}', 'search')">
+							<input autocomplete="off"  type="submit" value="Refresh File List" class="ms-data-extra" style = "width:180px ; font-size: large;" onclick="checkFilePattern('{{ server_address }}', '{{ user }}', '{{ project }}', 'search')">
 						</div>
 					</div>
 				</div>
 			</div>
 			<br>
 		</div>
-
 		<br>
-
-		<button id="back-button" class="text-button" onclick="revertGUI('{{ server_address }}', '{{ user }}', '{{ project }}', 'search')">
-			&xlarr; Go back
-		</button>
-
-		<button id="forward-button" class="text-button" onclick="forwardGUI('{{ server_address }}', '{{ user }}', '{{ project }}', 'search')">
-			Proceed &xrarr;
-		</button>
-
+		<br>
+		<br>
+		<br>
+		<br>
+		<div style = " display:flex; justify-content:center; align-items:center; font-size: larger; ">
+			<div style = "width:200px; margin-left: 60px;">
+				<button id="back-button" class="ms-data-extra-button"  onclick="revertGUI('{{ server_address }}', '{{ user }}', '{{ project }}', 'search')">
+					&xlarr; Go back
+				</button>
+			</div>
+			<div style = "width:200px;">
+				<button id="forward-button" class="ms-data-extra-button"  onclick="forwardGUI('{{ server_address }}', '{{ user }}', '{{ project }}', 'search')">
+					Proceed &xrarr;
+				</button>
+			</div>
+		</div>
+		<div style = "height: 300px" > </div>
 		<br><br>
 
 		{{ inspire_footer|safe }}

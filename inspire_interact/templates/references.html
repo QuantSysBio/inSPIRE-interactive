@@ -7,12 +7,19 @@
 </head>
 <body>
 	{{ inspire_header|safe }}
+    <div class = "download-div">
+		<div style=" width:1404px; text-align: center; background: linear-gradient(to right, aquamarine 40%, #FFFFFF 58%); ">
+		   <p>References</p>
+	   </div>
+	</div>
 
-    <div class="adjusted-text">
-        <h3>References</h3>
-        <div class="ref-row">
-            <div class="ref-col-1">
-                <h4>inSPIRE Specific Papers</h4>
+
+    <!-- First main -->
+    <div class="parameter-third-section" style = "margin-top: 70px; ">
+		<div class="parameter-third-section-left" style = " background: linear-gradient(to right, aquamarine 70%, #FFFFFF 100%); ">
+	
+			<div style="  margin-left: 5px;  width:700px;align-items: top;  text-align: left;">
+                <p><b>inSPIRE Specific Papers</b></p>
                 <p>
                     Please cite the following article if you are using inSPIRE in your research:
                 </p>
@@ -24,23 +31,43 @@
                 <p>
                     Another article will soon be describing the development of inSPIRE 2 and inSPIRE-Pathogen.
                 </p>
-            </div>
-            <div class="ref-col-2">
-                <center>
-                    <img src="{{url_for('static', filename='inspire1.jpg')}}" width="70%"/>
-                </center>
-            </div>
-        </div>
+			</div>
+		
 
-        
-        <div class="ref-row">
-            <div class="ref-col-2">
+	
+
+		</div>
+	
+		<div class="parameter-third-section-right">
+	
+			
+			<div style=" width:704px;  justify-content: center; margin-right:25px; ">
                 <center>
-                    <img src="{{url_for('static', filename='plot_1.png')}}" width="70%"/>
+                    <img src="{{url_for('static', filename='inspire1.jpg')}}" width="50%"/>
                 </center>
-            </div>
-            <div class="ref-col-1">
-                <h4>Tools used by inSPIRE</h4>
+			</div>		
+		
+		</div>
+	</div>	
+
+    <!-- second-main-->
+
+    <div class="parameter-third-section" style = "margin-top: 70px; ">
+		<div class="parameter-third-section-left" >
+	
+			<div style=" width:630px; text-align: left;  ">
+                <center>
+                    <img src="{{url_for('static', filename='plot_1.png')}}" width="50%"/>
+                </center>
+			</div>
+
+		</div>
+
+        <div class="parameter-third-section-right" style = " background: linear-gradient(to left, aquamarine 70%, #FFFFFF 100%); ">
+	
+			
+			<div style=" width:704px;text-align: left; margin-right:25px; ">
+                <p><b>Tools used by inSPIRE</b></p>
                 <p>
                     Please also cite the relevant publications of the rescoring tools used, see details on <a href=https://github.com/percolator/percolator>Percolator</a> and  <a href="https://github.com/wfondrie/mokapot">Mokapot</a>.
                 </p>
@@ -52,9 +79,12 @@
                 <p>
                     If using inSPIRE-affinity please also cite the relevant publications for <a href="https://services.healthtech.dtu.dk/service.php?NetMHCpan-4.1">NetMHCpan</a> binding affinity predictions..
                 </p>
-            </div>
-        </div>
-    </div>
+			</div>		
+		
+		</div>
+	
+	</div>	
+   
 
 </body>
 </html>

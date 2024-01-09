@@ -11,24 +11,29 @@
 		<!-- header -->
 		{{ inspire_header|safe }}
 
-        <hr>
-        <div class="adjusted-text">
-            <h3>Select Your Use Case</h3>
-            If you are interested only in increasing peptide identification rates and wish to perform your
-            own downstream analysis select inSPIRE-Standard. For specialised analysis of infeceted
-            cells select inSPIRE-Pathogen.
+        <div class = "download-div">
+            <div style=" width:1404px; text-align: center; background: linear-gradient(to right, aquamarine 40%, #FFFFFF 58%); ">
+               <p>Choose your inSPIRE option</p>
+           </div>
+       </div>
+        <div style = "display:flex; height:200px; justify-content: center; align-items:center; font-size: larger; ">
+            <div style=" width:1420px;">
+               <p> If you are interested only in increasing peptide identification rates and wish to perform your
+                own downstream analysis select <b>inSPIRE-Standard</b>. For specialised analysis of infeceted
+                cells select <b>inSPIRE-Pathogen</b>.</p>
+            </div>
         </div>
 
         <div class="center-content">
             <div class="buttons"> 
-                <div id="standard-button-div">
+                <div id="standard-button-div" style = "margin-right:40px;">
                     <button 
                     id="inSPIRE-Standard-button" class="white-black-button"
                     onclick="selectInspireType('standard', '{{ server_address }}', '{{ user }}', '{{ project }}')"
                     >inSPIRE<br>Standard</button>
                               
                 </div>
-                <div id="select-button-div">
+                <div id="select-button-div" style = "margin-left:40px;">
                     <button 
                     id="inSPIRE-Select-button" class="black-white-button"
                     onclick="selectInspireType('pathogen', '{{ server_address }}', '{{ user }}', '{{ project }}')"
@@ -39,8 +44,9 @@
             </div>
         </div>
 	
-        <br><br><br><br>
-        <br><br>
+       <div style = "height:300px">
+
+       </div>
 
         <!--footer-->
 

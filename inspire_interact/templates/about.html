@@ -7,49 +7,61 @@
 </head>
 <body>
 	{{ inspire_header|safe }}
-    <hr>
-    <div class="adjusted-text">
-
-        <h3>inSPIRE Development & Motivation</h3>
-        <p>
-            inSPIRE was developed at the Quantitative and Systems Biology group at the Max Planck
-            Institute for Multidisciplinary Sciences. We are particulary interested in finding
-            non-canonical peptides in large search spaces. In particular, we are focussed on the
-            identification and characterization of proteasomse catalyzed
-            peptide splicing both in immunopeptidomics data (<a href="https://www.science.org/doi/10.1126/science.aaf4384">1</a>,
-                <a href="https://www.sciencedirect.com/science/article/pii/S1471490617301497?via%3Dihub">2</a>,
-                <a href="https://aacrjournals.org/cancerimmunolres/article/7/1/62/466741/Mapping-the-MHC-Class-I-Spliced-Immunopeptidome-of">3</a>)
-            and in <i>in vitro</i> assays (<a href="https://www.frontiersin.org/articles/10.3389/fimmu.2019.02572/full">4</a>,
-                <a href="https://www.nature.com/articles/s41597-020-0487-6">5</a>,
-                <a href="https://www.nature.com/articles/s41597-022-01890-6">6</a>).
-            The challenges posed by these large search spaces (<a href="https://analyticalsciencejournals.onlinelibrary.wiley.com/doi/10.1002/pmic.202100226">7</a>,
-                <a href="https://analyticalsciencejournals.onlinelibrary.wiley.com/doi/10.1002/pmic.202200271">8</a>)
-            necessitated improvements in peptide identification. In order to leverage the
-            advances made by Prosit (<a href="https://www.nature.com/articles/s41592-019-0426-7">9</a>,
-                <a href="https://www.nature.com/articles/s41467-021-23713-9">10</a>) and NetMHCpan
-            (<a href="https://academic.oup.com/nar/article/48/W1/W449/5837056?login=true">11</a>)
-            we developed <b>inSPIRE</b> (<a href="https://www.mcponline.org/article/S1535-9476(22)00240-7/fulltext">12</a>) as a flexible tool for enhanced peptide identification leveraging these tools.
-            It quickly became apparent that inSPIRE had benefits in many applications beyond
-            non-canonical peptide identification. In particular, we developed <b>inSPIRE-Pathogen</b>
-            for identifying pathogen peptides in immunopeptidomics data and developed this
-            web server to enable easy access.
-        </p>
-        <p>
-            We look forward to further developing inSPIRE in the future.
-        </p>
-
-        <h3>
-            Development Team
-        </h3>
-        <center>
-            <img src="{{url_for('static', filename='aboutus.jpeg')}}" width="35%"/>
-        </center>
-        <p>
-            Outside of the primary developers, <b>inSPIRE</b> and <b>inSPIRE-interactive</b> have benefited from input from within the Quantitative and Systems Biology group
-            and our collaborators.
-        </p>
+    <!-- top section -->
+    <div class = "about-top-section">
+        <div class = "about-top-section-head">
+             <p> The Story of inSPIRE - Motivation &amp; Development
+             </p>
+        </div>
     </div>
-    <br><br>
+    <div class = "about-top-section">
+        <div class = "about-top-section-body"> 
+            
+            <p>
+                inSPIRE was developed at the Quantitative and Systems Biology group at the Max Planck
+                Institute for Multidisciplinary Sciences. We are particulary interested in finding
+                non-canonical peptides in large search spaces. In particular, we are focussed on the
+                identification and characterization of proteasomse catalyzed
+                peptide splicing both in immunopeptidomics data (<a href="https://www.science.org/doi/10.1126/science.aaf4384">1</a>,
+                    <a href="https://www.sciencedirect.com/science/article/pii/S1471490617301497?via%3Dihub">2</a>,
+                    <a href="https://aacrjournals.org/cancerimmunolres/article/7/1/62/466741/Mapping-the-MHC-Class-I-Spliced-Immunopeptidome-of">3</a>)
+                and in <i>in vitro</i> assays (<a href="https://www.frontiersin.org/articles/10.3389/fimmu.2019.02572/full">4</a>,
+                    <a href="https://www.nature.com/articles/s41597-020-0487-6">5</a>,
+                    <a href="https://www.nature.com/articles/s41597-022-01890-6">6</a>).
+                The challenges posed by these large search spaces (<a href="https://analyticalsciencejournals.onlinelibrary.wiley.com/doi/10.1002/pmic.202100226">7</a>,
+                    <a href="https://analyticalsciencejournals.onlinelibrary.wiley.com/doi/10.1002/pmic.202200271">8</a>)
+                necessitated improvements in peptide identification. In order to leverage the
+                advances made by Prosit (<a href="https://www.nature.com/articles/s41592-019-0426-7">9</a>,
+                    <a href="https://www.nature.com/articles/s41467-021-23713-9">10</a>) and NetMHCpan
+                (<a href="https://academic.oup.com/nar/article/48/W1/W449/5837056?login=true">11</a>)
+                we developed <b>inSPIRE</b> (<a href="https://www.mcponline.org/article/S1535-9476(22)00240-7/fulltext">12</a>) as a flexible tool for enhanced peptide identification leveraging these tools.
+                It quickly became apparent that inSPIRE had benefits in many applications beyond
+                non-canonical peptide identification. In particular, we developed <b>inSPIRE-Pathogen</b>
+                for identifying pathogen peptides in immunopeptidomics data and developed this
+                web server to enable easy access.
+                <br></br>
+                We look forward to further developing inSPIRE in the future.
+            </p>
+
+    
+        </div>
+    </div>
+    <div class =  "development-team-section">
+        <div class = "development-team-section-top">
+            <p>   Development Team </p>
+        </div>
+        <div class = "team-img">
+
+            <img src="{{url_for('static', filename='aboutus.jpeg')}}" width="842px" height = " 600px"/>
+            <p>
+                Outside of the primary developers, <b>inSPIRE</b> and <b>inSPIRE-interactive</b> have benefited from input from within the Quantitative and Systems Biology group
+                and our collaborators.
+            </p>
+        </div>
+    </div>
+    <br></br>
+    <br></br>
+
 
     {{ inspire_footer|safe }}
 </body>

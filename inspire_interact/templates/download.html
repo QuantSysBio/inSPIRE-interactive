@@ -10,21 +10,28 @@
 	
 		<!-- header -->
 		{{ inspire_header|safe }}
-		<hr>
 
-		<div class="adjusted-text">
-			<p>Click below to download a zip file of all inspire outputs.</p>
-			<div class="vertical-center">
-				<a href="http://{{ server_address }}:5000/interact/download/{{ user }}/{{ project }}"><button id="execute-button">
-					Download All Project Data
-				</button></a>
+		<div class = "download-div">
+			 <div style=" width:1404px; text-align: center; background: linear-gradient(to right, aquamarine 40%, #FFFFFF 58%); ">
+				<p>Downloads </p>
 			</div>
-			<div id="download-text" class="adjusted-text"></div>
 		</div>
-		<br><br>
+		<br><br><br>
+		<p style = " font-size:x-large; text-align:center; align-items: center;"><b>Download all inSPIRE outputs here as a zip file.</b></p>
+	
+		<div class = "vertical-center"> 
+			<a  href="http://{{ server_address }}:5000/interact/download/{{ user }}/{{ project }}">
+				<button class="download-button">
+					Download
+				</button>
+			</a>
 
+		</div>
+		
         {{ inspire_footer|safe }}
 
     </dev>
 </body>
 </html>
+
+

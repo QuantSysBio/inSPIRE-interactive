@@ -8,19 +8,19 @@
 <body>	
 
     <!-- main page-->
-	<dev class = "page-wrapper">
+	<div class = "page-wrapper">
 	
 		<!-- header -->
 		{{ inspire_header|safe }}
 
 		<!--second section -->
 
-		<dev class = "second-section">
-			<dev class = "second-section-center-left">
-				<dev class = "welcome-note">
+		<div class = "second-section">
+			<div class = "second-section-center-left">
+				<div class = "welcome-note">
 					<p>Welcome to inSPIRE Interactive !</p>
-				</dev>
-				<dev class = "intro-inspire"> <p>
+				</div>
+				<div class = "intro-inspire"> <p>
 					inSPIRE-interactive is a simple, 
 					webserver-based solution for you & your
 					lab to reliably identify greater numbers
@@ -28,8 +28,8 @@
 					via inSPIRE and dive deeper into 
 					immunopeptidomics experiments with inSPIRE-Pathogen.
 					</p>
-				</dev>
-				<dev class = "buttons"> 
+				</div>
+				<div class = "buttons"> 
 					<button type="button" class = "button-second-section"
 						onclick="location.href='http://{{ server_address }}:5000/interact';"> 
 						<p>&nbsp;&nbsp;&nbsp;&nbsp;GET STARTED					
@@ -40,26 +40,26 @@
 						<p>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;TUTORIAL					
 						</p>
 					</button>
-				</dev>
-			</dev>
-			<dev class = "second-section-center-right"> 
+				</div>
+			</div>
+			<div class = "second-section-center-right"> 
 				<img src = "{{url_for('static', filename='plot_1.png')}}"
 				class = "plot" 
 				width = "90%">
-			</dev>
+			</div>
 			
-		</dev>
+		</div>
 
 		<!--Third section-->
 
-		<dev class = "third-section">
-			<dev class = "third-section-top">
+		<div class = "third-section">
+			<div class = "third-section-top">
 				 <p> Why inSPIRE-Interactive? 
 				 </p>
-			</dev>
-		</dev>
-		<dev class = "third-section">
-			<dev class = "third-section-bottom"> 
+			</div>
+		</div>
+		<div class = "third-section">
+			<div class = "third-section-bottom"> 
 				<p>
 					For any mass spectrometry analysis, sensitive
 					and reliable identification is key to maximising 
@@ -72,8 +72,8 @@
 					NetMHCpan, and quantification via Skyline to build 
 					out your analysis ecosystem entirely within inSPIRE-interactive.
 				</p>
-			</dev>
-		</dev>
+			</div>
+		</div>
 		
 
 		<!-- Fourth section-->
@@ -96,7 +96,7 @@
 		<!--footer-->
 
 		{{ inspire_footer|safe }}
-	</dev>
+	</div>
 
 </body>
 </html>

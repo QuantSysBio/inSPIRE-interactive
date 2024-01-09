@@ -7,16 +7,27 @@
 </head>
 <body>
 	{{ inspire_header|safe }}
-    <div class="adjusted-text">
 
-        <h3>Frequently Asked Questions</h3>
-        <p>
-            Here we try to answer your questions before you asked them. However, if you
-            encounter an issue, it may be easiest to reach out to us directly (see
-            <a href="http://{{ server_address }}:5000/interact-page/contact">our contact details</a>).
-        </p>
+    <div class = "contact-main-section">
+        <div class = "contact-top-section">
+             <p> Frequently Asked Questions
+             </p>
+        </div>
     </div>
-    <br><br>
+    <div class = "contact-main-section">
+        <div class = "contact-top-section-description"> 
+
+            <p>
+                Here we try to answer your questions before you asked them. However, if you
+                encounter an issue, it may be easiest to reach out to us directly (see
+                <a href="http://{{ server_address }}:5000/interact-page/contact">our contact details</a>).
+            </p>
+
+    
+        </div>
+    </div>
+    <div class = "empty-faq"></div>
+
 
     {{ inspire_footer|safe }}
 </body>
