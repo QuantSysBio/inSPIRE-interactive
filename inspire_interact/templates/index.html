@@ -16,23 +16,26 @@
 
 		<!-- header -->
 		{{ inspire_header|safe }}
-		<div class = "job-submit-title">
-			 <div class = "job-submit-title-text">
-				<p> Job Submission </p>
-			</div> 
-		</div>
+		<hr>
+        <br><br>
+
+		<div class = "download-div">
+            <div style=" width:1404px; padding-left: 30px; text-align: left; background: linear-gradient(to right, aquamarine 40%, #FFFFFF 58%); ">
+               <p>Job Submission</p>
+           </div>
+       </div>
 
 		<div class="upload-div" style="align-items: flex-start;">
 
 			<!-- USER SELECTION -->
 
 			<div id="user-select-div" class="opening-sub-div-left">
-				<div style = "background-color: aquamarine; width:200px; text-align: center; border:2px solid  rgb(5, 208, 141)">
+				<div style = "background-color: aquamarine; width:250px; text-align: center; border:2px solid  rgb(5, 208, 141)">
 					<h3 style="align-items: center;">User Selection</h3>
 				</div>
 				<p>Select a previous user.</p>
 				<form>
-					<select id="user-selection" style = "border:2px solid  rgb(5, 208, 141); width:150px; height:40px; font-size: medium;" autocomplete="off" onchange="selectUser('{{ server_address }}', this.value)">
+					<select id="user-selection" style = "border:2px solid  rgb(5, 208, 141); width:250px; height:40px; font-size: medium;" autocomplete="off" onchange="selectUser('{{ server_address }}', this.value)">
 						<option selected disabled hidden>Select User</option>
 						{{user_list |safe}}
 					</select>
@@ -52,12 +55,12 @@
 			<!-- PROJECT SELECTION -->
 
 			<div id="project-select-div" class="opening-sub-div-mid">
-				<div style = "background-color: aquamarine; width:230px; text-align: center; border:2px solid  rgb(5, 208, 141)">
+				<div style = "background-color: aquamarine; width:250px; text-align: center; border:2px solid  rgb(5, 208, 141)">
 					<h3> Project Selection</h3>
 				</div>
 				<p>Select an existing project.</p>
 				<form>
-					<select id="project-selection" style = "border:2px solid  rgb(5, 208, 141); width:150px; height:40px; font-size: medium;" autocomplete="off" onchange="selectProject('{{ server_address }}', this.value)">
+					<select id="project-selection" style = "border:2px solid  rgb(5, 208, 141); width:250px; height:40px; font-size: medium;" autocomplete="off" onchange="selectProject('{{ server_address }}', this.value)">
 						<option class = "default" selected disabled hidden>Select Project</option>
 					</select>
 				</form>
@@ -82,7 +85,7 @@
 				</div>
 				<p>What do you want to do?</p>
 				<form>
-					<select id="workflow-selection"  style = "border:2px solid  rgb(5, 208, 141); width:150px; height:40px; font-size: medium;" autocomplete="off" onchange="selectWorkflow(this.value, '{{ server_address }}')">
+					<select id="workflow-selection"  style = "border:2px solid  rgb(5, 208, 141); width:250px; height:40px; font-size: medium;" autocomplete="off" onchange="selectWorkflow(this.value, '{{ server_address }}')">
 						<option selected disabled hidden>Select Workflow</option>
 						<option value="inspire">Run inSPIRE</option>
 						<option value="results">Retrieve Results</option>

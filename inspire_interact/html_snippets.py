@@ -41,7 +41,7 @@ INSPIRE_HEADER = """
         <dev class = "header-right">
 
             <button type="button" class = "button-git"  
-                onclick="location.href='https://github.com/QuantSysBio/inSPIRE/issues';">
+                onclick="location.href='https://github.com/QuantSysBio/inSPIRE';">
                 <p>&nbsp;&nbsp;GIT HUB</p>
             </button>
         

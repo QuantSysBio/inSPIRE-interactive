@@ -456,44 +456,8 @@
     margin-right: 20%;
 };
 
-.about-top-section{
-    display:flex;
-   
-    flex-direction: row;
-    justify-content:space-around;
-    align-items:center;
-}
-
-.about-top-section-head{
-
-    
-    height:125px;
-    display:flex;
-    align-items:center;
-    justify-content:center;
-    width:1404px;
-    font-size: 55px;
-    text-align:center;
-    margin-top: 20px;
-    background: linear-gradient(to right, aquamarine 40%, #FFFFFF 58%); 
-
-}
-
-.about-top-section-body{
-   
-    display:flex;
-    justify-content:space-around;
-    width:1404px;
-    height:330px;
-    font-size: larger;
-    margin-left: 10px;
-    margin-right: 10px;
-    margin-top: 15px;
-
-}
 
 .development-team-section{
-
     height:850px; 
     display:flex;
     flex-direction: column;
@@ -512,7 +476,6 @@
     flex-direction: row;
     justify-content:space-around;
     align-items:center;
-
 }
 
 .team-img{
@@ -623,8 +586,6 @@ input,
     display:flex;
     justify-content:space-around;
     align-items:center;
-
-    height:700px;
  }
 .h_iframe {
     margin-top:80px;

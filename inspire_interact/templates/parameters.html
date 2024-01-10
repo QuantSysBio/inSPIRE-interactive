@@ -7,8 +7,10 @@
 </head>
 <body onload="parametersCheck('{{ server_address }}', '{{ user }}', '{{ project }}')">	
 	{{ inspire_header|safe }}
+	<hr>
+	<br><br>
 	<div class = "download-div">
-		<div style=" width:1404px; text-align: center; background: linear-gradient(to right, aquamarine 40%, #FFFFFF 58%); ">
+		<div style=" width:1404px; padding-left: 30px; text-align: left; background: linear-gradient(to right, aquamarine 40%, #FFFFFF 58%); ">
 		   <p>inSPIRE Configuration</p>
 	   </div>
 	</div>
@@ -168,23 +170,15 @@
 			and project name and selecting the workflow "Retrieve Results".
 		</p>
 	</div>
-	
-	
-	<!-- go back button  -->
-	<br>
-	
-	
+
 	<div style = " display:flex; justify-content:center; align-items:center; font-size: larger; ">
 		<div style = "width:200px;">
 			<button id="back-button" class="ms-data-extra-button"onclick="revertGUI('{{ server_address }}', '{{ user }}', '{{ project }}', 'parameters')">
 				&xlarr; Go back
 			</button>
 		</div>
-	</div>
-	
-	
-	<br><br>
-	
+	</div>	
+	<div style = "height: 100px;"></div>
 	{{ inspire_footer|safe }}
 </body>
 </html>

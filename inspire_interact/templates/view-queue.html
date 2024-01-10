@@ -10,23 +10,33 @@
 	
 		<!-- header -->
 		{{ inspire_header|safe }}
-		<hr>
 
-		<p class="adjusted-text">Below are all jobs in the inSPIRE-interactive queue.</p>
+		<div class = "contact-main-section">
+			<div class = "contact-top-section">
+				 <p> inSPIRE-Interactive Queue
+				 </p>
+			</div>
+		</div>
+		<br><br>
+
+		<br><br>
 		<center>
-			<h2>inSPIRE-Interactive Queue</h2>
 			{{ queue_svg|safe }}
 		</center>
 
-		<p class="adjusted-text">
+		<p class="contact-main-section" style="text-align: left; align-items: left;">
             You can cancel any job by entering the Job ID in the box below and clicking cancel:
-			<form id="cancel-job-form" class="adjusted-text">
-				<input type="text" id="cancel-job-input" name="cancel-job-input" style="width:200px;"  class="text-input" onkeypress="textSubmit(event, '{{ server_address }}', 'noAction')">
-			</form>
-            <br>
-			<button id="cancel-job-button" class="adjusted-text" onclick="cancelJobById('{{ server_address }}')">
-				Cancel Selected Job
-			</button>
+			
+			<div class="vertical-center" style="height:100px; margin-bottom: 0px;">
+				<form id="cancel-job-form">
+					<input type="text" id="cancel-job-input" name="cancel-job-input" style = "border:2px solid  rgb(5, 208, 141); width:250px;"  class="text-input" onkeypress="textSubmit(event, '{{ server_address }}', 'noAction')">
+				</form>
+			</div>
+			<div class="vertical-center" style="height:100px; margin-bottom: 0px; margin-top: 0px;">
+				<button id="cancel-job-button" class="job-button" onclick="cancelJobById('{{ server_address }}')">
+					Cancel Selected Job
+				</button>
+			</div>
             <div id="cancel-text" class="adjusted-text"></div>
 		</p>
 
