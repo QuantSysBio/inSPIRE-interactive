@@ -897,6 +897,8 @@ function competingCheckboxes(checkbox, checkboxClass)
         });
         checkbox.checked = true;
         setElementDisplay(['netmhcpan-allele-div']);
+    }  else {
+        setElementDisplay(['netmhcpan-allele-div'], 'none');
     }
 }
 
