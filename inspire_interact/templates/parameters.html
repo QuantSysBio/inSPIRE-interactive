@@ -8,54 +8,58 @@
 <body onload="parametersCheck('{{ server_address }}', '{{ user }}', '{{ project }}')">	
 	{{ inspire_header|safe }}
 	<hr>
-
-	<div class="adjusted-text">
-		<div id="parameters-div">
-			<h2>inSPIRE Configuration</h2>
-			<h3>Instrument Settings</h3>
-			<div id="params-col-1" class="column"  style="margin-left: 0%;">
+	<br><br>
+	<div class = "download-div">
+		<div style=" width:1404px; padding-left: 30px; text-align: left; background: linear-gradient(to right, aquamarine 40%, #FFFFFF 58%); ">
+		   <p>inSPIRE Configuration</p>
+	   </div>
+	</div>
+	
+	<div class = "parameter-second-section">
+		<div class = "parameter-second-section-left">
+			<div style = "font-size: larger;">
+				<p><b>Instrument Settings</b></p>
+			</div>
+			<div > 
 				Enter the MS1 Accuracy of the Mass Spectrometer:
-				<div id="ms1-settings-entry" style="width:600; margin-left:0;">
+				<div id="ms1-settings-entry"  style="margin-left:0;">
 					<form id="ms1-settings-form">
-						<input type="text" id="ms1-accuracy-input" name="mz-accuracy-input" onkeypress="textSubmit(event, '{{ server_address }}', 'noAction')">
-						<select id="ms1-unit-selection">
+						<input type="text" id="ms1-accuracy-input" style = "width:96%; border:2px solid  rgb(5, 208, 141); "  name="mz-accuracy-input" onkeypress="textSubmit(event, '{{ server_address }}', 'noAction')">
+						<select id="ms1-unit-selection" class="ms-data-extra" style = "font-size: medium;" >
 							<option value="ppm">ppm</option>
 						</select>
 					</form>
 				</div>
 				<br>
 				Enter the MS2 Accuracy of the Mass Spectrometer:
-				<div id="ms2-settings-entry" style="width:600; margin-left:0;">
+				<div id="ms2-settings-entry"  style="margin-left:0;">
 					<form id="ms2-settings-form">
-						<input type="text" id="ms2-accuracy-input" name="ms2-accuracy-input" onkeypress="textSubmit(event, '{{ server_address }}', 'noAction')">
-						<select id="ms2-unit-selection">
+						<input type="text" id="ms2-accuracy-input"  style = "width:96%; border:2px solid  rgb(5, 208, 141); "   name="ms2-accuracy-input" onkeypress="textSubmit(event, '{{ server_address }}', 'noAction')">
+						<select id="ms2-unit-selection" class="ms-data-extra" style = "font-size: medium;" >
 							<option value="Da">Da</option>
 							<option value="ppm">ppm</option>
 						</select>
 					</form>
 				</div>
 			</div>
-
-			<h3>Additional Features</h3>
-
+			<p style = "font-size: larger;"><b>Quantification</b></p>
+	
 			<table>
 				<tr>
 					<td>
-						Run Quantification (only possible if RAW files have been uploaded).
+						Run Quantification? (only possible if RAW files have been uploaded).
 					</td>
 					<td>
 						<input type="checkbox" id="quantification-checkbox" name="quantification">
 					</td>
 				</tr>
 			</table>
-
-			<div id="quant-div" style="width:600; margin-left:0; display:none">
-				<div id="startDraggable"></div>
-			</div>
-
-			<br><br>
-
-			Use NetMHCpan Binding affinity?
+		
+		</div>
+		<div class = "parameter-second-section-right">
+			<p style = "font-size: larger;">
+				<b>Use NetMHCpan Binding affinity?</b>
+			</p>
 			<table><tr>
 				<td>As a feature for assignment (best for mono-allelic immunopeptidome data): </td>
 				<td><input type="checkbox" class="pancheckbox" id="panfeature" name="panfeature" onclick="competingCheckboxes(this, 'pancheckbox')"></td>
@@ -63,77 +67,118 @@
 				<td>In reporting after assignment (best for multi-allelic immunopeptidome data): </td>
 				<td><input type="checkbox" class="pancheckbox" id="panvalidation" name="panvalidation" onclick="competingCheckboxes(this, 'pancheckbox')"></td>
 			</tr></table>
-			<br>
+			<br><br><br>
 			<div id="netmhcpan-allele-div" style="width:600; margin-left:0; display:none">
-				Specify the allele(s) to be predicted for (eg. HLA-B07:02). For multi-allelic data provide comma separated list.
-				<form id="netmhcpan-allele-form">
-					<input type="text" id="netmhcpan-allele-input" name="netmhcpan-allele-input" style="width:60%;"  class="text-input" onkeypress="textSubmit(event, '{{ server_address }}', 'noAction')">
+				<p> Specify the allele(s) to be predicted for (eg. HLA-B07:02). For multi-allelic data provide comma separated list. </p>
+				<form id="netmhcpan-allele-form" >
+					<input type="text" id="netmhcpan-allele-input" name="netmhcpan-allele-input" style="width:90%; height:50px;  border:2px solid  rgb(5, 208, 141);"  class="text-input" onkeypress="textSubmit(event, '{{ server_address }}', 'noAction')">
 				</form>
 				<br>
 			</div>
-
-			<h3>Per File Information</h3>
-			<div id="raw-table-div" style="width:600; margin-left:0;">
-				Specify RAW File information.
-				<br><br>
-				<table id="raw-table" style="width: 60%;">
-				<br>
-					{{ html_table|safe }}
-				</table>
+				
+	
+		</div>
+		
+	</div>
+	
+	
+	
+	<!--Third Section -->
+	
+	<div style = "display:flex;
+				flex-direction: row;
+				justify-content: center;
+				align-items:center;">
+		<div class="parameter-third-section-left">
+	
+			<div style=" width:1404px; text-align: left; margin-left:1%; ">
+					<p style = "font-size: larger;">
+						<b>File Specific Information</b>
+					</p>
+					<br>
+						Specify RAW File information.
 			</div>
-			<br>
-			<h3>Additional Settings</h3>
-			<div id="params-col-2" class="column"  style="margin-left: 0%;">
-				(Optional) Additional inSPIRE configurations.
-				<table id="configs-table" style="width: 60%; border: 2px solid darkgreen; padding: 10px 10px; margin: 12px 12px; ">
-				<br>
-					<tr>
-						<td>Config Key</td>
-						<td>Config Setting</td>
-						<td></td>
-					</tr>
-					<tr>
-						<td><input type="text" class="config-key" onkeypress="textSubmit(event, '{{ server_address }}', 'noAction')"/></td>
-						<td><input type="text" class="config-value" onkeypress="textSubmit(event, '{{ server_address }}', 'noAction')"/></td>
-						<td><input type="button" class="delete-entry"  value="Delete Entry" onclick="deleteRow(this)"></td>
-					</tr>
-				</table>
-				<button id="add-configs" onclick="addConfigs()">Add Additional Configurations</button>
-			</div>
+		
 
 	
-			<br><br>
-		</div>
 
-		<div id="execution-div" class="container">
-			<div class="vertical-center">
-				<button id="parameter-save-button" onclick="saveParameters('{{ server_address }}', '{{ user }}', '{{ project }}')">
-					Save Parameters
-				</button>
-				<br><br>
-				<button id="execute-button" onclick="executePipeline('{{ server_address }}', '{{ user }}', '{{ project }}')">
-					Execute Pipeline
-				</button>
+			<div style=" width:1404px;  text-align: left; ">
+					<br><br>
+					<table id="raw-table" style="width: 100%;">
+					<br>
+						{{ html_table|safe }}
+					</table>
+	
 			</div>
 		</div>
+	</div>
+	<div style = "display:flex;
+				flex-direction: row;
+				justify-content: center;
+				align-items:center;">
+		<div class="parameter-third-section-right">
+	
+			<div style=" width:1404px; text-align: left; ">
+				<p style = "font-size: larger;">
+					<b>Additional Settings.</b>
+				</p>
+				<br>
+				(Optional) Additional inSPIRE configurations.
+			</div>
 
-		<div id="file-download-text" style="display: none;">
-			<p>Pipeline running. Results will be accessable via:</p>
-			<a id="file-download" href></a>
-			<p>You can also access the results from the main interact page by entering your username
-				and project name and selecting the workflow "Retrieve Results".</p>
+			<div style=" width:1304px;  text-align: left; margin-right:25px; ">
+				<br><br>
+				<table id="configs-table" style="width: 100%;  border:2px solid  rgb(5, 208, 141); padding: 10px 10px; margin: 12px 12px; ">
+					<br>
+						<tr>
+							<td>Config Key</td>
+							<td>Config Setting</td>
+							<td></td>
+						</tr>
+						<tr>
+							<td><input type="text" class="config-key" onkeypress="textSubmit(event, '{{ server_address }}', 'noAction')"/></td>
+							<td><input type="text" class="config-value" onkeypress="textSubmit(event, '{{ server_address }}', 'noAction')"/></td>
+							<td><input type="button"  class = "ms-data-extra" value="Delete Entry" onclick="deleteRow(this)"></td>
+						</tr>
+				</table>
+				<button id="add-configs"   class="ms-data-extra"  style="font-size: medium; margin-left:12px;" onclick="addConfigs()">Add Additional Configurations</button>
+			</div>		
+		
 		</div>
-    </div>
 
-    <br>
+	</div>
+	
+	<br><br><br>
+	<!-- save and execution button -->
 
-    <button id="back-button" class="text-button" onclick="revertGUI('{{ server_address }}', '{{ user }}', '{{ project }}', 'parameters')">
-        &xlarr; Go back
-    </button>
+	<div id="execution-div" class="container" style=" height:200px;">
+		<div class="vertical-center" style = "margin-top: 0%; height:200px;">
+			<button id="parameter-save-button" class = "ms-data-extra" style = " border-radius: 10px; cursor: pointer;font-size:x-large; width :250px; height:90px; margin-right: 40px;" onclick="saveParameters('{{ server_address }}', '{{ user }}', '{{ project }}')">
+				Save Parameters
+			</button>
+			<br><br>
+			<button id="execute-button" class=" ms-data-extra" style = " border-radius: 10px;cursor:pointer; font-size:x-large;width:250px; margin-left: 40px; height:90px" onclick="executePipeline('{{ server_address }}', '{{ user }}', '{{ project }}')">
+				Execute Pipeline
+			</button>
+		</div>
+	</div>
+	
+	<div id="file-download-text" class='adjusted-text' style="display: none; font-size: larger;">
+		<p>Pipeline running. Results will be accessable via:</p>
+		<a id="file-download" href></a>
+		<p>You can also access the results from the main interact page by entering your username
+			and project name and selecting the workflow "Retrieve Results".
+		</p>
+	</div>
 
-
-	<br><br>
-
+	<div style = " display:flex; justify-content:center; align-items:center; font-size: larger; ">
+		<div style = "width:200px;">
+			<button id="back-button" class="ms-data-extra-button"onclick="revertGUI('{{ server_address }}', '{{ user }}', '{{ project }}', 'parameters')">
+				&xlarr; Go back
+			</button>
+		</div>
+	</div>	
+	<div style = "height: 100px;"></div>
 	{{ inspire_footer|safe }}
 </body>
 </html>

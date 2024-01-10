@@ -12,20 +12,28 @@
 		<!-- header -->
 		{{ inspire_header|safe }}
 		<hr>
-		<h3 class="adjusted-text">MS Data (RAW or mgf)</h3>
-		<p class="adjusted-text">Note that RAW files must be uploaded for quantification to be performed.</p>
+        <br><br>
 
+		<div class = "download-div">
+			<div style=" width:1404px; padding-left: 30px; text-align: left; background: linear-gradient(to right, aquamarine 40%, #FFFFFF 58%); ">
+			   <p>MS Data (Required Format - .RAW or .mgf)</p>
+		   </div>
+	   </div>
+	   <div style  = "text-align:center; font-size: larger; margin-top:100px; margin-bottom:50px;">
+		<br>
+			<p><b>Note: RAW files must be uploaded for quantification to be performed.</b></p>
+	   </div>
 		<div class="upload-div">
 			<!-- MASS SPEC DATA DIV -->
 			<div id="ms-data-div" >
 				<div class="row">
-					<div style="margin-left: 0%;">
-						<p>Upload your MS data</p>
+					<div style="margin-left: 8%;  justify-content: center; align-items: center;">
+						<p> Upload your MS data </p>
 						<br>
-						<input type="file" id="ms-file-upload" multiple="true" />
+						<input type="file"  class="ms-data-extra" style = "font-size: large; " id="ms-file-upload"  multiple="true" />
 						<br>
 						<br>
-						<input autocomplete="off" type="submit" onclick="uploadFiles('{{ server_address }}', '{{ user }}', '{{ project }}', 'ms')">
+						<input autocomplete="off" class="ms-data-extra" style = "width:130px; font-size: large;" type="submit" onclick="uploadFiles('{{ server_address }}', '{{ user }}', '{{ project }}', 'ms')">
 						<p id="ms-waiting" style="display:none;">Files uploading...</p>
 						<br>
 						<progress id="progressBar" value="0" max="100" style="width:300px;display:none"></progress>
@@ -41,28 +49,30 @@
 						<p>
 							If you have uploaded incorrect files and need	to delete them, click below:
 						</p>
-						<input autocomplete="off"  type="submit" value="Delete All Files" onclick="clearFilePattern('{{ server_address }}', '{{ user }}', '{{ project }}', 'ms')">
+						<input autocomplete="off"  class="ms-data-extra" style = "width:160px ; font-size: large;" type="submit"  value="Delete All Files" onclick="clearFilePattern('{{ server_address }}', '{{ user }}', '{{ project }}', 'ms')">
 					</p>
 						If you updated files manually, refresh the file list here
 					</p>
-					<input autocomplete="off"  type="submit" value="Refresh File List" onclick="checkFilePattern('{{ server_address }}', '{{ user }}', '{{ project }}', 'ms')">
+					<input autocomplete="off"  class="ms-data-extra"  style = "width:160px; font-size: large;" type="submit"  value="Refresh File List" onclick="checkFilePattern('{{ server_address }}', '{{ user }}', '{{ project }}', 'ms')">
 					</div>
 				</div>
 			</div>
 		</div>
 
-		<br>
-
-		<button id="back-button" class="text-button" onclick="revertGUI('{{ server_address }}', '{{ user }}', '{{ project }}', 'ms')">
-			&xlarr; Go back
-		</button>
-
-		<button id="forward-button" class="text-button" onclick="forwardGUI('{{ server_address }}', '{{ user }}', '{{ project }}', 'ms')">
-			Proceed &xrarr;
-		</button>
-
-		<br><br>
-
+		<br>	<br>	<br>
+       <div style = " display:flex; justify-content:center; align-items:center; font-size: larger; ">
+			<div style = "width:200px;">
+				<button id="back-button"   class="ms-data-extra-button"  onclick="revertGUI('{{ server_address }}', '{{ user }}', '{{ project }}', 'ms')">
+					&xlarr; Go back
+				</button>
+			</div>
+			<div style = "width:200px;">
+				<button id="forward-button"  class="ms-data-extra-button"  onclick="forwardGUI('{{ server_address }}', '{{ user }}', '{{ project }}', 'ms')">
+					Proceed &xrarr;
+				</button>
+			</div>
+		</div>
+		<div style = "height: 100px;"></div>
 		{{ inspire_footer|safe }}
 			
 	</dev>

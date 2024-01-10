@@ -234,7 +234,6 @@ def upload_file(user, project, file_type):
 
     return jsonify(message='Ok')
 
-
 @app.route('/interact/metadata', methods=['POST'])
 @cross_origin()
 def upload_metadata():

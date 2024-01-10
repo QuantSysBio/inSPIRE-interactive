@@ -12,19 +12,30 @@
 	<title>inSPIRE-Interactive</title>
 </head>
 <body>	
-	<dev class="page-wrapper">
+	<div class="page-wrapper">
 
 		<!-- header -->
 		{{ inspire_header|safe }}
 		<hr>
+        <br><br>
+
+		<div class = "download-div">
+            <div style=" width:1404px; padding-left: 30px; text-align: left; background: linear-gradient(to right, aquamarine 40%, #FFFFFF 58%); ">
+               <p>Job Submission</p>
+           </div>
+       </div>
 
 		<div class="upload-div" style="align-items: flex-start;">
+
 			<!-- USER SELECTION -->
-			<div id="user-select-div" class="opening-sub-div">
-				<h3>User Selection</h3>
+
+			<div id="user-select-div" class="opening-sub-div-left">
+				<div style = "background-color: aquamarine; width:250px; text-align: center; border:2px solid  rgb(5, 208, 141)">
+					<h3 style="align-items: center;">User Selection</h3>
+				</div>
 				<p>Select a previous user.</p>
 				<form>
-					<select id="user-selection" autocomplete="off" onchange="selectUser('{{ server_address }}', this.value)">
+					<select id="user-selection" style = "border:2px solid  rgb(5, 208, 141); width:250px; height:40px; font-size: medium;" autocomplete="off" onchange="selectUser('{{ server_address }}', this.value)">
 						<option selected disabled hidden>Select User</option>
 						{{user_list |safe}}
 					</select>
@@ -32,40 +43,49 @@
 				<br>
 				<form>
 					<label>Or add a new user:</label><br>
-					<input autocomplete="off"  type="text" id="new-user-input" name="new-user-input" onkeypress="textSubmit(event, '{{ server_address }}', 'createNewUser')">
-				</form>
+					<input   style = "border:2px solid  rgb(5, 208, 141); width:250px;" autocomplete="off"  type="text" id="new-user-input" name="new-user-input" onkeypress="textSubmit(event, '{{ server_address }}', 'createNewUser')">
+				</form >
 				<br>
-				<button id="create-user-button" onclick="createNewUser('{{ server_address }}')">Create New User</button>
+				<button id="create-user-button" class="job-button" onclick="createNewUser('{{ server_address }}')"><p>Create New User</p></button>
 			</div>
+		
+	
 
-			<div id="opening-Vl-1" class="vl" style="visibility: hidden;"></div>
-
+		
 			<!-- PROJECT SELECTION -->
-			<div id="project-select-div" class="opening-sub-div" style="visibility: hidden;">
-				<h3>Project Selection</h3>
+
+			<div id="project-select-div" class="opening-sub-div-mid">
+				<div style = "background-color: aquamarine; width:250px; text-align: center; border:2px solid  rgb(5, 208, 141)">
+					<h3> Project Selection</h3>
+				</div>
 				<p>Select an existing project.</p>
 				<form>
-					<select id="project-selection" autocomplete="off" onchange="selectProject('{{ server_address }}', this.value)">
+					<select id="project-selection" style = "border:2px solid  rgb(5, 208, 141); width:250px; height:40px; font-size: medium;" autocomplete="off" onchange="selectProject('{{ server_address }}', this.value)">
 						<option class = "default" selected disabled hidden>Select Project</option>
 					</select>
 				</form>
 				<br>
 				<form>
 					<label>Or enter your new project title:</label><br>
-					<input autocomplete="off" type="text" id="new-project-input" name="new-project-input" onkeypress="textSubmit(event, '{{ server_address }}', 'createNewProject')">
+					<input  style = "border:2px solid  rgb(5, 208, 141); width:250px;" autocomplete="off" type="text" id="new-project-input" name="new-project-input" onkeypress="textSubmit(event, '{{ server_address }}', 'createNewProject')">
 				</form>
 				<br>
-				<button id="create-project-button" onclick="createNewProject('{{ server_address }}')" >Create New Project</button>
+				<button id="create-project-button" class="job-button" onclick="createNewProject('{{ server_address }}')" >Create New Project</button>
 			</div>
+		
+	
 
-			<div id="opening-Vl-2" class="vl" style="visibility: hidden;"></div>
+
 				
 			<!-- WORKFLOW SELECTION -->
-			<div id="workflow-select-div" class="opening-sub-div" style="visibility: hidden;">
-				<h3>Workflow Selection</h3>
+
+			<div id="workflow-select-div" class="opening-sub-div-right">
+				<div style = "background-color:aquamarine; width:250px; text-align: center; border:2px solid  rgb(5, 208, 141)">
+					<h3>Workflow Selection</h3>
+				</div>
 				<p>What do you want to do?</p>
 				<form>
-					<select id="workflow-selection" autocomplete="off" onchange="selectWorkflow(this.value, '{{ server_address }}')">
+					<select id="workflow-selection"  style = "border:2px solid  rgb(5, 208, 141); width:250px; height:40px; font-size: medium;" autocomplete="off" onchange="selectWorkflow(this.value, '{{ server_address }}')">
 						<option selected disabled hidden>Select Workflow</option>
 						<option value="inspire">Run inSPIRE</option>
 						<option value="results">Retrieve Results</option>
@@ -75,9 +95,12 @@
 				</form>
 			</div>
 		</div>
+		
 
 		{{ inspire_footer|safe }}
 			
-	</dev>
+	</div> 
 </body>
 </html>
+
+

@@ -11,10 +11,17 @@
 	
 		<!-- header -->
 		{{ inspire_header|safe }}
-		<hr>
-        <h3 class="adjusted-text">Proteome Fasta Files</h3>
-		<p class="adjusted-text">For inSPIRE to provide pathogen eptiope candidates it requires both host and pathogen FASTA files.</p>
+        <hr>
+        <br><br>
 
+        <div class = "download-div">
+            <div style=" width:1404px; padding-left: 30px; text-align: left; background: linear-gradient(to right, aquamarine 40%, #FFFFFF 58%); ">
+                <p>Proteome Fasta File</p>
+            </div>
+        </div>
+        <div style = "display:flex; text-align:center; height:150px; justify-content: center; align-items: center; font-size:larger; ">
+                <p>For inSPIRE to provide pathogen eptiope candidates it requires both host and pathogen FASTA files.</p>
+        </div>
         <div class="upload-div">
             <div id="all-proteome-div">
 
@@ -22,14 +29,14 @@
                 <div id="sub-proteome-select-div" class="row" style="margin-left: 0%;">
                     <div id="proteome-select-column-1" style="margin-left: 0%;">
                         <p>Upload the host proteome:</p>
-                        <input type="file" id="host-proteome-file-upload" multiple="false" />
+                        <input type="file"  class="ms-data-extra" style = "font-size: large; " id="host-proteome-file-upload" multiple="false" />
                         <br>
                         <p>Upload the pathogen proteome:</p>
-                        <input type="file" id="pathogen-proteome-file-upload" multiple="false" />
+                        <input type="file"   class="ms-data-extra"  style = "font-size: large; " id="pathogen-proteome-file-upload" multiple="false" />
                         <br>
                         <br>
 
-                        <input type="submit" onclick="uploadFiles('{{ server_address }}', '{{ user }}', '{{ project }}', 'proteome-select')">
+                        <input type="submit"   class="ms-data-extra" style = "width:130px; font-size: large; " onclick="uploadFiles('{{ server_address }}', '{{ user }}', '{{ project }}', 'proteome-select')">
                         <p id="proteome-select-waiting" style="display:none;">Files uploading...</p>
                         <br>
                         <progress id="progressBar" value="0" max="100" style="width:300px;display:none"></progress>
@@ -37,7 +44,7 @@
                         <p id="proteome-select-no-files" style="display:none; color:red;">Please upload both files before proceeding.</p>
                     </div>
 
-                    <div class="vl"></div>
+                    <div class="vl-2"></div>
 
                     <div id="proteome-select-column-2" style="margin-left: 0%;">
                         <p>Files currently loaded:</p>
@@ -45,28 +52,32 @@
                         <p>
                             If you have uploaded incorrect files and need to delete them, click below:
                         </p>
-                        <input autocomplete="off"  type="submit" value="Delete All Files" onclick="clearFilePattern('{{ server_address }}', '{{ user }}', '{{ project }}', 'proteome-select')">
+                        <input autocomplete="off"   class="ms-data-extra"  style = "width:160px; font-size: large;" type="submit" value="Delete All Files" onclick="clearFilePattern('{{ server_address }}', '{{ user }}', '{{ project }}', 'proteome-select')">
                         <p>
                             If you updated files manually, refresh the file list here
                         </p>
-                        <input autocomplete="off"  type="submit" value="Refresh File List" onclick="checkFilePattern('{{ server_address }}',  '{{ user }}', '{{ project }}','proteome-select')">
+                        <input autocomplete="off"  class="ms-data-extra"  style = "width:160px; font-size: large;"  type="submit" value="Refresh File List" onclick="checkFilePattern('{{ server_address }}',  '{{ user }}', '{{ project }}','proteome-select')">
                     </div>
                 </div>
             </div>
             <br>
         </div>
 
-        <br>
-    
-        <button id="back-button" class="text-button" onclick="revertGUI('{{ server_address }}', '{{ user }}', '{{ project }}', 'proteome')">
-            &xlarr; Go back
-        </button>
+        <br><br><br>
+        <div style = " display:flex; justify-content:center; align-items:center; font-size: larger; ">
+			<div style = "width:200px;">
+                <button id="back-button" class="ms-data-extra-button"   onclick="revertGUI('{{ server_address }}', '{{ user }}', '{{ project }}', 'proteome')">
+                    &xlarr; Go back
+                </button>
+            </div>
+            <div style = "width:200px;">
+                <button id="forward-button" class="ms-data-extra-button"  onclick="forwardGUI('{{ server_address }}', '{{ user }}', '{{ project }}', 'proteome')">
+                    Proceed &xrarr;
+                </button>
+            </div>
 
-        <button id="forward-button" class="text-button" onclick="forwardGUI('{{ server_address }}', '{{ user }}', '{{ project }}', 'proteome')">
-            Proceed &xrarr;
-        </button>
-
-		<br><br>
+        </div>
+		<div style = "height: 100px;"></div>
 
 		{{ inspire_footer|safe }}
 

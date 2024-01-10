@@ -19,7 +19,7 @@ INSPIRE_HEADER = """
         </dev>
 
         <dev class = "about-us">
-            <a href=http://{server_address}:5000/interact-page/about> <p class = "about-us-text"> About Us </p>
+            <a href=http://{server_address}:5000/interact-page/about> <p class = "about-us-text"> About </p>
             </a>
         </dev>
 
@@ -39,6 +39,14 @@ INSPIRE_HEADER = """
         </dev>
 
         <dev class = "header-right">
+
+            <button type="button" class = "button-git"  
+                onclick="location.href='https://github.com/QuantSysBio/inSPIRE';">
+                <p>&nbsp;&nbsp;GIT HUB</p>
+            </button>
+        
+
+       
             <button type="button" class = "button"
                 onclick="location.href='http://{server_address}:5000/interact';">
                 <p>&nbsp;&nbsp;&nbsp;&nbsp;GET STARTED</p>

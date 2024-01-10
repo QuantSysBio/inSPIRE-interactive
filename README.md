@@ -75,5 +75,3 @@ The following configurations should be set for inSPIRE-interactive:
 | fraggerPath    | The file path to the .jar file of MSFragger (e.g. for version 3.7 the end of this path should be: MSFragger-3.7/MSFragger-3.7.jar) |
 | fraggerMemory  | The ammount of memory (GB) that is available for MSFragger execution. |
 | netMHCpan      | The command that can be used to run NetMHCpan (e.g. on Linux we use [tcsh](https://www.cyberciti.biz/faq/howto-install-csh-shell-on-linux/) to execute NetMHCpan and so our config key is ```tcsh /data/inSPIRE-Server/netMHCpan-4.1/netMHCpan```). |
-
-

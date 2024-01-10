@@ -8,20 +8,32 @@
 <body>
 	<dev class = "page-wrapper">
 		{{ inspire_header|safe }}
-		<hr>
-		<div class="adjusted-text">
-			<p>Unfortunately your job appears to have failed.</p>
-			<a href="http://{{ server_address }}:5000/interact/get_results/{{ user }}/{{ project }}/inspireLog"> Click to Download the log of inSPIRE execution.</a>
+
+		<div class = "download-div">
+			<div style=" width:1404px; text-align: center; background: linear-gradient(to left, rgb(188, 245, 226) 30%, #FFFFFF 100%);  ">
+			   <p style = "color:red"><b>Attention! This Job has Failed. </b></p>
+		   </div>
+	   </div>
+
+		<div style = "display:flex;flex-direction: column; text-align: center; font-size: larger; justify-content:space-evenly; align-items:center;height:620px;">
+			<p><b>Unfortunately your job appears to have failed.</b></p>
+			<a href="http://{{ server_address }}:5000/interact/get_results/{{ user }}/{{ project }}/inspireLog"> 
+				<button class="download-button" style= " margin:0; width:550px; height: 80px; font-size: larger;">
+					Click to Download the log of inSPIRE execution.
+				</button></a>
 			or<br>
-			<a href="http://{{ server_address }}:5000/interact-page/parameters/{{ user }}/{{ project }}">Click to re-execute the pipeline with alternative parameters.</a>
+			<a href="http://{{ server_address }}:5000/interact-page/parameters/{{ user }}/{{ project }}">
+				<button class="download-button" style= "margin:0; width:650px; height: 80px; font-size: larger;">
+					Click to re-execute the pipeline with alternative parameters.
+				</button></a>
 			<br>
 		</div>
-		<center>
+		<!--<center>
 			<h2>Progress Log</h2>
 			{{ progress_html|safe }}
 		</center>
 
-		<br><br>
+		<br><br>-->
 
         {{ inspire_footer|safe }}
 	</dev>

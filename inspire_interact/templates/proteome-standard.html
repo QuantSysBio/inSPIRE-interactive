@@ -10,12 +10,19 @@
 	
 		<!-- header -->
 		{{ inspire_header|safe }}
-		<hr>
-        <h3 class="adjusted-text">Proteome Fasta File (Optional)</h3>
-        <p class="adjusted-text">
-            Proteome file is only required for inSPIRE if you wish to infer proteins or are running an MSFragger search.<br>
-            If you do not require this, you can click Proceed without uploading.
-        </p>
+        <hr>
+        <br><br>
+
+        <div class = "download-div">
+			<div style=" width:1404px; padding-left: 30px; text-align: left; background: linear-gradient(to right, aquamarine 40%, #FFFFFF 58%); ">
+			   <p>Proteome Fasta File (Optional)</p>
+		   </div>
+	   </div>
+        <div style = "display:flex; text-align:center; height:150px; justify-content: center; align-items: center; font-size:larger; ">
+            <p><b>Proteome file is only required for inSPIRE if you wish to infer proteins or are running an MSFragger search.<br>
+                If you do not require this, you can click Proceed without uploading.</b></p>
+        </div>
+ 
 
 	<div class="upload-div">
         <div id="all-proteome-div">
@@ -27,10 +34,10 @@
                     <div id="proteome-column-1" style="margin-left: 0%;">
                         <p>Upload your proteome file.</p>
                         <br>
-                        <input type="file" id="proteome-file-upload" multiple="true" />
+                        <input type="file"  class="ms-data-extra" style = "font-size: large; " id="proteome-file-upload" multiple="true" />
                         <br>
                         <br>
-                        <input type="submit" onclick="uploadFiles('{{ server_address }}', '{{ user }}', '{{ project }}', 'proteome')">
+                        <input type="submit"  class="ms-data-extra" style = "width:130px; font-size: large; " onclick="uploadFiles('{{ server_address }}', '{{ user }}', '{{ project }}', 'proteome')">
                         <p id="proteome-waiting" style="display:none;">Files uploading...</p>
                         <br>
                         <progress id="progressBar" value="0" max="100" style="width:300px;display:none"></progress>
@@ -38,7 +45,7 @@
                         <p id="proteome-no-files" style="display:none; color:red;">Please upload a file before proceeding.</p>
                     </div>
 
-                    <div class="vl"></div>
+                    <div class="vl-2"></div>
 
                     <div id="proteome-column-2"style="margin-left: 0%;">
                         <p>Files currently loaded:</p>
@@ -46,11 +53,11 @@
                         <p>
                             If you have uploaded incorrect files and need to delete them, click below:
                         </p>
-                        <input autocomplete="off"  type="submit" value="Delete All Files" onclick="clearFilePattern('{{ server_address }}', '{{ user }}', '{{ project }}', 'proteome')">
+                        <input autocomplete="off"  type="submit"  class="ms-data-extra" style = "width:160px; font-size: large; " value="Delete All Files" onclick="clearFilePattern('{{ server_address }}', '{{ user }}', '{{ project }}', 'proteome')">
                         <p>
                             If you updated files manually, refresh the file list here
                         </p>
-                        <input autocomplete="off"  type="submit" value="Refresh File List" onclick="checkFilePattern('{{ server_address }}', '{{ user }}', '{{ project }}', 'proteome')">
+                        <input autocomplete="off"  type="submit"  class="ms-data-extra" style = "width:160px; font-size: large; " value="Refresh File List" onclick="checkFilePattern('{{ server_address }}', '{{ user }}', '{{ project }}', 'proteome')">
                     </div>
                 </div>
             </div>
@@ -58,17 +65,23 @@
 		<br>
     </div>
 
-    <button id="back-button" class="text-button" onclick="revertGUI('{{ server_address }}', '{{ user }}', '{{ project }}', 'proteome')">
-        &xlarr; Go back
-    </button>
+    <br><br><br>
+    <div style = " display:flex; justify-content:center; align-items:center; font-size: larger; ">
+        <div style = "width:200px;">
+            <button id="back-button" class="ms-data-extra-button" onclick="revertGUI('{{ server_address }}', '{{ user }}', '{{ project }}', 'proteome')">
+                &xlarr; Go back
+            </button>
+        </div>
+        <div style = "width:200px;">
+            <button id="forward-button" class="ms-data-extra-button"  onclick="forwardGUI('{{ server_address }}', '{{ user }}', '{{ project }}', 'proteome')">
+                Proceed &xrarr;
+            </button>
+        </div>
+    </div>
+    <div style = "height: 100px;"></div>
 
-    <button id="forward-button" class="text-button" onclick="forwardGUI('{{ server_address }}', '{{ user }}', '{{ project }}', 'proteome')">
-        Proceed &xrarr;
-    </button>
 
-        <br><br>
-
-        {{ inspire_footer|safe }}
+    {{ inspire_footer|safe }}
 
     </dev>
 </body>
