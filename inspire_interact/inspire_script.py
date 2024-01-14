@@ -4,6 +4,7 @@
 INSPIRE_SCRIPT = """
 import os
 import sys
+import traceback
 
 from inspire.run import run_inspire
 
@@ -35,6 +36,7 @@ def execute_taks(home_key, project_home, task_list, proc_id):
             status = '0'
         except Exception as e:
             print('inSPIRE failed on task' + task  + 'with Exception:' + str(e))
+            print(traceback.format_exc())
             status = '1'
 
         update_status(
