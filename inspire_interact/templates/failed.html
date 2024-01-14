@@ -11,12 +11,17 @@
 
 		<div class = "download-div">
 			<div style=" width:1404px; text-align: center; background: linear-gradient(to left, rgb(188, 245, 226) 30%, #FFFFFF 100%);  ">
-			   <p style = "color:red"><b>Attention! This Job has Failed. </b></p>
+			   <p style = "color:red"><b>Unfortunately your inSPIRE job has failed. </b></p>
 		   </div>
 	   </div>
+	   <br><br>
 
-		<div style = "display:flex;flex-direction: column; text-align: center; font-size: larger; justify-content:space-evenly; align-items:center;height:620px;">
-			<p><b>Unfortunately your job appears to have failed.</b></p>
+	   <center>
+			<h2>Progress Log</h2>
+			{{ progress_html|safe }}
+		</center>
+
+		<div style = "display:flex;flex-direction: column; text-align: center; font-size: larger; justify-content:space-evenly; align-items:center;height:420px;">
 			<a href="http://{{ server_address }}:5000/interact/get_results/{{ user }}/{{ project }}/inspireLog"> 
 				<button class="download-button" style= " margin:0; width:550px; height: 80px; font-size: larger;">
 					Click to Download the log of inSPIRE execution.

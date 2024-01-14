@@ -48,7 +48,7 @@ def execute_inspire(app_config, project_home, config_dict):
     os.popen(
         f'{sys.executable} {script_path} > {project_home}/inspire_log.txt 2>&1'
     )
-    for idx in range(5):
+    for idx in range(3):
         if check_pids(project_home, 'inspire') == 'waiting':
             break
         

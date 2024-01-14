@@ -30,12 +30,18 @@ INTERMEDIATE_FILES = [
 KEY_FILES = {
     'epitopePlots': 'inspireOutput/epitope/spectralPlots.pdf',
     'epitopeReport': 'inspireOutput/epitope/inspire-epitope-report.html',
-    'inspire': 'inspireOutput/finalPsmAssignments.csv',
+    'psms': 'inspireOutput/finalPsmAssignments.csv',
+    'peptides': 'inspireOutput/finalPeptideAssignments.csv',
     'inspireLog': 'inspire_log.txt',
-    'inspirePathogen': 'inspireOutput/epitope/potentialEpitopeCandidates.xlsx',
+    'inspirePathogen': 'inspireOutput/epitope.zip',
     'performance': 'inspireOutput/inspire-report.html',
     'quantification': 'inspireOutput/quant.zip',
     'quantReport': 'inspireOutput/quant/inspire-quant-report.html',
+}
+
+ZIP_PATHS = {
+    'quantification': 'inspireOutput/quant',
+    'inspirePathogen': 'inspireOutput/epitope',
 }
 
 TASKS_NAMES = [

@@ -13,12 +13,15 @@
 	<table class="results-table">
 
 		<div class="res-row">
-			<div style="margin-left: 20%; padding-right:6%" class="res-column">
+			<div style="margin-left: 15%; padding-right:6%; width:500px;" class="res-column">
 				<h2>inSPIRE Identification Results</h2>
 				<p id="psm-fdr-increase">{{ inspire_increase }}</p>
-
-				<a href="http://{{ server_address }}:5000/interact/get_results/{{ user }}/{{ project }}/inspire"> Click to download the inSPIRE finalAssignments (PSM level)</a>
-				or<br>
+				Click to download all identifications on
+				<a href="http://{{ server_address }}:5000/interact/get_results/{{ user }}/{{ project }}/psms">
+					PSM level</a> or
+				<a href="http://{{ server_address }}:5000/interact/get_results/{{ user }}/{{ project }}/peptides">
+					peptide level</a>
+				or
 				<a href="http://{{ server_address }}:5000/interact/get_results/{{ user }}/{{ project }}/performance">Click to view the inSPIRE performance report</a>		
 				<br>
 				<br>
@@ -30,7 +33,9 @@
 				<h2>inSPIRE Quantitative Report</h2>
 				<p id="psm-fdr-increase">{{ inspire_quantified_count }}</p>
 
-				<a href="http://{{ server_address }}:5000/interact/get_results/{{ user }}/{{ project }}/quantification"> Click to download the quantification zip file.</a>
+				<a href="http://{{ server_address }}:5000/interact/get_results/{{ user }}/{{ project }}/quantification">
+					Click to download the quantification zip file
+				</a>
 				or<br>
 				<a href="http://{{ server_address }}:5000/interact/get_results/{{ user }}/{{ project }}/quantReport">Click to view the inSPIRE quantitative report</a>
 				<br>
@@ -40,10 +45,12 @@
 		</div>
 
 		<div class="res-row">
-			<div id="inSpirePerformance" style="visibility: {{ inspire_select_visible }}; margin-left: 20%; ; padding-right:6%"  class="res-column">
+			<div id="inSpirePerformance" style="visibility: {{ inspire_select_visible }}; margin-left: 15%; ; padding-right:6%; width:500px;"  class="res-column">
 				<h2>inSPIRE-Pathogen Results</h2>
 				<p id="inspire-pathogen-increase">{{ pathogen_increase }}</p>
-				<a href="http://{{ server_address }}:5000/interact/get_results/{{ user }}/{{ project }}/inspirePathogen"> Click to download the inSPIRE-Select epitope candidates</a>
+				<a href="http://{{ server_address }}:5000/interact/get_results/{{ user }}/{{ project }}/inspirePathogen">
+					Click to download the zip file with all epitope information
+				</a>
 				or<br>
 				<a href="http://{{ server_address }}:5000/interact/get_results/{{ user }}/{{ project }}/epitopeReport">Click to view the inSPIRE epitope report</a>
 				<br>
