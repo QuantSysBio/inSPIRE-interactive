@@ -15,19 +15,57 @@
         </div>
     </div>
     <div class = "contact-main-section">
-        <div class = "contact-top-section-description"> 
+        <div class = "contact-top-section-description" style="height: 75px;"> 
 
             <p>
                 Here we try to answer your questions before you asked them. However, if you
                 encounter an issue, it may be easiest to reach out to us directly (see
                 <a href="http://{{ server_address }}:5000/interact-page/contact">our contact details</a>).
             </p>
-
-    
         </div>
     </div>
-    <div class = "empty-faq"></div>
+    <dev class = "contact-main-section">
+        <dev class = "contact-top-section-description"> 
 
+            <p>
+                <b>
+                    I've started the inSPIRE pipeline. Do I need to leave my laptop running?
+                </b>
+                <br></br>
+                If you installed inSPIRE locally and are running inSPIRE-Interactive in local mode,
+                you will need to leave the laptop running. However, if inSPIRE is running on a shared
+                server and you are accessing the server remotely, nothing is running locally. You
+                can safely close your laptop and retrieve results later.
+                <br></br>
+                <b>
+                    What are the requirements for my user and project names?
+                </b>
+                <br></br>
+                The names selected here simply help to divide up the inSPIRE outputs in a sensible
+                folder system. However, we strongly discourage the use of white space in your titles,
+                for example a username of "john.doe" is much better than "john doe".
+                <br></br>
+                <b>
+                    I closed my browser by accident, how can I get back?
+                </b>
+                <br></br>
+                If you had executed the pipeline and just need to retrieve the results go to the
+                start page and select the Retrieve Results workflow. If you had not executed the
+                job just select Run inSPIRE workflow and click the proceed button to get back to
+                where you were working.
+                <br></br>
+                <b>
+                    My upload seems to be frozen and I don't see any change in the screen.
+                </b>
+                <br></br>
+                If you are uploaded from a remote drive (particularly on Windows systems) there's a
+                chance that a network firewall may block the upload. You could try moving the files
+                locally and upload from there. To get more details on the problem you can also right
+                click on the page and select Inspect.
+            </p>
+        </dev>
+    </dev>
+    <br></br>
 
     {{ inspire_footer|safe }}
 </body>

@@ -123,7 +123,9 @@
 					<b>Additional Settings.</b>
 				</p>
 				<br>
-				(Optional) Additional inSPIRE configurations.
+				(Optional) Additional inSPIRE configurations (these are only required for specialised use cases
+				see configuration options on
+				<a href="https://github.com/QuantSysBio/inSPIRE#inspire-config-file">our GitHub page</a>).
 			</div>
 
 			<div style=" width:1304px;  text-align: left; margin-right:25px; ">
@@ -162,22 +164,32 @@
 			</button>
 		</div>
 	</div>
-	
-	<div id="file-download-text" class='adjusted-text' style="display: none; font-size: larger;">
-		<p>Pipeline running. Results will be accessable via:</p>
-		<a id="file-download" href></a>
-		<p>You can also access the results from the main interact page by entering your username
-			and project name and selecting the workflow "Retrieve Results".
-		</p>
+
+	<div style = "display:flex;
+			flex-direction: column;
+			justify-content: center;
+			align-items:center;">
+		<div class="parameter-third-section-right">
+			<div id="loading-text" class = "ms-data-extra" style="display: none;">
+				<p>Just a moment, we are setting up your pipeline</p>
+			</div>
+		</div>
+		<div id="file-download-text" class='ms-data-extra' style="display: none; font-size: larger; padding-left:2%; padding-right:2%;">
+			<p>Pipeline running. Results will be accessible via:</p>
+			<a id="file-download" href></a>
+			<p>You can also access the results from the main interact page by selecting the workflow "Retrieve Results".
+			</p>
+		</div>
+		<br><br>
 	</div>
 
-	<div style = " display:flex; justify-content:center; align-items:center; font-size: larger; ">
-		<div style = "width:200px;">
+	<div style="display:flex; justify-content:center; align-items:center; font-size: larger; ">
+		<div style="width:200px;">
 			<button id="back-button" class="ms-data-extra-button"onclick="revertGUI('{{ server_address }}', '{{ user }}', '{{ project }}', 'parameters')">
 				&xlarr; Go back
 			</button>
 		</div>
-	</div>	
+	</div>
 	<div style = "height: 100px;"></div>
 	{{ inspire_footer|safe }}
 </body>

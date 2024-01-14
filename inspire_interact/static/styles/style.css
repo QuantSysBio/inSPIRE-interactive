@@ -515,7 +515,6 @@
     display:flex;
     justify-content:space-around;
     width:1404px;
-    height:200px;
     font-size: larger;
     margin-left: 10px;
     margin-right: 10px;
@@ -584,8 +583,8 @@ input,
 
  .empty-faq{
     display:flex;
-    justify-content:space-around;
-    align-items:center;
+    /* justify-content:space-around; */
+    align-items:left;
  }
 .h_iframe {
     margin-top:80px;

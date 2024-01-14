@@ -172,6 +172,8 @@ async function selectProject(serverAddress, selectedProject) {
  * Updates GUI to display available workflow options.
  */
 function showWorkflowOptions() {
+    let workflowSelection = document.getElementById("workflow-selection");
+    workflowSelection.selectedIndex = 0;
     setElementVisibility(["workflow-select-div"]);
 };
 
@@ -572,6 +574,8 @@ function makeDownloadVisible(message) {
     }
 
     fileDownloadTextElem.style.display = "block";
+    let loadingElem = document.getElementById("loading-text");
+    loadingElem.style.display = "none";
 };
 
 /**
@@ -859,12 +863,17 @@ function constructConfigObject(user, project) {
 }
 
 async function executePipeline(serverAddress, user, project) {
-    configObject = constructConfigObject(user, project);
-    configObject['metadata_type'] = 'parameters';
-    await postJson(serverAddress, 'metadata', configObject);
-    delete configObject['metadata_type']; 
+    document.getElementById('execute-button').disabled = "disabled";
+    
+    let loadingElem = document.getElementById("loading-text");
+    loadingElem.style.display = "block";
+
+    var configObject = constructConfigObject(user, project);
 
     var response = await postJson(serverAddress, 'inspire', configObject);
+
+    configObject['metadata_type'] = 'parameters';
+    postJson(serverAddress, 'metadata', configObject);
 
     makeDownloadVisible(response['message']);
 
@@ -897,6 +906,8 @@ function competingCheckboxes(checkbox, checkboxClass)
         });
         checkbox.checked = true;
         setElementDisplay(['netmhcpan-allele-div']);
+    }  else {
+        setElementDisplay(['netmhcpan-allele-div'], 'none');
     }
 }
 

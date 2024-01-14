@@ -31,6 +31,7 @@ from inspire_interact.constants import (
     RESCORE_COMMAND_KEY,
     SERVER_ADDRESS_KEY,
     SKYLINE_RUNNER_KEY,
+    ZIP_PATHS,
 )
 from inspire_interact.handle_results import (
     create_queue_fig,
@@ -79,7 +80,7 @@ def get_user(user):
     """
     if os.path.isdir(f'{app.config[INTERACT_HOME_KEY]}/projects/{user}'):
         projects = sorted(os.listdir(f'projects/{user}'))
-        projects = [project for project in projects if not project.endswith('.tar')]
+        projects = [project for project in projects if not project.endswith('.zip')]
     else:
         os.mkdir(f'projects/{user}')
         projects = []
@@ -349,7 +350,7 @@ def download_project(user, project):
     if not os.path.exists(f'{project_home}/inspireOutput'):
         os.mkdir((f'{project_home}/inspireOutput'))
     shutil.make_archive(f'{project_home}/inspireOutput', 'zip', f'{project_home}/inspireOutput')
-    return send_file(f'{project_home}/inspireOutput.zip')
+    return send_file(f'{project_home}/inspireOutput.zip', mimetype='zip', as_attachment=True)
 
 
 @app.route('/interact/cancel', methods=['POST'])
@@ -362,6 +363,8 @@ def cancel_job():
     user = config_dict.get('user')
     project = config_dict.get('project')
     job_id = config_dict.get('jobID')
+    if job_id is not None:
+        job_id = int(job_id)
 
     cancel_message = cancel_job_helper(app.config[INTERACT_HOME_KEY], user, project, job_id)
 
@@ -486,23 +489,31 @@ def get_results_file(user, project, workflow):
     project_home = f'{home_key}/projects/{user}/{project}'
 
     # The quantification results require a zip archive
-    if workflow == 'quantification':
+    if workflow in ('quantification', 'inspirePathogen'):
+        if os.path.exists(f'{project_home}/{ZIP_PATHS[workflow]}.zip'):
+            os.remove(f'{project_home}/{ZIP_PATHS[workflow]}.zip')
+
         shutil.make_archive(
-            f'{project_home}/inspireOutput/quant',
+            f'{project_home}/{ZIP_PATHS[workflow]}',
             'zip',
-            f'{project_home}/inspireOutput/quant',
+            f'{project_home}/{ZIP_PATHS[workflow]}',
         )
 
     # The following results require the relevant results file to be sent:
     if workflow in (
         'epitopePlots',
-        'inspire',
+        'psms',
+        'peptides',
         'inspireLog',
         'inspirePathogen',
         'quantification'
     ):
         if os.path.exists(f'{project_home}/{KEY_FILES[workflow]}'):
-            return send_file(f'{project_home}/{KEY_FILES[workflow]}')
+            kwargs = {}
+            if KEY_FILES[workflow].endswith('.zip'):
+                kwargs['mimetype'] = 'zip'
+                kwargs['as_attachment'] = True
+            return send_file(f'{project_home}/{KEY_FILES[workflow]}', **kwargs)
 
     # The following send html reports
     if workflow in ('epitopeReport', 'performance', 'quantReport'):
