@@ -22,22 +22,22 @@
 				<a href="http://{{ server_address }}:5000/interact/get_results/{{ user }}/{{ project }}/peptides">
 					peptide level</a>
 				or
-				<a href="http://{{ server_address }}:5000/interact/get_results/{{ user }}/{{ project }}/performance">Click to view the inSPIRE performance report</a>		
+				<a href="http://{{ server_address }}:5000/interact/get_results/{{ user }}/{{ project }}/performance">click to view the inSPIRE performance report</a>		
 				<br>
 				<br>
 				{{ psm_fdr_html|safe }}
 				<br>
 			</div>
 
-			<div class="res-column">
+			<div class="res-column" style="width: 500px;">
 				<h2>inSPIRE Quantitative Report</h2>
 				<p id="psm-fdr-increase">{{ inspire_quantified_count }}</p>
 
 				<a href="http://{{ server_address }}:5000/interact/get_results/{{ user }}/{{ project }}/quantification">
 					Click to download the quantification zip file
 				</a>
-				or<br>
-				<a href="http://{{ server_address }}:5000/interact/get_results/{{ user }}/{{ project }}/quantReport">Click to view the inSPIRE quantitative report</a>
+				or
+				<a href="http://{{ server_address }}:5000/interact/get_results/{{ user }}/{{ project }}/quantReport">click to view the inSPIRE quantitative report</a>
 				<br>
 				<br>
 				{{ quant_html|safe }}
@@ -50,20 +50,21 @@
 				<p id="inspire-pathogen-increase">{{ pathogen_increase }}</p>
 				<a href="http://{{ server_address }}:5000/interact/get_results/{{ user }}/{{ project }}/inspirePathogen">
 					Click to download the zip file with all epitope information
+				</a> or
+				<a href="http://{{ server_address }}:5000/interact/get_results/{{ user }}/{{ project }}/epitopeReport">
+					click to view the inSPIRE epitope report
 				</a>
-				or<br>
-				<a href="http://{{ server_address }}:5000/interact/get_results/{{ user }}/{{ project }}/epitopeReport">Click to view the inSPIRE epitope report</a>
 				<br>
 				<br>
 				{{ ep_bar|safe }}
 			</div>
 
-			<div class="res-column">
+			<div class="res-column" style="width: 500px;">
 				<h2>inSPIRE Execution Logs</h2>
-				<p>You can see the details of inSPIRE execution</p>
+				<p>Here you can see the details of inSPIRE execution</p>
 				<a href="http://{{ server_address }}:5000/interact/get_results/{{ user }}/{{ project }}/inspireLog"> Click to download the log of inSPIRE execution</a>
-				or<br>
-				<a href="http://{{ server_address }}:5000/interact-page/parameters/{{ user }}/{{ project }}">Click to re-execute the pipeline with alternative parameters.</a>
+				or
+				<a href="http://{{ server_address }}:5000/interact-page/parameters/{{ user }}/{{ project }}">click to re-execute the pipeline with alternative parameters.</a>
 				<br>
 				<br>
 				{{ progress_html|safe }}
