@@ -2,7 +2,7 @@ from setuptools import setup, find_packages
 
 setup(
     name='inspire-interact',
-    version='1.0rc01',
+    version='1.0rc2',
     description='Interactive GUI for inSPIRE Platform.',
     author='John Cormican, Sahil Khan, Juliane Liepe, Manuel S. Pereira',
     author_email='juliane.liepe@mpinat.mpg.de',
@@ -20,7 +20,7 @@ setup(
     packages=find_packages(),
     python_requires='>=3.11',
     install_requires=[
-        # 'inspirems==2.0rc01',
+        'inspirems==2.0rc3',
         'blinker==1.6.2',
         'click==8.1.3',
         'flask==2.3.2',
