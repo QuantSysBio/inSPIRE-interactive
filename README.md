@@ -15,7 +15,7 @@ We recommend working with inSPIRE through conda.
 
 For basic inSPIRE-Interactive use.
 
-1) To start with create a new conda environment with python version 3.9:
+1) To start with create a new conda environment with python version 3.11:
 
 ```
 conda create --name inspire python=3.11
