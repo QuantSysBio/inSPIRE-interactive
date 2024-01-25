@@ -45,14 +45,19 @@ inspire-interact -h
 conda install -c bioconda percolator
 ```
 
-Once you have successfully installed inSPIRE-Interactive you should run it specifying your pipeline and the mode of execution. The core execution of inSPIRE will take the form:
+6) Once you have successfully installed inSPIRE-Interactive you should run it specifying your pipeline and the mode of execution. The core execution of inSPIRE will take the form:
 
 ```
-inspire-interact --config_file path-to-config-file --mode mode-of-execution
+inspire-interact --config_file path-to-config-file --mode local
 ```
 
 where the config file is a yaml file specifying configuration of your inSPIRE-Interactive server and the mode is either "server" if you are setting up inSPIRE-Interactive for use throughout your lab, or "local" if you are only using inSPIRE-Interactive on your own machine.
 
+7) On local mode you can then access the webserver home by pasting the following address on your browser:
+
+```
+http://127.0.0.1:5000/interact-page/home
+```
 
 ## Additional Features
 
