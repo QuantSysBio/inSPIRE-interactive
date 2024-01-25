@@ -84,7 +84,7 @@ def prepare_inspire(config_dict, project_home, app_config):
 
     meta_dict = read_meta(project_home, 'search')
     if not meta_dict:
-        raise ValueError('No Search Engine information was provided, check this screen.')
+        raise ValueError('No Search Engine information was provided.')
 
     output_config['searchEngine'] = meta_dict.get('searchEngine', 'msfragger')
     inspire_settings['fragger'] = bool(meta_dict.get('runFragger', 1))

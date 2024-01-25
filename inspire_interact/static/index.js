@@ -565,8 +565,7 @@ function makeDownloadVisible(message) {
     let fileDownloadTextElem = document.getElementById("file-download-text")
 
     if (message.startsWith('inSPIRE-Interact failed')) {
-        fileDownloadTextElem.innerHTML = message;
-        fileDownloadTextElem.style = 'color: red;'
+        fileDownloadTextElem.textContent = message;
     } else {   
         let a = document.getElementById('file-download');
         a.href = message;
@@ -666,10 +665,12 @@ async function parametersCheck(serverAddress, user, project)
         for (var row_idx = 1, row; row = table.rows[row_idx]; row_idx++) {
             file_name = row.cells[0].textContent;
             col = row.cells[2];
-            col.getElementsByClassName('infection-checkbox')[0].checked = true;
-            controlFlags.forEach(function (item, _) {
-                controlCheck(col, file_name, item)
-            });
+            if (typeof col !== "undefined") {
+                col.getElementsByClassName('infection-checkbox')[0].checked = true;
+                controlFlags.forEach(function (item, _) {
+                    controlCheck(col, file_name, item)
+                });
+            };
         }
     }
     if ('technicalReplicates' in metaDict) {
@@ -863,6 +864,9 @@ function constructConfigObject(user, project) {
 }
 
 async function executePipeline(serverAddress, user, project) {
+
+    let paramSaveElem = document.getElementById("params-save-text");
+    paramSaveElem.style.display = "none";
     document.getElementById('execute-button').disabled = "disabled";
     
     let loadingElem = document.getElementById("loading-text");
@@ -881,6 +885,9 @@ async function executePipeline(serverAddress, user, project) {
 
 
 async function saveParameters(serverAddress, user, project) {
+    let paramSaveElem = document.getElementById("params-save-text");
+    paramSaveElem.style.display = "block";
+
     configObject = constructConfigObject(user, project);
     configObject['metadata_type'] = 'parameters';
     
