@@ -92,7 +92,7 @@ The following configurations should be set for inSPIRE-interactive:
 ```
 ---
 fraggerPath:  C:/User/username/Downloads/MSFragger-3.7/MSFragger-3.7.jar
-fraggerMemory: 240
+fraggerMemory: 60
 maxInspireCpus: 20
 skylineRunner: C:/Program Files/Skyline/SkylineRunner.exe
 rescoreCommand: C:/Program Files/percolator-v3-05/bin/percolator.exe
