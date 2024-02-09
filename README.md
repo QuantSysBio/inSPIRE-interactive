@@ -86,12 +86,13 @@ The following configurations should be set for inSPIRE-interactive:
 | netMHCpan      | The command that can be used to run NetMHCpan (e.g. on Linux we use [tcsh](https://www.cyberciti.biz/faq/howto-install-csh-shell-on-linux/) to execute NetMHCpan and so our config key is ```tcsh /data/inSPIRE-Server/netMHCpan-4.1/netMHCpan```). |
 
 
-## Example of Windows Config
+## Example of minimal Windows Config
 
 
 ```
 ---
-fraggerPath:  C:/User/username/Downloads/MSFragger-3.7/MSFragger-3.7.jar
+fraggerPath: C:/Users/username/Downloads/MSFragger-3.7/MSFragger-3.7.jar
+netMHCpan: C:/Users/username/Downloads/netMHCpan-4.1
 fraggerMemory: 60
 maxInspireCpus: 20
 skylineRunner: C:/Program Files/Skyline/SkylineRunner.exe
