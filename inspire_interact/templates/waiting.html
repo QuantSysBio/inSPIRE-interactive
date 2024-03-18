@@ -3,9 +3,8 @@
 <head>
 	<link rel='stylesheet' type="text/css" href="{{ url_for('static',filename='styles/style.css') }}">
 	<script src="{{url_for('static', filename='index.js')}}"></script>
-	<meta http-equiv="refresh" content="30">
-
 	<title>inSPIRE-Interactive</title>
+	<meta http-equiv="refresh" content="30; url=http://{{ server_address }}:5000/interact/{{ user }}/{{ project }}/inspire">
 </head>
 <body>
 	<dev class = "page-wrapper">
