@@ -63,7 +63,7 @@ http://127.0.0.1:5000/interact-page/home
 
 In order to use raw files on Linux or Mac O.S. you will require the use of mono ([mono project](https://www.mono-project.com/download/stable/)) which is required by the ThermoRawFileParser. (The ThermoRawFileParser itself is open source and downloaded by inSPIRE.)
 
-In order to use NetMHCpan for binding affinity prediction you should download the software from the [DTU site](https://services.healthtech.dtu.dk/services/NetMHCpan-4.1/) (you must agree to the license agreement). On linux and maxos systems we typically use tcsh.
+In order to use NetMHCpan for binding affinity prediction you should download the software from the [DTU site](https://services.healthtech.dtu.dk/services/NetMHCpan-4.1/) (you must agree to the license agreement). On linux and maxos systems we typically use tcsh. If you are a windows user you should download the Linux distribution and will need to install docker (see [docker documentation](https://docs.docker.com/desktop/).
 
 In order to use MSFragger within inSPIRE-Interactive you should download from [MSFragger](https://github.com/Nesvilab/MSFragger/wiki/Preparing-MSFragger#Downloading-MSFragger) (you must agree to the license agreements). You will also need java which can be installed using:
 
@@ -91,9 +91,19 @@ The following configurations should be set for inSPIRE-interactive:
 
 ```
 ---
-fraggerPath:  C:/Users/username/Downloads/MSFragger-3.7/MSFragger-3.7.jar
-fraggerMemory: 240
+fraggerPath: C:/Users/username/Downloads/MSFragger-3.7/MSFragger-3.7.jar
+netMHCpan: C:/Users/username/Downloads/netMHCpan-4.1
+fraggerMemory: 60
 maxInspireCpus: 20
 skylineRunner: C:/Program Files/Skyline/SkylineRunner.exe
 rescoreCommand: C:/Program Files/percolator-v3-05/bin/percolator.exe
+```
+# Example of Linux/MacOS Config
+
+```
+---
+fraggerPath: /Users/username/Downloads/MSFragger-3.7/MSFragger-3.7.jar
+netMHCpan: /Users/username/Downloads/netMHCpan-4.1
+fraggerMemory: 60
+maxInspireCpus: 20
 ```
