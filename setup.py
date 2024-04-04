@@ -30,8 +30,8 @@ setup(
         'Werkzeug==3.0.1',
     ],
     project_urls={
-        'Homepage': 'https://github.com/QuantSysBio/inSPIRE',
-        'Tracker': 'https://github.com/QuantSysBio/inSPIRE/issues',
+        'Homepage': 'https://github.com/QuantSysBio/inSPIRE-interactive',
+        'Tracker': 'https://github.com/QuantSysBio/inSPIRE-interactive/issues',
     },
     zip_safe=False,
 )
