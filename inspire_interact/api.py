@@ -606,6 +606,10 @@ def main():
 
     app.config[MODE_KEY] = args.mode
 
+    print('\n\033[1m\033[92m\nAddresses to navigate to')
+    print(f'If you are running inSPIRE-Interactive on a remote server navigate to \033[96mhttp://{host_name}:5000/interact-page/home\033[92m')
+    print(f'If you are running inSPIRE-Interactive on your local machine navigate to \033[96mhttp://127.0.0.1:5000/interact-page/home\033[92m')
+    print('\n\033[0m\n')
     app.run(host='0.0.0.0', debug = False)
 
     print('Quitting, first clearing queue.')
