@@ -598,7 +598,7 @@ def main():
     app.config[FRAGGER_MEMORY_KEY] = config_dict.get(FRAGGER_MEMORY_KEY)
     app.config[CPUS_KEY] = config_dict.get(CPUS_KEY, 1)
     app.config[SKYLINE_RUNNER_KEY] = config_dict.get(SKYLINE_RUNNER_KEY)
-    app.config[RESCORE_COMMAND_KEY] = config_dict.get(RESCORE_COMMAND_KEY)
+    app.config[RESCORE_COMMAND_KEY] = config_dict.get(RESCORE_COMMAND_KEY, 'percolator')
     if app.config[SKYLINE_RUNNER_KEY] is not None:
          app.config[SKYLINE_RUNNER_KEY] = app.config[SKYLINE_RUNNER_KEY].replace(
             '\\', '/'
