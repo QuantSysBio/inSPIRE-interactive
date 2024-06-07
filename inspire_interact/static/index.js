@@ -545,14 +545,14 @@ function selectSearchEngine(value, serverAddress, user, project) {
  * 
  * @param {*} value chosen inspire type.
  */
-function selectInspireType(value, serverAddress, user, project) {
+async function selectInspireType(value, serverAddress, user, project) {
     var configObject = {
         'user': user,
         'project': project,
         'metadata_type': 'core',
         'variant': value,
     };
-    postJson(serverAddress, 'metadata', configObject);
+    await postJson(serverAddress, 'metadata', configObject);
     forwardGUI(serverAddress, user, project, 'usecase');
 };
 
