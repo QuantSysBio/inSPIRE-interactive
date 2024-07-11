@@ -30,7 +30,7 @@ conda activate inspire
 3) You will then need to install the inSPIRE-interactive package (this also installs inSPIRE):
 
 ```
-pip install inspire-interact
+pip install inspire-interact==0.6
 ```
 
 4) To check your installation, run the following command (it is normal for this call to hang for a few seconds on first execution)
